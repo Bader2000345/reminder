@@ -1268,6 +1268,7 @@ const GeneralReminder = (() => {
     const TITLE = 'أذكار عامة';
     const supported = 'Notification' in window;
     let timer = null;
+    let pushState = PUSH_SERVER ? 'pending' : 'nourl';
 
     const store = {
         get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -1308,7 +1309,8 @@ const GeneralReminder = (() => {
     }
 
     async function pushSync(on) {
-        if (!PUSH_SERVER || !('PushManager' in window) || !('serviceWorker' in navigator)) return;
+        if (!PUSH_SERVER) return;
+        if (!('PushManager' in window) || !('serviceWorker' in navigator)) { pushState = 'unsupported'; return updateUI(); }
         try {
             const reg = await navigator.serviceWorker.ready;
             let sub = await reg.pushManager.getSubscription();
@@ -1319,12 +1321,15 @@ const GeneralReminder = (() => {
                     const key = Uint8Array.from(raw, c => c.charCodeAt(0));
                     sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
                 }
-                await post('/subscribe', sub.toJSON());
+                const res = await post('/subscribe', sub.toJSON());
+                pushState = res.ok ? 'on' : 'error';
             } else if (sub) {
                 await post('/unsubscribe', { endpoint: sub.endpoint });
                 await sub.unsubscribe();
             }
-        } catch (e) { /* لا نكسر التطبيق إذا فشل الاشتراك */ }
+            if (!on) pushState = 'off';
+        } catch (e) { pushState = 'error'; }
+        updateUI();
     }
 
     function fireIfDue() {
@@ -1362,7 +1367,7 @@ const GeneralReminder = (() => {
         } else if (isActive()) {
             const nextTime = new Date((slotOf(Date.now()) + 1) * INTERVAL_MS)
                 .toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
-            status.textContent = `مفعّلة · الإشعار القادم ${nextTime} · ${PUSH_SERVER ? 'تصلك حتى والتطبيق مغلق' : 'تعمل طالما الموقع أو التطبيق مفتوح'}`;
+            status.textContent = `مفعّلة · الإشعار القادم ${nextTime} · ${{ on: 'تصلك حتى والتطبيق مغلق ✓', pending: 'جارٍ تفعيل الإشعار في الخلفية…', error: 'تعذر تفعيل الإشعار في الخلفية، تعمل والتطبيق مفتوح فقط', unsupported: 'متصفحك لا يدعم الإشعار في الخلفية', nourl: 'تعمل طالما الموقع أو التطبيق مفتوح' }[pushState] || ''}`;
         } else {
             status.textContent = 'فعّل المفتاح لتصلك أذكار عشوائية كل ١٥ دقيقة.';
         }

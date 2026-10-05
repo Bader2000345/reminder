@@ -1,6 +1,12 @@
 /* مُذكّر — Service Worker: إشعارات + تخزين مؤقت بسيط للعمل دون اتصال */
-importScripts('general-adhkar.js');
-const CACHE = 'mudhakkir-v2';
+// إن تعذّر تحميل general-adhkar.js لا يتعطل الـ Service Worker كله
+try { importScripts('general-adhkar.js'); } catch (e) {}
+const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIST.length) ? GENERAL_ADHKAR_LIST : [
+    'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
+    'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ',
+    'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
+];
+const CACHE = 'mudhakkir-v3';
 const CORE = ['./', './index.html'];
 
 self.addEventListener('install', event => {
@@ -54,10 +60,10 @@ self.addEventListener('push', event => {
         const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
         if (wins.some(w => w.visibilityState === 'visible')) return; // الصفحة مفتوحة وتتولى الإشعار بنفسها
         let i;
-        do { i = Math.floor(Math.random() * GENERAL_ADHKAR_LIST.length); } while (i === lastIdx && GENERAL_ADHKAR_LIST.length > 1);
+        do { i = Math.floor(Math.random() * ADHKAR.length); } while (i === lastIdx && ADHKAR.length > 1);
         lastIdx = i;
         await self.registration.showNotification('أذكار عامة', {
-            body: GENERAL_ADHKAR_LIST[i], tag: 'general-adhkar', renotify: true, lang: 'ar', dir: 'rtl'
+            body: ADHKAR[i], tag: 'general-adhkar', renotify: true, lang: 'ar', dir: 'rtl'
         });
     })());
 });
