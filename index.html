@@ -474,6 +474,80 @@
         .rd-sheet .rd-img { max-width: 100%; margin: 0 auto; }
         .reader[data-theme="dark"] .rd-sheet, .reader[data-theme="dark"] .rd-text { box-shadow: var(--edge), 0 24px 50px rgba(0, 0, 0, .5); }
         @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .category-card:hover, .quick-card:hover, .setting-card:hover, .adhkar-list article:hover { transform: none; } }
+
+        /* ===== لوحة التحكم الرئيسية الجديدة ===== */
+        #page-home { position: relative; isolation: isolate; }
+        #page-home::before, #page-home::after { content:""; position:absolute; pointer-events:none; z-index:-1; border-radius:50%; filter:blur(1px); opacity:.42; }
+        #page-home::before { width:420px; height:420px; top:80px; right:-180px; background:radial-gradient(circle, rgba(117,139,87,.16), transparent 68%); animation: driftGlow 14s ease-in-out infinite alternate; }
+        #page-home::after { width:300px; height:300px; top:560px; left:-150px; background:radial-gradient(circle, rgba(179,142,70,.10), transparent 68%); animation: driftGlow 18s ease-in-out infinite alternate-reverse; }
+        @keyframes driftGlow { from { transform:translate3d(0,0,0) scale(1); } to { transform:translate3d(18px,12px,0) scale(1.08); } }
+        .main-content { animation:patternDrift 32s ease-in-out infinite alternate; }
+        @keyframes patternDrift { from { background-position:0 0; } to { background-position:18px 12px; } }
+        .home-intro { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom:24px; }
+        .home-intro h1 { font-size:clamp(27px,3vw,38px); letter-spacing:-.8px; margin:2px 0 0; }
+        .home-intro h1 span { color:var(--olive); }
+        .home-date { display:flex; align-items:center; gap:9px; padding:9px 13px; border:1px solid var(--line); background:color-mix(in srgb, var(--paper) 78%, transparent); border-radius:12px; color:var(--muted); font-size:11px; white-space:nowrap; }
+        .home-date i { width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 5px color-mix(in srgb, var(--gold) 15%, transparent); }
+        .home-dashboard { display:grid; grid-template-columns:minmax(0,1.28fr) minmax(290px,.72fr); gap:18px; align-items:stretch; }
+        .home-card { position:relative; overflow:hidden; background:color-mix(in srgb, var(--paper) 94%, var(--cream)); border:1px solid var(--line); border-radius:22px; box-shadow:0 18px 45px rgba(44,53,39,.07); }
+        .home-card::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(135deg, rgba(255,255,255,.18), transparent 42%); opacity:.6; }
+        .dhikr-card { min-height:320px; padding:27px 30px 24px; background:linear-gradient(145deg, var(--olive-dark), var(--olive) 62%, #5d704d); color:#fbfaf4; border:0; box-shadow:0 22px 50px rgba(50,66,41,.2); }
+        .dhikr-card::before { content:""; position:absolute; width:290px; height:290px; left:-95px; bottom:-155px; border:1px solid rgba(255,255,255,.16); border-radius:50%; box-shadow:0 0 0 24px rgba(255,255,255,.025),0 0 0 49px rgba(255,255,255,.02); }
+        .dhikr-card .card-kicker { color:rgba(255,255,255,.68); }
+        .card-kicker { display:block; font-size:11px; letter-spacing:.2px; margin-bottom:8px; }
+        .dhikr-card h2 { position:relative; z-index:1; margin:0; font-family:var(--font-title); font-size:22px; font-weight:600; }
+        .dhikr-card .dhikr-copy { position:relative; z-index:1; max-width:620px; margin:25px 0 26px; padding-left:112px; font-family:var(--font-quran); font-size:clamp(20px,2.3vw,28px); line-height:1.9; text-wrap:balance; }
+        .dhikr-meta { display:flex; align-items:center; justify-content:space-between; gap:15px; position:relative; z-index:1; }
+        .dhikr-source { color:rgba(255,255,255,.62); font-size:11px; }
+        .dhikr-meta-actions { display:flex; align-items:center; gap:8px; }
+        .dhikr-next, .sound-toggle { background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.2); padding:9px 13px; border-radius:10px; font-size:11px; transition:.25s; }
+        .sound-toggle { padding-inline:10px; }
+        .sound-toggle[aria-pressed="false"] { color:rgba(255,255,255,.55); background:rgba(255,255,255,.06); }
+        .dhikr-next:hover { background:rgba(255,255,255,.2); transform:translateY(-2px); }
+        .tasbih-orb { position:absolute; left:28px; top:22px; width:88px; height:88px; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 32% 27%, #f3df9e 0 6%, #c49d50 18%, #8a6830 59%, #55401f 100%); box-shadow:inset 8px 9px 10px rgba(255,255,255,.18), inset -9px -12px 15px rgba(33,37,20,.38), 0 12px 20px rgba(25,34,20,.3); transform:perspective(500px) rotateX(8deg); transition:transform .2s cubic-bezier(.2,.8,.2,1), filter .2s; z-index:2; }
+        .tasbih-orb::before { content:""; position:absolute; inset:7px; border-radius:50%; border:1px solid rgba(255,246,202,.38); }
+        .tasbih-orb:active { transform:perspective(500px) rotateX(8deg) scale(.92) translateY(3px); filter:brightness(1.12); }
+        .tasbih-orb span { font-size:25px; color:#fff8de; text-shadow:0 2px 4px rgba(64,39,11,.5); }
+        .tasbih-orb small { position:absolute; top:93px; color:rgba(255,255,255,.76); font-size:12px; font-weight:600; white-space:nowrap; }
+        .tasbih-ripple { animation:tasbihPop .38s ease-out; }
+        @keyframes tasbihPop { 50% { transform:perspective(500px) rotateX(8deg) scale(1.1); } }
+        .tasbih-float { position:absolute; left:63px; top:104px; color:#f5d98d; font-weight:700; opacity:0; pointer-events:none; z-index:4; }
+        .tasbih-float.show { animation:floatUp .8s ease-out; }
+        @keyframes floatUp { 15% { opacity:1; } 100% { opacity:0; transform:translateY(-28px); } }
+        .progress-card { padding:25px 25px 22px; display:flex; flex-direction:column; justify-content:space-between; }
+        .progress-card .section-heading { align-items:center; }
+        .progress-card .section-heading h2 { font-size:19px; }
+        .progress-card .section-heading strong { font-size:28px; color:var(--olive); }
+        .progress-card .progress-track { height:9px; margin:22px 0 19px; }
+        .progress-card .progress-track span { width:19%; background:linear-gradient(90deg,var(--olive),#899c68); }
+        .quran-progress-label { display:flex; justify-content:space-between; color:var(--muted); font-size:11px; }
+        .quran-progress-label strong { color:var(--ink); font-size:13px; }
+        .resume-reading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding-top:17px; border-top:1px dashed var(--line); }
+        .resume-reading p { margin:0; color:var(--muted); font-size:11px; line-height:1.7; }
+        .resume-reading p strong { display:block; color:var(--ink); font-size:13px; }
+        .resume-reading .primary-button { padding:10px 12px; font-size:11px; white-space:nowrap; }
+        .daily-stats-line { margin:17px 0 0; padding-top:14px; border-top:1px dashed var(--line); color:var(--muted); font-size:10px; }
+        .daily-stats-line strong { color:var(--olive); font-variant-numeric:tabular-nums; }
+        .smart-section { margin-top:22px; }
+        .smart-section .section-title { margin-bottom:13px; }
+        .smart-section .section-title h2 { font-size:19px; }
+        .time-context { color:var(--olive); font-size:11px; background:var(--gold-light); padding:6px 10px; border-radius:9px; }
+        .smart-card { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:20px 23px; }
+        .smart-card .smart-copy { display:flex; align-items:center; gap:15px; }
+        .smart-icon { width:48px; height:48px; flex:0 0 48px; display:grid; place-items:center; border-radius:15px; background:var(--gold-light); color:var(--gold); font-size:23px; }
+        .smart-card h3 { font-size:16px; margin:0 0 4px; }
+        .smart-card p { color:var(--muted); font-size:11px; margin:0; }
+        .smart-card .primary-button { padding:10px 16px; white-space:nowrap; }
+        .quick-card { padding:22px; margin-top:22px; }
+        .quick-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+        .quick-actions button { min-height:94px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; background:var(--cream); border:1px solid transparent; border-radius:15px; padding:13px 8px; color:var(--ink); font-size:11px; font-weight:600; transition:.25s; }
+        .quick-actions button:hover { border-color:color-mix(in srgb, var(--olive) 35%, transparent); background:var(--paper); transform:translateY(-3px); box-shadow:0 10px 20px rgba(44,53,39,.07); }
+        .quick-actions span { display:grid; place-items:center; width:35px; height:35px; margin:0; color:var(--olive); background:var(--paper); border-radius:11px; font-size:19px; }
+        .home-footer-note { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:11px; margin-top:28px; border-top:1px solid var(--line); padding-top:18px; }
+        @media (max-width: 850px) { .home-dashboard { grid-template-columns:1fr; } .dhikr-card { min-height:300px; } }
+        @media (max-width: 600px) { .home-intro { align-items:flex-start; flex-direction:column; gap:11px; } .home-date { width:100%; justify-content:center; } .dhikr-card { padding:22px 20px 24px; } .dhikr-card .dhikr-copy { padding-left:92px; padding-bottom:0; margin:48px 0 18px; font-size:22px; } .tasbih-orb { left:20px; top:19px; width:76px; height:76px; } .tasbih-orb small { top:81px; font-size:11px; } .tasbih-float { left:49px; top:91px; } .smart-card { align-items:flex-start; flex-direction:column; gap:15px; } .smart-card .primary-button { width:100%; } .quick-actions { grid-template-columns:repeat(2,1fr); } .home-footer-note { flex-direction:column; align-items:flex-start; gap:6px; } }
+        @media (prefers-reduced-motion: reduce) { #page-home::before,#page-home::after,.tasbih-ripple,.tasbih-float.show,.main-content { animation:none !important; } * { scroll-behavior:auto !important; } }
+
     </style>
 </head>
 <body>
@@ -498,65 +572,48 @@
         
         <!-- 1. الصفحة الرئيسية -->
         <section id="page-home" class="page-view active-page">
-            <header class="topbar">
-                <div><p class="eyebrow">مرحباً بك في تطبيق مُذكّر</p><h1>صباح الخير، <span>مبارك</span></h1></div>
+            <header class="home-intro">
+                <div><p class="eyebrow">لوحتك اليومية في مُذكّر</p><h1>صباح الخير، <span>مبارك</span></h1></div>
+                <div class="home-date"><i></i><span id="home-date-label">اليوم · —</span></div>
             </header>
 
-            <section id="pwa-install-banner" class="content-section" style="margin-bottom:20px;">
-                <div class="quran-row" style="background: var(--olive); color:#fff; border-radius:16px; padding:20px 24px; display:flex; align-items:center; gap:15px;">
-                    <div style="flex:1;">
-                        <strong style="color:#fff; font-size:1.1rem; display:block;">تثبيت تطبيق مُذكّر (PWA)</strong>
-                        <p style="color:#e2ded4; margin-top:4px; font-size:11px;">احصل على تجربة سريعة بدون إنترنت وعلى شاشة هاتفك الرئيسية.</p>
-                    </div>
-                    <button id="btn-install-pwa" class="primary-button" style="background:#ffffff; color:var(--olive); font-weight:bold;">⬇ تحميل التطبيق</button>
+            <section class="home-dashboard" aria-label="لوحة التحكم اليومية">
+                <article class="home-card dhikr-card">
+                    <span class="card-kicker">الذِكر التفاعلي التالي</span>
+                    <h2 id="dhikr-card-title">خذ لحظة للذكر</h2>
+                    <p class="dhikr-copy" id="dhikr-card-text">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</p>
+                    <div class="dhikr-meta"><span class="dhikr-source" id="dhikr-card-source">ذكر مقترح لك الآن</span><div class="dhikr-meta-actions"><button class="sound-toggle" id="tasbih-sound-toggle" type="button" aria-pressed="true">الصوت: تشغيل</button><button class="dhikr-next" id="dhikr-next-btn" type="button">ذكر آخر ↻</button></div></div>
+                    <button class="tasbih-orb" id="tasbih-orb" type="button" aria-label="تسبيح سريع، اضغط للعد"><span id="tasbih-count">0</span><small>اضغط للتسبيح · +1</small></button>
+                    <span class="tasbih-float" id="tasbih-float">+١</span>
+                </article>
+                <article class="home-card progress-card">
+                    <div class="section-heading"><div><span class="soft-label">وردك القرآني</span><h2>متابعة القراءة</h2></div><strong id="dashboard-progress-percent">19٪</strong></div>
+                    <div class="progress-track"><span id="dashboard-progress-bar"></span></div>
+                    <div class="quran-progress-label"><span>الصفحة الحالية</span><strong id="dashboard-quran-page">٢٨ من ٦٠٤</strong></div>
+                    <div class="resume-reading"><p><strong>سورة البقرة</strong>الجزء الثالث · آخر توقف</p><button class="primary-button nav-btn" data-target="quran" type="button">متابعة القراءة</button></div>
+                    <p class="daily-stats-line" id="daily-stats-line" aria-live="polite">إحصائية اليوم: <strong>٠</strong> تسبيحة · <strong>٠</strong> آية</p>
+                </article>
+            </section>
+
+            <section class="smart-section">
+                <div class="section-title"><div><span class="soft-label">اقتراح يتكيّف مع وقتك</span><h2>الأذكار الذكية حسب الوقت</h2></div><span class="time-context" id="smart-time-context">الآن</span></div>
+                <article class="home-card smart-card">
+                    <div class="smart-copy"><div class="smart-icon" id="smart-icon" aria-hidden="true">☼</div><div><h3 id="smart-title">أذكار الصباح</h3><p id="smart-description">ابدأ يومك بذكرٍ يشرح الصدر ويمنحك سكينة.</p></div></div>
+                    <button class="primary-button nav-btn" data-target="adhkar" type="button" id="smart-action">فتح أذكار الصباح <span>←</span></button>
+                </article>
+            </section>
+
+            <section class="home-card quick-card">
+                <div class="section-title"><div><span class="soft-label">أقسامك الأساسية</span><h2>الوصول السريع</h2></div></div>
+                <div class="quick-actions">
+                    <button class="nav-btn" data-target="free-reading" type="button"><span>▤</span>المصحف</button>
+                    <button class="nav-btn" data-target="adhkar" type="button"><span>◌</span>المسبحة الشاملة</button>
+                    <button class="nav-btn" data-target="my-adhkar" type="button"><span>♡</span>أذكاري الخاصة</button>
+                    <button class="nav-btn" data-target="settings" type="button"><span>↗</span>الإحصائيات</button>
                 </div>
             </section>
 
-            <section class="welcome-grid">
-                <article class="welcome-card">
-                    <div class="welcome-copy">
-                        <span class="soft-label">وردك اليومي</span>
-                        <h2>فَاذْكُرُونِي أَذْكُرْكُمْ<br><em>وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ</em></h2>
-                        <p>ابدأ يومك بذكرٍ يطمئن قلبك</p>
-                        <button class="primary-button nav-btn" data-target="adhkar">ابدأ الآن <span>←</span></button>
-                    </div>
-                </article>
-                <article class="progress-card">
-                    <div class="section-heading">
-                        <div><span class="soft-label">إنجازات اليوم</span><h2>أحسنت، استمر</h2></div>
-                        <strong id="dashboard-progress-percent">0٪</strong>
-                    </div>
-                    <div class="progress-track"><span id="dashboard-progress-bar"></span></div>
-                    <div class="stat-row">
-                        <div><strong id="dash-stat-tasbeeh">12</strong><small>سبحات</small></div>
-                        <div><strong id="dash-stat-pages">0</strong><small>آيات منجزة</small></div>
-                        <div><strong id="dash-stat-adhkar">3</strong><small>أذكار</small></div>
-                    </div>
-                </article>
-            </section>
-
-            <section class="section-block">
-                <div class="section-title"><div><span class="soft-label">محطاتك اليومية</span><h2>التذكيرات القادمة</h2></div><button class="nav-btn" data-target="my-adhkar" style="background:none; color:var(--gold);">عرض الكل ←</button></div>
-                <div class="reminder-list" id="home-upcoming"></div>
-            </section>
-
-            <section class="bottom-grid">
-                <article class="quick-card">
-                    <div class="section-title"><div><span class="soft-label">وصول سريع</span><h2>اختيارات سريعة</h2></div></div>
-                    <div class="quick-actions">
-                        <button class="nav-btn" data-target="adhkar"><span>◌</span>الأذكار</button>
-                        <button class="nav-btn" data-target="quran"><span>▤</span>الورد</button>
-                        <button class="nav-btn" data-target="free-reading"><span>⌕</span>المصحف</button>
-                        <button class="nav-btn" data-target="settings"><span>⚙</span>الإعدادات</button>
-                    </div>
-                </article>
-                <article class="quote-card">
-                    <p>أَلا بِذِكْرِ اللَّهِ <em>تَطْمَئِنُّ الْقُلُوبُ</em></p>
-                    <small>سورة الرعد · ٢٨</small>
-                </article>
-            </section>
-
-            <footer><span>مُذكّر</span><span>تذكيرك بالخير.. يغير يومك</span></footer>
+            <div class="home-footer-note"><span>مُذكّر · تذكيرك بالخير يغيّر يومك</span><span>وقليل دائم خير من كثير منقطع</span></div>
         </section>
 
         <!-- 2. صفحة الأذكار الشاملة -->
@@ -1144,6 +1201,7 @@ function renderSingleVerse() {
 document.getElementById('next-verse-btn')?.addEventListener('click', () => {
     if (wirdState.currentStepIndex < wirdState.totalVersesCount) {
         wirdState.currentStepIndex++;
+        DailyStats?.add('wirdVerses', 1);
         renderSingleVerse();
     } else {
         const finishedMsg = document.getElementById('wird-finished-msg');
@@ -1568,6 +1626,74 @@ const Reminders = (() => {
             showGuide();
         }
     });
+})();
+
+
+// ===== إحصائيات الاستخدام اليومية =====
+const DailyStats = (() => {
+    const KEY = 'mudhakkir-daily-stats';
+    const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+    const read = () => {
+        try {
+            const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+            return saved.date === todayKey() ? saved : { date: todayKey(), tasbeeh: 0, wirdVerses: 0 };
+        } catch (e) { return { date: todayKey(), tasbeeh: 0, wirdVerses: 0 }; }
+    };
+    const write = stats => { try { localStorage.setItem(KEY, JSON.stringify(stats)); } catch (e) {} };
+    const get = () => read();
+    const add = (field, amount = 1) => { const stats = read(); stats[field] = Number(stats[field] || 0) + amount; write(stats); render(); return stats; };
+    const render = () => {
+        const line = document.getElementById('daily-stats-line'); if (!line) return;
+        const stats = read(); const format = n => Number(n).toLocaleString('ar-EG');
+        line.innerHTML = `إحصائية اليوم: <strong>${format(stats.tasbeeh)}</strong> تسبيحة · <strong>${format(stats.wirdVerses)}</strong> آية`;
+    };
+    return { get, add, render };
+})();
+
+// ===== تفاعلات لوحة التحكم الرئيسية =====
+(() => {
+    const countEl = document.getElementById('tasbih-count');
+    const orb = document.getElementById('tasbih-orb');
+    const floatEl = document.getElementById('tasbih-float');
+    const dhikrText = document.getElementById('dhikr-card-text');
+    const dhikrSource = document.getElementById('dhikr-card-source');
+    const nextBtn = document.getElementById('dhikr-next-btn');
+    const soundToggle = document.getElementById('tasbih-sound-toggle');
+    if (!countEl || !orb) return;
+    const COUNT_KEY = 'mudhakkir-home-tasbih-count';
+    const INDEX_KEY = 'mudhakkir-home-dhikr-index';
+    let count = Number(localStorage.getItem(COUNT_KEY) || 0);
+    let index = Number(localStorage.getItem(INDEX_KEY) || 0);
+    const SOUND_KEY = 'mudhakkir-tasbih-sound';
+    let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
+    let audioContext = null;
+    const format = n => Number(n).toLocaleString('ar-EG');
+    const updateSoundButton = () => { if (!soundToggle) return; soundToggle.textContent = `الصوت: ${soundOn ? 'تشغيل' : 'إيقاف'}`; soundToggle.setAttribute('aria-pressed', String(soundOn)); };
+    const playTap = () => {
+        if (!soundOn) return;
+        try {
+            audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain();
+            oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(560, audioContext.currentTime); oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + .08);
+            gain.gain.setValueAtTime(.0001, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(.045, audioContext.currentTime + .01); gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + .09);
+            oscillator.connect(gain).connect(audioContext.destination); oscillator.start(); oscillator.stop(audioContext.currentTime + .1);
+        } catch (e) {}
+    };
+    const renderCount = () => { countEl.textContent = format(count); const stat = document.getElementById('dash-stat-tasbeeh'); if (stat) stat.textContent = format(count); };
+    const showDhikr = () => { if (!Array.isArray(window.GENERAL_ADHKAR_LIST) && typeof GENERAL_ADHKAR_LIST === 'undefined') return; const list = typeof GENERAL_ADHKAR_LIST !== 'undefined' ? GENERAL_ADHKAR_LIST : []; if (!list.length) return; index = (index + 1) % list.length; dhikrText.textContent = list[index]; dhikrSource.textContent = `ذكر مقترح · ${format(index + 1)} من ${format(list.length)}`; localStorage.setItem(INDEX_KEY, index); };
+    renderCount(); showDhikr(); updateSoundButton(); DailyStats.render();
+    orb.addEventListener('click', () => { count += 1; localStorage.setItem(COUNT_KEY, count); DailyStats.add('tasbeeh', 1); playTap(); renderCount(); orb.classList.remove('tasbih-ripple'); void orb.offsetWidth; orb.classList.add('tasbih-ripple'); floatEl.classList.remove('show'); void floatEl.offsetWidth; floatEl.classList.add('show'); });
+    soundToggle?.addEventListener('click', () => { soundOn = !soundOn; localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off'); updateSoundButton(); });
+    nextBtn?.addEventListener('click', showDhikr);
+    const date = document.getElementById('home-date-label'); if (date) date.textContent = new Date().toLocaleDateString('ar-EG', { weekday:'long', day:'numeric', month:'long' });
+    const hour = new Date().getHours();
+    const evening = hour >= 15 || hour < 4;
+    document.getElementById('smart-title').textContent = evening ? 'أذكار المساء' : 'أذكار الصباح';
+    document.getElementById('smart-description').textContent = evening ? 'اختم يومك بذكرٍ هادئ يملأ القلب طمأنينة.' : 'ابدأ يومك بذكرٍ يشرح الصدر ويمنحك سكينة.';
+    document.getElementById('smart-action').innerHTML = `فتح ${evening ? 'أذكار المساء' : 'أذكار الصباح'} <span>←</span>`;
+    document.getElementById('smart-time-context').textContent = evening ? 'فترة المساء' : 'فترة الصباح';
+    document.getElementById('smart-icon').textContent = evening ? '☾' : '☼';
+    const progress = document.getElementById('dashboard-progress-bar'); if (progress) progress.style.width = '19%';
 })();
 
 // التشغيل المبدئي
