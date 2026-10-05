@@ -67,7 +67,7 @@
 
         .app-shell { display: flex; flex-direction: row-reverse; min-height: 100vh; max-width: 1440px; margin: auto; }
         .sidebar { width: 104px; background: var(--paper); border-left: 1px solid var(--line); display: flex; align-items: center; flex-direction: column; padding: 30px 14px 24px; position: fixed; right: 0; top: 0; height: 100vh; z-index: 5; }
-        .brand-mark { width: 46px; height: 46px; border: 1px solid var(--line); border-radius: 14px; background: var(--cream); color: var(--olive); font: 700 24px var(--font-title); display: grid; place-items: center; margin-bottom: 40px; cursor: pointer; }
+        .brand-mark { width: 46px; height: 46px; border: 1px solid var(--line); border-radius: 14px; background: var(--cream); color: var(--olive); font: 600 24px var(--font-title); display: grid; place-items: center; margin-bottom: 40px; cursor: pointer; }
         .side-nav { display: flex; flex-direction: column; gap: 12px; width: 100%; }
         .side-link { height: 56px; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 12px; transition: .2s; background: none; width: 100%; cursor: pointer; }
         .side-link span { font-size: 20px; line-height: 1; }
@@ -81,7 +81,7 @@
 
         .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .eyebrow, .soft-label { color: var(--muted); font-size: 11px; margin: 0 0 5px; }
-        .topbar h1, .page-header h1 { font-size: 28px; font-weight: 700; margin: 0; color: var(--ink); font-family: var(--font-title); }
+        .topbar h1, .page-header h1 { font-size: 28px; font-weight: 600; margin: 0; color: var(--ink); font-family: var(--font-title); }
         .topbar h1 span { color: var(--gold); }
 
         .welcome-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
@@ -149,7 +149,7 @@
         .adhkar-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .adhkar-list article { display: flex; align-items: center; gap: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; transition: 0.2s; }
         .adhkar-list article:hover { border-color: var(--gold); }
-        .adhkar-list article > span { color: var(--gold); font-size: 12px; font-weight: 700; background: var(--gold-light); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; }
+        .adhkar-list article > span { color: var(--gold); font-size: 12px; font-weight: 600; background: var(--gold-light); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; }
         .adhkar-list p { font-size: 13px; margin: 0; line-height: 1.6; flex: 1; font-family: var(--font-quran); }
         .copy-button { background: var(--cream); color: var(--muted); border-radius: 6px; padding: 6px 10px; font-size: 14px; border: none; cursor: pointer; transition: .2s; }
         .copy-button.copied { background: var(--olive); color: #fff; }
@@ -179,7 +179,7 @@
         }
         .view-mode-toggle { display: flex; background: var(--cream); border-radius: 8px; padding: 2px; border: 1px solid var(--line); }
         .view-mode-btn { padding: 6px 12px; border-radius: 6px; font-size: 11px; background: none; color: var(--muted); cursor: pointer; }
-        .view-mode-btn.active { background: var(--paper); color: var(--olive); font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .view-mode-btn.active { background: var(--paper); color: var(--olive); font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .quran-verses-container {
             background: var(--paper);
@@ -222,7 +222,7 @@
             background: var(--gold-light);
             color: var(--gold);
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             padding: 3px 10px;
             border-radius: 20px;
         }
@@ -278,7 +278,7 @@
             padding: 4px 18px;
             border-radius: 20px;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 600;
         }
         .single-verse-content {
             font-family: var(--font-quran);
@@ -300,7 +300,7 @@
             padding: 16px;
             border-radius: 12px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 14px;
             margin-top: 15px;
             display: none;
@@ -311,11 +311,11 @@
         .wird-info-tag { font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
         .wird-summary { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 15px 0; }
         .wird-stat { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 12px 16px; font-size: 11px; flex: 1; min-width: 110px; }
-        .wird-stat strong { display: block; font-size: 18px; color: #fff; font-weight: 700; }
+        .wird-stat strong { display: block; font-size: 18px; color: #fff; font-weight: 600; }
         
         .khatma-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 24px; margin-top: 24px; }
         .khatma-head { display: flex; align-items: flex-start; justify-content: space-between; }
-        .khatma-percent { color: var(--gold); font-size: 24px; font-weight: 700; }
+        .khatma-percent { color: var(--gold); font-size: 24px; font-weight: 600; }
         .khatma-track { height: 10px; background: var(--line); border-radius: 10px; overflow: hidden; margin: 16px 0 14px; }
         .khatma-track span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--olive), var(--gold)); border-radius: inherit; transition: width .4s ease; }
 
@@ -380,11 +380,11 @@
         :root { --font-main: "Tajawal", "Cairo", sans-serif; --font-title: "Amiri", "Noto Naskh Arabic", serif; --font-brand: "Aref Ruqaa", "Amiri", serif; --cream: #f6f3ea; --paper: #fffefb; --line: #e8e3d4; --gold: #8a7440; --olive: #4a5d3a; --olive-dark: #38472c; --shadow: 0 4px 18px rgba(80, 70, 40, 0.06); }
         body.dark-mode { --gold: #d6af5a; --olive: #607c52; }
         body { font-size: 15px; }
-        .topbar h1, .page-header h1 { font-family: var(--font-title); color: var(--gold); font-size: 34px; font-weight: 700; }
-        .section-title h2, .section-heading h2, .welcome-copy h2 { font-family: var(--font-title); font-weight: 700; }
+        .topbar h1, .page-header h1 { font-family: var(--font-title); color: var(--gold); font-size: 34px; font-weight: 600; }
+        .section-title h2, .section-heading h2, .welcome-copy h2 { font-family: var(--font-title); font-weight: 600; }
         .sidebar { width: 200px; align-items: stretch; padding: 26px 16px 20px; }
         .main-content { width: calc(100% - 200px); margin-right: 200px; }
-        .brand-mark { width: auto; height: auto; border: 0; background: none; font: 700 40px var(--font-brand); color: var(--olive); margin: 0 0 32px; text-align: right; padding: 0 6px; }
+        .brand-mark { width: auto; height: auto; border: 0; background: none; font: 600 40px var(--font-brand); color: var(--olive); margin: 0 0 32px; text-align: right; padding: 0 6px; }
         .side-link { flex-direction: row; justify-content: space-between; height: 46px; padding: 0 16px; }
         .side-link small { font-size: 13px; }
         .side-link svg { width: 20px; height: 20px; flex: none; }
@@ -442,6 +442,38 @@
         .rd-basmala { text-align: center; margin-bottom: 8px; }
         .rd-msg { margin: auto; opacity: .7; }
         body.reader-open { overflow: hidden; }
+
+        /* ===== Refresh: زمردي وعاجي + عمق ثلاثي الأبعاد هادئ ===== */
+        :root { --font-quran: "Amiri Quran", "Amiri", serif; --ink: #26332d; --muted: #6b7269; --olive: #2e7660; --olive-dark: #1f5444; --cream: #f6f2e6; --paper: #fffdf8; --line: #e6dec9; --gold: #a8843a; --gold-light: #f4ecd5; --primary-green: #1f4b3d; --accent-soft: #ece6d4; --verse-bg: #fbf7ec;
+          --edge: inset 0 1px 0 rgba(255, 255, 255, .85); --shadow: 0 1px 2px rgba(40, 50, 35, .05), 0 10px 26px rgba(40, 50, 35, .06); --lift: 0 2px 4px rgba(40, 50, 35, .06), 0 16px 34px rgba(40, 50, 35, .08);
+          --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cg fill='none' stroke='%23a8843a' stroke-opacity='.11'%3E%3Crect x='20' y='20' width='24' height='24'/%3E%3Crect x='20' y='20' width='24' height='24' transform='rotate(45 32 32)'/%3E%3C/g%3E%3C/svg%3E"); }
+        body.dark-mode { --ink: #e7ece6; --muted: #9ba79f; --olive: #2e7660; --olive-dark: #5fb394; --cream: #0e1714; --paper: #15211c; --line: #263630; --gold: #d4ae60; --gold-light: #231f12; --primary-green: #17342b; --accent-soft: #1c2d26; --verse-bg: #182822;
+          --edge: inset 0 1px 0 rgba(255, 255, 255, .06); --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 26px rgba(0, 0, 0, .28); --lift: 0 2px 4px rgba(0, 0, 0, .3), 0 16px 34px rgba(0, 0, 0, .35);
+          --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cg fill='none' stroke='%23d4ae60' stroke-opacity='.08'%3E%3Crect x='20' y='20' width='24' height='24'/%3E%3Crect x='20' y='20' width='24' height='24' transform='rotate(45 32 32)'/%3E%3C/g%3E%3C/svg%3E"); }
+        body { font-size: 15px; }
+        .main-content { background-image: var(--pattern); background-size: 64px; }
+        .sidebar { box-shadow: var(--edge), 2px 0 18px rgba(40, 50, 35, .04); }
+        .side-link.active { box-shadow: var(--edge), 0 6px 14px rgba(31, 84, 68, .22); }
+        .category-card, .quick-card, .stat-row > *, .khatma-card, .setting-card, .progress-card, .quote-card, .reader-hero, .personal-reminder, .reminder-item, .adhkar-detail-item, .adhkar-list article, .modal-card {
+          background-color: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--edge), var(--shadow); transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+        .category-card:hover, .quick-card:hover, .setting-card:hover, .adhkar-list article:hover { transform: perspective(800px) translateY(-3px) rotateX(2deg); box-shadow: var(--edge), var(--lift); border-color: var(--gold); }
+        .primary-button { border-radius: 10px; box-shadow: 0 3px 0 var(--olive-dark), 0 8px 16px rgba(31, 84, 68, .16); transition: transform .12s ease, box-shadow .12s ease; }
+        .primary-button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--olive-dark), 0 3px 8px rgba(31, 84, 68, .14); }
+        .welcome-card, .quran-hero { box-shadow: var(--edge), var(--lift); }
+        .welcome-card::after { content: ""; position: absolute; left: 44px; bottom: 0; width: 98px; height: 150px; border: 1px solid rgba(168, 132, 58, .3); border-bottom: 0; border-radius: 49px 49px 0 0; }
+        .single-verse-content, .verse-text, .adhkar-detail-text { font-family: var(--font-quran); line-height: 2.2; font-size: 21px; }
+        .adhkar-detail-item { padding: 20px 22px; margin-bottom: 14px; }
+        .adhkar-note { margin-top: 14px; padding: 12px 14px; border-top: 1px dashed var(--gold); background: var(--gold-light); border-radius: 10px; color: var(--muted); font-size: 13px; line-height: 1.9; }
+        /* وضع القراءة: ورقة المصحف بعمق هادئ */
+        .reader { --rd-bg: #ece5d2; --rd-sheet: #fffdf6; --rd-fg: #26332d; --rd-bar: #f6f1e2; --rd-line: #ddd3b8; background-image: var(--pattern); }
+        .reader[data-theme="dark"] { --rd-bg: #0b1210; --rd-sheet: #14201b; --rd-fg: #e7ece6; --rd-bar: #101b17; --rd-line: #26362f; }
+        .reader .segmented button.active { background: var(--olive); box-shadow: 0 2px 0 var(--olive-dark); }
+        .reader-stage { padding: 22px 12px; }
+        .rd-sheet, .rd-text { background: var(--rd-sheet); border: 1px solid var(--rd-line); border-radius: 10px; box-shadow: var(--edge), 0 2px 4px rgba(40, 50, 35, .06), 0 22px 48px rgba(40, 50, 35, .12); padding: 26px 22px; }
+        .rd-sheet { max-width: min(100%, 880px); width: 100%; margin: 0 auto; align-self: flex-start; padding: 14px; }
+        .rd-sheet .rd-img { max-width: 100%; margin: 0 auto; }
+        .reader[data-theme="dark"] .rd-sheet, .reader[data-theme="dark"] .rd-text { box-shadow: var(--edge), 0 24px 50px rgba(0, 0, 0, .5); }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .category-card:hover, .quick-card:hover, .setting-card:hover, .adhkar-list article:hover { transform: none; } }
     </style>
 </head>
 <body>
@@ -833,9 +865,9 @@ const ADHKAR_DATABASE = {
         title: "أذكار النوم",
         items: [
             { text: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ ﴿" + AYAT_KURSI + "﴾", count: 1 },
-            { text: SURAH_IKHLAS, count: 3 },
-            { text: SURAH_FALAQ, count: 3 },
-            { text: SURAH_NAS, count: 3 },
+            { text: SURAH_IKHLAS + " " + SURAH_FALAQ + " " + SURAH_NAS, count: 3, note: "عن أم المؤمنين عائشة رضي الله عنها: «أن النبي ﷺ كان إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما: ﴿قل هو الله أحد﴾ و﴿قل أعوذ برب الفلق﴾ و﴿قل أعوذ برب الناس﴾، ثم يمسح بهما ما استطاع من جسده، يبدأ بهما على رأسه ووجهه وما أقبل من جسده، يفعل ذلك ثلاث مرات». رواه البخاري." },
+            { text: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿قُلْ يَا أَيُّهَا الْكَافِرُونَ ۝ لَا أَعْبُدُ مَا تَعْبُدُونَ ۝ وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ ۝ وَلَا أَنَا عَابِدٌ مَّا عَبَدتُّمْ ۝ وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ ۝ لَكُمْ دِينُكُمْ وَلِيَ دِينِ﴾", count: 1, note: "عن فروة بن نوفل، عن أبيه: أن النبي ﷺ قال لنوفل: «اقرأ ﴿قل يا أيها الكافرون﴾ ثم نم على خاتمتها؛ فإنها براءة من الشرك». أخرجه أبو داود (5055)، وغيره، وحسّنه الألباني في صحيح الجامع (1/115) رقم (292)." },
+            { text: "﴿آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِّن رُّسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ ۝ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ۚ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ ۗ رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنتَ مَوْلَانَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ﴾", count: 1, note: "عن أبي مسعود البدري رضي الله عنه قال: قال رسول الله ﷺ: «الآيتان من آخر سورة البقرة من قرأهما في ليلة كفتاه». أخرجه البخاري (4008)، ومسلم (807). فائدة: خواتيم سورة البقرة: يمكن قراءتها في أي وقت من الليل، أو مع أذكار النوم حتى لا تُنسى، لكن الأفضل المبادرة إلى قراءتهما في أول الليل، ومعنى كفتاه: أي تكفيه الشر والسوء، وقيل كفتاه عن قيام الليل." },
             { text: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي وَبِكَ أَرْفَعُهُ، إِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ.", count: 1 },
             { text: "اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِي إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لَا مَلْجَأَ وَلَا مَنْجَا مِنْكَ إِلَّا إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ، وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ.", count: 1 },
             { text: "سُبْحَانَ اللَّهِ (٣٣)، الْحَمْدُ لِلَّهِ (٣٣)، اللَّهُ أَكْبَرُ (٣٤).", count: 1 },
@@ -1004,6 +1036,7 @@ document.querySelectorAll('[data-adhkar-group]').forEach(card => {
                 div.className = 'adhkar-detail-item';
                 div.innerHTML = `
                     <div class="adhkar-detail-text">${item.text}</div>
+                    ${item.note ? `<div class="adhkar-note">${item.note}</div>` : ''}
                     <div class="adhkar-repeat-row">
                         <span class="adhkar-repeat-count">عدد التكرار: ${item.count}</span>
                         <button class="adhkar-repeat-button">تكرار (${current})</button>
@@ -1170,8 +1203,9 @@ const Reader = (() => {
         stage.scrollTop = 0;
         if (st.mode === 'image') {
             const img = el('img', 'rd-img'); img.alt = 'صفحة ' + n; img.src = CDN(n);
+            const sheet = el('div', 'rd-sheet'); sheet.append(img);
             img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = RAW(n); } };
-            stage.replaceChildren(img);
+            stage.replaceChildren(sheet);
             if (n < TOTAL) new Image().src = CDN(n + 1);
             return;
         }
