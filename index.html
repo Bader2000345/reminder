@@ -548,6 +548,68 @@
         @media (max-width: 600px) { .home-intro { align-items:flex-start; flex-direction:column; gap:11px; } .home-date { width:100%; justify-content:center; } .dhikr-card { padding:22px 20px 24px; } .dhikr-card .dhikr-copy { padding-left:92px; padding-bottom:0; margin:48px 0 18px; font-size:22px; } .tasbih-orb { left:20px; top:19px; width:76px; height:76px; } .tasbih-orb small { top:81px; font-size:11px; } .tasbih-float { left:49px; top:91px; } .smart-card { align-items:flex-start; flex-direction:column; gap:15px; } .smart-card .primary-button { width:100%; } .quick-actions { grid-template-columns:repeat(2,1fr); } .home-footer-note { flex-direction:column; align-items:flex-start; gap:6px; } }
         @media (prefers-reduced-motion: reduce) { #page-home::before,#page-home::after,.tasbih-ripple,.tasbih-float.show,.main-content { animation:none !important; } * { scroll-behavior:auto !important; } }
 
+
+        /* ===== تحسينات الورد اليومي وتجربة الهاتف ===== */
+        .wird-streak-bar { display:flex; align-items:center; justify-content:space-between; gap:14px; margin:0 0 18px; padding:15px 18px; background:var(--paper); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); }
+        .wird-streak-copy { display:flex; align-items:center; gap:11px; }
+        .streak-flame { display:grid; place-items:center; width:38px; height:38px; border-radius:12px; background:var(--gold-light); color:var(--gold); font-size:20px; }
+        .wird-streak-copy strong { display:block; font-size:13px; color:var(--ink); }
+        .wird-streak-copy small { display:block; color:var(--muted); font-size:10px; margin-top:3px; }
+        .wird-badge { display:none; color:var(--gold); background:var(--gold-light); border:1px solid color-mix(in srgb,var(--gold) 35%,transparent); border-radius:9px; padding:7px 10px; font-size:10px; font-weight:700; white-space:nowrap; }
+        .wird-badge.visible { display:block; animation:fadeIn .35s ease; }
+        .wird-progress-wrap { margin:14px 0 4px; }
+        .wird-progress-meta { display:flex; justify-content:space-between; color:rgba(255,255,255,.78); font-size:11px; margin-bottom:7px; }
+        .wird-live-track { height:7px; background:rgba(255,255,255,.18); border-radius:99px; overflow:hidden; }
+        .wird-live-track span { display:block; height:100%; width:0; background:var(--gold); border-radius:inherit; transition:width .45s ease; }
+        .single-verse-display { transition:transform .3s ease, box-shadow .3s ease; }
+        .single-verse-display.reading-bump { animation:verseBump .42s ease; }
+        @keyframes verseBump { 50% { transform:translateY(-5px); box-shadow:0 18px 35px rgba(46,118,96,.16); } }
+        .wird-action-row { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:18px; }
+        .wird-complete-btn { min-width:210px; background:var(--gold) !important; color:#fff; font-weight:700; padding:13px 20px !important; }
+        .wird-complete-btn:disabled { opacity:.55; cursor:not-allowed; }
+        .focus-button { background:transparent; color:var(--olive); border:1px solid var(--line); border-radius:9px; padding:10px 14px; font-size:11px; font-weight:600; }
+        .wird-float-plus { position:fixed; inset-inline-start:50%; bottom:105px; z-index:50; color:var(--gold); font-size:20px; font-weight:800; opacity:0; pointer-events:none; transform:translateX(-50%); }
+        .wird-float-plus.show { animation:wirdFloat .85s ease-out; }
+        @keyframes wirdFloat { 15% { opacity:1; } 100% { opacity:0; transform:translate(-50%,-38px); } }
+        .wird-focus { display:none; position:fixed; inset:0; z-index:120; background:var(--cream); color:var(--ink); padding:24px; align-items:center; justify-content:center; }
+        .wird-focus.open { display:flex; }
+        .wird-focus-card { width:min(760px,100%); text-align:center; background:var(--paper); border:1px solid var(--line); border-radius:22px; padding:36px 26px 24px; box-shadow:var(--lift); position:relative; }
+        .wird-focus-card .single-verse-content { font-size:clamp(25px,4vw,40px); line-height:2.25; margin:24px 0; }
+        .wird-focus-close { position:absolute; top:12px; left:14px; width:40px; height:40px; border-radius:50%; background:var(--cream); color:var(--muted); font-size:22px; }
+        .wird-focus-card small { color:var(--muted); }
+        .reader { z-index:40; }
+        .reader-bar, .reader-foot { flex-shrink:0; position:relative; z-index:2; }
+        .reader-stage { min-height:0; overscroll-behavior:contain; }
+        .reader-foot { padding-left:max(12px, env(safe-area-inset-left)); padding-right:max(12px, env(safe-area-inset-right)); }
+        @media(max-width:700px) {
+          html, body { width:100%; max-width:100%; overflow-x:hidden; }
+          .app-shell, .main-content, .page-view { width:100%; max-width:100%; min-width:0; }
+          .main-content { margin-right:0 !important; padding-inline:15px; }
+          .home-dashboard, .home-card, .quran-hero, .khatma-card, .reader-hero { min-width:0; max-width:100%; }
+          .dhikr-card .dhikr-copy { max-width:100%; overflow-wrap:anywhere; }
+          .wird-streak-bar { align-items:flex-start; flex-direction:column; }
+          .wird-badge.visible { align-self:flex-start; }
+          .quran-hero { padding:22px 14px 20px; }
+          .single-verse-display { padding:34px 14px 24px; }
+          .single-verse-content { font-size:22px; line-height:2.15; }
+          .single-verse-nav { gap:8px; }
+          .single-verse-nav .primary-button { min-height:44px; padding-inline:13px !important; }
+          .wird-action-row { margin-top:13px; }
+          .wird-complete-btn { width:100%; }
+          .focus-button { width:100%; min-height:44px; }
+          .reader { inset:0 0 65px; }
+          .reader-bar { padding:8px 9px; gap:6px; }
+          .reader-bar select { max-width:116px; min-height:38px; }
+          .reader .segmented button { padding:7px 8px; min-height:36px; }
+          .reader-stage { padding:10px 7px; }
+          .rd-sheet, .rd-text { padding:18px 13px; border-radius:8px; box-shadow:none; }
+          .reader-foot { min-height:62px; padding-top:8px; padding-bottom:calc(8px + env(safe-area-inset-bottom)); gap:6px; font-size:11px; }
+          .reader-foot button { min-height:42px; padding:8px 9px; }
+          .reader-foot label { display:flex; align-items:center; gap:4px; }
+          .reader-foot input { width:52px !important; min-height:38px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .wird-float-plus.show, .single-verse-display.reading-bump { animation:none; } }
+
     </style>
 </head>
 <body>
@@ -663,12 +725,17 @@
                 <button class="primary-button nav-btn" data-target="free-reading">الانتقال إلى القراءة الحرة ←</button>
             </header>
 
+            <div class="wird-streak-bar" aria-live="polite">
+                <div class="wird-streak-copy"><span class="streak-flame" aria-hidden="true">✦</span><div><strong id="wird-streak-text">استمرارية الورد تبدأ اليوم</strong><small id="wird-streak-sub">أتمم وردك اليوم لتحافظ على سلسلتك</small></div></div>
+                <span class="wird-badge" id="wird-badge">وسام ٧ أيام متتالية</span>
+            </div>
             <section class="quran-hero">
                 <div class="daily-wird-container">
                     <span class="wird-info-tag">الورد اليومي المخصص</span>
                     <h2 style="margin: 6px 0; font-family: var(--font-title);" id="wird-title-display">سورة البقرة / الجزء الثالث</h2>
                     <p style="margin: 0 0 10px; font-size: 11px; opacity: 0.9;" id="wird-details-display">عرض آية بآية حسب وردك اليومي</p>
                     
+                    <div class="wird-progress-wrap" aria-label="تقدم الورد"><div class="wird-progress-meta"><span>تقدم وردك اليوم</span><strong id="wird-progress-label">٠ / ١٠ آيات</strong></div><div class="wird-live-track"><span id="wird-live-progress"></span></div></div>
                     <div class="wird-summary">
                         <div class="wird-stat"><strong id="wird-current-aya-num">1</strong><small>الآية الحالية</small></div>
                         <div class="wird-stat"><strong id="wird-total-target">10</strong><small>مجموع الآيات المطلوبة</small></div>
@@ -688,12 +755,12 @@
                     </div>
 
                     <div class="single-verse-nav">
-                        <button class="primary-button" id="prev-verse-btn" style="background:rgba(255,255,255,0.25);">السابقة</button>
-                        <button class="primary-button" id="next-verse-btn" style="background:var(--gold); font-weight:bold; padding:12px 28px;">التالية ➔</button>
+                        <button class="primary-button" id="prev-verse-btn" type="button" style="background:rgba(255,255,255,0.25);">السابقة</button>
+                        <button class="primary-button wird-complete-btn" id="next-verse-btn" type="button">أتممت هذه الآية <span aria-hidden="true">✓</span></button>
                     </div>
-
-                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
-                        <button class="primary-button" style="background:rgba(255,255,255,0.18);" data-open-modal="edit-wird-modal">✏ تعديل إعدادات الورد</button>
+                    <div class="wird-action-row">
+                        <button class="focus-button" id="wird-focus-btn" type="button">وضع التركيز · آية واحدة</button>
+                        <button class="primary-button" type="button" data-open-modal="edit-wird-modal" style="background:rgba(255,255,255,0.18);">✏ تعديل إعدادات الورد</button>
                     </div>
                 </div>
             </section>
@@ -779,8 +846,8 @@
         <button class="modal-close" data-close-modal>×</button>
         <h2>تحديد الورد اليومي</h2>
         <form id="wird-form">
-            <label>اسم السورة:
-                <input type="text" id="input-wird-sura" value="سورة البقرة" required>
+            <label>السورة:
+                <select id="input-wird-sura" required aria-label="اختيار السورة"></select>
             </label>
             <div class="form-row">
                 <label>من الآية:
@@ -793,6 +860,11 @@
             <button class="primary-button" type="submit" style="margin-top:10px;">حفظ وتطبيق الورد</button>
         </form>
     </div>
+</div>
+
+<div class="wird-float-plus" id="wird-float-plus" aria-hidden="true">+١ آية</div>
+<div class="wird-focus" id="wird-focus" role="dialog" aria-modal="true" aria-label="وضع التركيز على آية واحدة">
+    <div class="wird-focus-card"><button class="wird-focus-close" id="wird-focus-close" type="button" aria-label="إغلاق وضع التركيز">×</button><small id="focus-verse-badge">الآية الحالية</small><div class="single-verse-content" id="focus-verse-text"></div><button class="primary-button wird-complete-btn" id="focus-complete-btn" type="button">أتممت هذه الآية · التالية</button></div>
 </div>
 
 <!-- وضع القراءة (ملء الشاشة) -->
@@ -820,6 +892,7 @@
         <form id="reminder-form">
             <label>عنوان التذكير<input type="text" id="rem-title" maxlength="40" required placeholder="مثال: أذكار بعد الصلاة"></label>
             <label>نص الذكر<textarea id="rem-text" rows="3" maxlength="300" required placeholder="اكتب الذكر الذي تريد أن يصلك"></textarea></label>
+            <label>وقت الورد المفضل<select id="rem-preset"><option value="custom">وقت مخصص</option><option value="05:30">بعد صلاة الفجر · 05:30</option><option value="21:30">قبل النوم · 21:30</option></select></label>
             <label>الوقت (يوميًا)<input type="time" id="rem-time" value="06:30" required></label>
             <button class="primary-button" type="submit">حفظ التذكير</button>
         </form>
@@ -1153,73 +1226,25 @@ document.querySelectorAll('[data-close-modal]').forEach(b => {
     b.addEventListener('click', () => b.closest('.modal')?.classList.remove('open'));
 });
 
-// 4. الورد اليومي (Verse-by-Verse Logic)
-let wirdState = {
-    surahName: "سورة البقرة",
-    surahNum: 2,
-    startVerse: 253,
-    totalVersesCount: 10,
-    currentStepIndex: 1,
-    versesData: []
-};
-
-async function fetchWirdVerses() {
-    const verseTextElem = document.getElementById('single-verse-text');
-    verseTextElem.textContent = "جارٍ تحميل الآية الكريمة...";
-    
-    try {
-        const response = await fetch(`https://api.alquran.cloud/v1/surah/${wirdState.surahNum}/ar.alafasy`);
-        const data = await response.json();
-        if (data && data.data && data.data.ayahs) {
-            const allAyahs = data.data.ayahs;
-            wirdState.versesData = allAyahs.slice(wirdState.startVerse - 1, wirdState.startVerse - 1 + wirdState.totalVersesCount);
-            renderSingleVerse();
-        }
-    } catch(err) {
-        verseTextElem.textContent = "حدث خطأ في تحميل الورد. يرجى التأكد من الاتصال بالإنترنت.";
-    }
-}
-
-function renderSingleVerse() {
-    const currentVerse = wirdState.versesData[wirdState.currentStepIndex - 1];
-    const verseTextElem = document.getElementById('single-verse-text');
-    const verseBadge = document.getElementById('verse-badge-num');
-    const currentNumDisplay = document.getElementById('wird-current-aya-num');
-    const finishedMsg = document.getElementById('wird-finished-msg');
-    const nextBtn = document.getElementById('next-verse-btn');
-
-    if (currentVerse) {
-        verseTextElem.textContent = currentVerse.text;
-        verseBadge.textContent = `الآية ${currentVerse.numberInSurah}`;
-        currentNumDisplay.textContent = wirdState.currentStepIndex;
-        finishedMsg.style.display = 'none';
-        nextBtn.disabled = false;
-        nextBtn.style.opacity = '1';
-    }
-}
-
-document.getElementById('next-verse-btn')?.addEventListener('click', () => {
-    if (wirdState.currentStepIndex < wirdState.totalVersesCount) {
-        wirdState.currentStepIndex++;
-        DailyStats?.add('wirdVerses', 1);
-        renderSingleVerse();
-    } else {
-        const finishedMsg = document.getElementById('wird-finished-msg');
-        const nextBtn = document.getElementById('next-verse-btn');
-        if (finishedMsg) finishedMsg.style.display = 'block';
-        if (nextBtn) {
-            nextBtn.disabled = true;
-            nextBtn.style.opacity = '0.5';
-        }
-    }
-});
-
-document.getElementById('prev-verse-btn')?.addEventListener('click', () => {
-    if (wirdState.currentStepIndex > 1) {
-        wirdState.currentStepIndex--;
-        renderSingleVerse();
-    }
-});
+// 4. الورد اليومي: إعداد محفوظ + إنجاز آية + تقدم وسلسلة
+const WIRD_KEY = 'mudhakkir-wird-state';
+const WIRD_STREAK_KEY = 'mudhakkir-wird-streak';
+const SURAH_NAMES = ['الفاتحة','البقرة','آل عمران','النساء','المائدة','الأنعام','الأعراف','الأنفال','التوبة','يونس','هود','يوسف','الرعد','إبراهيم','الحجر','النحل','الإسراء','الكهف','مريم','طه','الأنبياء','الحج','المؤمنون','النور','الفرقان','الشعراء','النمل','القصص','العنكبوت','الروم','لقمان','السجدة','الأحزاب','سبأ','فاطر','يس','الصافات','ص','الزمر','غافر','فصلت','الشورى','الزخرف','الدخان','الجاثية','الأحقاف','محمد','الفتح','الحجرات','ق','الذاريات','الطور','النجم','القمر','الرحمن','الواقعة','الحديد','المجادلة','الحشر','الممتحنة','الصف','الجمعة','المنافقون','التغابن','الطلاق','التحريم','الملك','القلم','الحاقة','المعارج','نوح','الجن','المزمل','المدثر','القيامة','الإنسان','المرسلات','النبأ','النازعات','عبس','التكوير','الانفطار','المطففين','الانشقاق','البروج','الطارق','الأعلى','الغاشية','الفجر','البلد','الشمس','الليل','الضحى','الشرح','التين','العلق','القدر','البينة','الزلزلة','العاديات','القارعة','التكاثر','العصر','الهمزة','الفيل','قريش','الماعون','الكوثر','الكافرون','النصر','المسد','الإخلاص','الفلق','الناس'];
+let wirdState = { surahName:'سورة البقرة', surahNum:2, startVerse:253, totalVersesCount:10, currentStepIndex:1, completed:0, versesData:[] };
+try { Object.assign(wirdState, JSON.parse(localStorage.getItem(WIRD_KEY)) || {}); } catch(e) {}
+const saveWird = () => { try { localStorage.setItem(WIRD_KEY, JSON.stringify({...wirdState, versesData:[]})); } catch(e) {} };
+function formatAr(n) { return Number(n).toLocaleString('ar-EG'); }
+function streakData() { try { return JSON.parse(localStorage.getItem(WIRD_STREAK_KEY)) || {days:0,last:''}; } catch(e) { return {days:0,last:''}; } }
+function markWirdDay() { const d=new Date(), key=`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; const st=streakData(); if(st.last===key) return st; const prev=new Date(d); prev.setDate(d.getDate()-1); const pk=`${prev.getFullYear()}-${prev.getMonth()+1}-${prev.getDate()}`; st.days = st.last===pk ? Number(st.days||0)+1 : 1; st.last=key; try{localStorage.setItem(WIRD_STREAK_KEY,JSON.stringify(st));}catch(e){} return st; }
+function renderWirdProgress() { const done=Math.min(wirdState.completed, wirdState.totalVersesCount), pct=wirdState.totalVersesCount ? done/wirdState.totalVersesCount*100 : 0; const bar=document.getElementById('wird-live-progress'); if(bar) bar.style.width=pct+'%'; const label=document.getElementById('wird-progress-label'); if(label) label.textContent=`${formatAr(done)} / ${formatAr(wirdState.totalVersesCount)} آيات`; const badge=document.getElementById('wird-badge'); const st=streakData(); if(document.getElementById('wird-streak-text')) document.getElementById('wird-streak-text').textContent=st.days?`أنت مستمر منذ ${formatAr(st.days)} يوم${st.days===1?'':'اً'}`:'استمرارية الورد تبدأ اليوم'; if(document.getElementById('wird-streak-sub')) document.getElementById('wird-streak-sub').textContent=st.days>=30?'وسام الختمة الشهرية جاهز لك':st.days>=7?'أسبوع كامل من الثبات — أحسنت':'أتمم وردك اليوم لتحافظ على سلسلتك'; if(badge){badge.classList.toggle('visible',st.days>=7); badge.textContent=st.days>=30?'وسام ٣٠ يوماً':'وسام ٧ أيام متتالية';} }
+function fillSurahSelect(){ const sel=document.getElementById('input-wird-sura'); if(!sel||sel.options.length) return; SURAH_NAMES.forEach((name,i)=>sel.append(new Option(`${i+1}. سورة ${name}`,i+1))); sel.value=wirdState.surahNum; }
+async function fetchWirdVerses() { const el=document.getElementById('single-verse-text'); el.textContent='جارٍ تحميل الآية الكريمة...'; try { const res=await fetch(`https://api.alquran.cloud/v1/surah/${wirdState.surahNum}/ar.alafasy`), data=await res.json(); if(data?.data?.ayahs){ const all=data.data.ayahs; const max=Math.max(1,all.length-wirdState.startVerse+1); wirdState.startVerse=Math.min(Math.max(1,wirdState.startVerse),all.length); wirdState.totalVersesCount=Math.min(Math.max(1,wirdState.totalVersesCount),max); wirdState.versesData=all.slice(wirdState.startVerse-1,wirdState.startVerse-1+wirdState.totalVersesCount); wirdState.currentStepIndex=Math.min(Math.max(1,wirdState.currentStepIndex),wirdState.totalVersesCount); wirdState.completed=Math.min(Number(wirdState.completed||0),wirdState.totalVersesCount); renderSingleVerse(); } } catch(e) { el.textContent='حدث خطأ في تحميل الورد. يرجى التأكد من الاتصال بالإنترنت.'; } }
+function renderSingleVerse(){ const v=wirdState.versesData[wirdState.currentStepIndex-1], text=document.getElementById('single-verse-text'), badge=document.getElementById('verse-badge-num'), num=document.getElementById('wird-current-aya-num'), btn=document.getElementById('next-verse-btn'); if(v){text.textContent=v.text; badge.textContent=`الآية ${v.numberInSurah}`; num.textContent=formatAr(wirdState.currentStepIndex); btn.disabled=wirdState.completed>=wirdState.totalVersesCount; btn.innerHTML=wirdState.completed>=wirdState.totalVersesCount?'اكتمل الورد ✓':'أتممت هذه الآية <span aria-hidden="true">✓</span>'; const f=document.getElementById('focus-verse-text'); if(f)f.textContent=v.text; const fb=document.getElementById('focus-verse-badge'); if(fb)fb.textContent=badge.textContent; } renderWirdProgress(); }
+function completeVerse(){ if(wirdState.completed>=wirdState.totalVersesCount) return; wirdState.completed++; DailyStats?.add('wirdVerses',1); if(wirdState.currentStepIndex<wirdState.totalVersesCount) wirdState.currentStepIndex++; else { markWirdDay(); document.getElementById('wird-finished-msg').style.display='block'; } const card=document.querySelector('.single-verse-display'); card?.classList.remove('reading-bump'); void card?.offsetWidth; card?.classList.add('reading-bump'); const flo=document.getElementById('wird-float-plus'); flo?.classList.remove('show'); void flo?.offsetWidth; flo?.classList.add('show'); saveWird(); renderSingleVerse(); }
+document.getElementById('next-verse-btn')?.addEventListener('click',completeVerse); document.getElementById('focus-complete-btn')?.addEventListener('click',completeVerse); document.getElementById('prev-verse-btn')?.addEventListener('click',()=>{if(wirdState.currentStepIndex>1){wirdState.currentStepIndex--;saveWird();renderSingleVerse();}});
+document.getElementById('wird-focus-btn')?.addEventListener('click',()=>document.getElementById('wird-focus')?.classList.add('open')); document.getElementById('wird-focus-close')?.addEventListener('click',()=>document.getElementById('wird-focus')?.classList.remove('open')); document.getElementById('wird-focus')?.addEventListener('click',e=>{if(e.target.id==='wird-focus')e.currentTarget.classList.remove('open');});
+const wirdForm=document.getElementById('wird-form'); wirdForm?.addEventListener('submit',e=>{e.preventDefault(); const sel=document.getElementById('input-wird-sura'); wirdState.surahNum=Number(sel.value); wirdState.surahName='سورة '+SURAH_NAMES[wirdState.surahNum-1]; wirdState.startVerse=Math.max(1,Number(document.getElementById('input-wird-start-aya').value)||1); wirdState.totalVersesCount=Math.max(1,Number(document.getElementById('input-wird-aya-count').value)||10); wirdState.currentStepIndex=1; wirdState.completed=0; document.getElementById('wird-title-display').textContent=`${wirdState.surahName}`; document.getElementById('wird-total-target').textContent=formatAr(wirdState.totalVersesCount); document.getElementById('wird-details-display').textContent=`من الآية ${formatAr(wirdState.startVerse)} · وردك اليومي`; saveWird(); document.getElementById('edit-wird-modal').classList.remove('open'); fetchWirdVerses();});
+fillSurahSelect(); document.getElementById('input-wird-start-aya').value=wirdState.startVerse; document.getElementById('input-wird-aya-count').value=wirdState.totalVersesCount; document.getElementById('wird-title-display').textContent=wirdState.surahName; document.getElementById('wird-total-target').textContent=formatAr(wirdState.totalVersesCount); document.getElementById('wird-details-display').textContent=`من الآية ${formatAr(wirdState.startVerse)} · وردك اليومي`; fetchWirdVerses();
 
 // 5. وضع القراءة (ملء الشاشة)
 const Reader = (() => {
@@ -1301,7 +1326,7 @@ const Reader = (() => {
     async function enter() {
         root.hidden = false; document.body.classList.add('reader-open');
         applyTheme(); render();
-        try { if (document.documentElement.requestFullscreen) { await document.documentElement.requestFullscreen(); usedFs = true; } } catch (e) { usedFs = false; }
+        try { if (window.matchMedia('(min-width: 701px)').matches && document.documentElement.requestFullscreen) { await document.documentElement.requestFullscreen(); usedFs = true; } } catch (e) { usedFs = false; }
     }
     function close() {
         root.hidden = true; document.body.classList.remove('reader-open');
@@ -1560,13 +1585,16 @@ const Reminders = (() => {
         list.filter(r => r.on).sort((a, b) => a.time.localeCompare(b.time)).slice(0, 2).forEach(r => add(r.title, fmt(r.time) + ' · يوميًا', 'my-adhkar'));
     }
 
-    document.getElementById('reminder-form')?.addEventListener('submit', async e => {
+    document.getElementById('rem-preset')?.addEventListener('change', e => { if(e.target.value !== 'custom') document.getElementById('rem-time').value=e.target.value; });
+
+document.getElementById('reminder-form')?.addEventListener('submit', async e => {
         e.preventDefault();
         const title = document.getElementById('rem-title').value.trim();
         const text = document.getElementById('rem-text').value.trim();
         const time = document.getElementById('rem-time').value;
+        const preset = document.getElementById('rem-preset')?.value || 'custom';
         if (!title || !text || !time) return;
-        list.push({ id: Date.now(), title, text, time, on: true, last: '' });
+        list.push({ id: Date.now(), title, text, time, preset, on: true, last: '' });
         save(); e.target.reset(); document.getElementById('rem-time').value = '06:30';
         document.getElementById('reminder-modal').classList.remove('open');
         await GeneralReminder.ensurePermission();
