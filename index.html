@@ -2718,7 +2718,7 @@ const InAppReminder = (() => {
 
 // مزامنة الاشتراك مع سيرفر الإشعارات: يرسل وقت كل تذكير (دون نصه) ليصل الإشعار والتطبيق مغلق
 const PushSync = (() => {
-    const SENT_KEY = 'mudhakkir-push-sent';
+    const SENT_KEY = 'mudhakkir-push-sent-v2'; // مفتاح جديد: كل الأجهزة تعيد إرسال أوقاتها بعد التحديث
     let state = PUSH_SERVER ? 'pending' : 'nourl';
     let running = null, again = false;
     const listeners = new Set();
@@ -2748,6 +2748,9 @@ const PushSync = (() => {
                 if (sent && sent.sig === sig && Date.now() - sent.at < 864e5) return setState('on');
                 const res = await post('/subscribe', body);
                 if (!res.ok) return setState('error');
+                // السيرفر القديم يرد بـ "ok" فقط ويتجاهل التذكيرات؛ الجديد يرد بـ v: 2
+                const reply = await res.json().catch(() => null);
+                if (!reply || reply.v !== 2) return setState(reminders.length ? 'outdated' : 'on');
                 try { localStorage.setItem(SENT_KEY, JSON.stringify({ sig, at: Date.now() })); } catch (e) {}
                 setState('on');
             } else {
@@ -2842,7 +2845,7 @@ const GeneralReminder = (() => {
         } else if (isActive()) {
             const nextTime = new Date((slotOf(Date.now()) + 1) * INTERVAL_MS)
                 .toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' });
-            status.textContent = `مفعّلة · الإشعار القادم ${nextTime} · ${{ on: 'تصلك حتى والتطبيق مغلق ✓', pending: 'جارٍ تفعيل الإشعار في الخلفية…', error: 'تعذر تفعيل الإشعار في الخلفية، تعمل والتطبيق مفتوح فقط', unsupported: 'متصفحك لا يدعم الإشعار في الخلفية', nourl: 'تعمل طالما الموقع أو التطبيق مفتوح', off: '' }[PushSync.state()] || ''}`;
+            status.textContent = `مفعّلة · الإشعار القادم ${nextTime} · ${{ on: 'تصلك حتى والتطبيق مغلق ✓', outdated: 'تصلك حتى والتطبيق مغلق ✓', pending: 'جارٍ تفعيل الإشعار في الخلفية…', error: 'تعذر تفعيل الإشعار في الخلفية، تعمل والتطبيق مفتوح فقط', unsupported: 'متصفحك لا يدعم الإشعار في الخلفية', nourl: 'تعمل طالما الموقع أو التطبيق مفتوح', off: '' }[PushSync.state()] || ''}`;
         } else {
             status.textContent = 'فعّل المفتاح لتصلك أذكار عشوائية كل ١٥ دقيقة.';
         }
@@ -2935,7 +2938,7 @@ const Reminders = (() => {
         if (perm === 'unsupported') return `${when} · يظهر داخل التطبيق فقط (المتصفح لا يدعم الإشعارات)`;
         if (perm === 'denied') return `${when} · الإشعارات محظورة، فعّلها من إعدادات المتصفح`;
         if (perm !== 'granted') return `${when} · اضغط «جرّب إشعارًا الآن» للسماح بالإشعارات`;
-        const bg = { on: 'يصلك حتى والتطبيق مغلق ✓', pending: 'جارٍ تفعيل الإشعار في الخلفية…', error: 'تعذّر تفعيل الخلفية، يعمل والتطبيق مفتوح', unsupported: 'يعمل والتطبيق مفتوح', nourl: 'يعمل والتطبيق مفتوح', off: '' }[PushSync.state()] || '';
+        const bg = { on: 'يصلك حتى والتطبيق مغلق ✓', pending: 'جارٍ تفعيل الإشعار في الخلفية…', error: 'تعذّر تفعيل الخلفية، يعمل والتطبيق مفتوح', outdated: 'سيرفر الإشعارات قديم (حدّث worker.js)، يعمل والتطبيق مفتوح', unsupported: 'يعمل والتطبيق مفتوح', nourl: 'يعمل والتطبيق مفتوح', off: '' }[PushSync.state()] || '';
         return `مفعّل · ${when}${bg ? ' · ' + bg : ''}`;
     }
     const badgeText = r => ({ daily: 'يومي', days: 'أيام محددة', once: 'مرة واحدة' })[r.repeat] || 'يومي';
