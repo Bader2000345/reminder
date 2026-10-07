@@ -1318,7 +1318,7 @@ try { var __s = document.getElementById('splash'); if (sessionStorage.getItem('m
         <span class="iar-kicker">حان وقت التذكير</span>
         <strong class="iar-title"></strong>
         <p class="iar-text"></p>
-        <div class="iar-actions"><button class="primary-button iar-done" type="button">ذكرتُ الله ✓</button><button class="ghost-button iar-close" type="button">لاحقًا</button></div>
+        <div class="iar-actions"><button class="primary-button iar-done" type="button">ذكرت</button><button class="ghost-button iar-close" type="button">لاحقًا</button></div>
     </div>
 </div>
 
@@ -3048,9 +3048,16 @@ const Reminders = (() => {
     }
 
     // فحص دوري: الـ Service Worker يعرض التذكير (ويمنع التكرار)، وإن لم يتوفر نفحص هنا
-    function tick() {
+    async function tick() {
         if (!list.some(r => r.on)) return;
-        if (SW_OK && navigator.serviceWorker.controller) { navigator.serviceWorker.controller.postMessage({ type: 'mdk-check' }); return; }
+        // الـ Service Worker هو المرجع الوحيد لما عُرض (حتى لا يتكرر التذكير عند فتح التطبيق)
+        if (SW_OK) {
+            try {
+                const reg = await navigator.serviceWorker.getRegistration();
+                if (reg && reg.active) { reg.active.postMessage({ type: 'mdk-check' }); return; }
+                if (reg) return; // قيد التثبيت: ننتظر الفحص التالي بدل فحص منفصل قد يكرر الإشعار
+            } catch (e) {}
+        }
         const now = Date.now();
         let shown = {};
         try { shown = JSON.parse(localStorage.getItem(SHOWN_KEY)) || {}; } catch (e) {}
