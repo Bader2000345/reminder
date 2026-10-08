@@ -1,17 +1,20 @@
-/* Ù…ÙØ°ÙƒÙ‘Ø± â€” Service Worker: Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø£Ø°ÙƒØ§Ø± Ø§Ù„Ø¹Ø§Ù…Ø© + Ø§Ù„ØªØ°ÙƒÙŠØ±Ø§Øª Ø§Ù„Ø´Ø®ØµÙŠØ© + ØªØ®Ø²ÙŠÙ† Ù…Ø¤Ù‚Øª Ù„Ù„Ø¹Ù…Ù„ Ø¯ÙˆÙ† Ø§ØªØµØ§Ù„ */
-// Ø¥Ù† ØªØ¹Ø°Ù‘Ø± ØªØ­Ù…ÙŠÙ„ general-adhkar.js Ù„Ø§ ÙŠØªØ¹Ø·Ù„ Ø§Ù„Ù€ Service Worker ÙƒÙ„Ù‡
+/* مُذكّر — Service Worker: إشعارات الأذكار العامة + التذكيرات الشخصية + إشعار التحديثات + تخزين مؤقت للعمل دون اتصال */
+// إن تعذّر تحميل general-adhkar.js لا يتعطل الـ Service Worker كله
 try { importScripts('general-adhkar.js'); } catch (e) {}
 const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIST.length) ? GENERAL_ADHKAR_LIST : [
-    'Ø³ÙØ¨Ù’Ø­ÙŽØ§Ù†ÙŽ Ø§Ù„Ù„ÙŽÙ‘Ù‡Ù ÙˆÙŽØ¨ÙØ­ÙŽÙ…Ù’Ø¯ÙÙ‡ÙØŒ Ø³ÙØ¨Ù’Ø­ÙŽØ§Ù†ÙŽ Ø§Ù„Ù„ÙŽÙ‘Ù‡Ù Ø§Ù„Ù’Ø¹ÙŽØ¸ÙÙŠÙ…Ù',
-    'Ø£ÙŽØ³Ù’ØªÙŽØºÙ’ÙÙØ±Ù Ø§Ù„Ù„ÙŽÙ‘Ù‡ÙŽ Ø§Ù„Ù’Ø¹ÙŽØ¸ÙÙŠÙ…ÙŽ ÙˆÙŽØ£ÙŽØªÙÙˆØ¨Ù Ø¥ÙÙ„ÙŽÙŠÙ’Ù‡Ù',
-    'Ù„ÙŽØ§ Ø­ÙŽÙˆÙ’Ù„ÙŽ ÙˆÙŽÙ„ÙŽØ§ Ù‚ÙÙˆÙŽÙ‘Ø©ÙŽ Ø¥ÙÙ„ÙŽÙ‘Ø§ Ø¨ÙØ§Ù„Ù„ÙŽÙ‘Ù‡Ù'
+    'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
+    'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ',
+    'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
-const CACHE = 'mudhakkir-v10';
-const DATA = 'mudhakkir-data'; // Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ØªØ°ÙƒÙŠØ± Ø§Ù„ØªÙŠ ÙŠÙƒØªØ¨Ù‡Ø§ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ (Ù„Ø§ ØªÙØ­Ø°Ù Ø¹Ù†Ø¯ Ø§Ù„ØªØ­Ø¯ÙŠØ«)
-const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './manifest.json',
+const CACHE = 'mudhakkir-v13';
+const DATA = 'mudhakkir-data'; // إعدادات التذكير التي يكتبها التطبيق (لا تُحذف عند التحديث)
+// ملفات التطبيق التي تُخزَّن للعمل دون اتصال (أضف أي ملف جديد هنا)
+const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design'].map(n => `./assets/css/${n}.css`);
+const JS_FILES = ['preload-theme', 'splash', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'reader', 'notifications', 'reminders', 'updates', 'home', 'share', 'time-context', 'motion', 'main'].map(n => `./assets/js/${n}.js`);
+const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
     './assets/img/logo-light.png', './assets/img/logo-dark.png', './assets/img/icon-192.png', './assets/img/favicon-64.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
-const DUE_WINDOW = 30 * 60 * 1000; // ÙŠÙØ¹Ø±Ø¶ Ø§Ù„ØªØ°ÙƒÙŠØ± Ø¥Ù† ØªØ£Ø®Ø± ÙˆØµÙˆÙ„ Ø§Ù„Ø¥Ø´Ø¹Ø§Ø± Ø­ØªÙ‰ Ù£Ù  Ø¯Ù‚ÙŠÙ‚Ø©
+const DUE_WINDOW = 30 * 60 * 1000; // يُعرض التذكير إن تأخر وصول الإشعار حتى ٣٠ دقيقة
 const dataUrl = name => new URL('__mdk/' + name, self.registration.scope).href;
 
 self.addEventListener('install', event => {
@@ -30,7 +33,7 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Ø§Ù„Ø´Ø¨ÙƒØ© Ø£ÙˆÙ„Ù‹Ø§ØŒ Ø«Ù… Ø§Ù„Ù†Ø³Ø®Ø© Ø§Ù„Ù…Ø®Ø²Ù†Ø© Ø¹Ù†Ø¯ Ø§Ù†Ù‚Ø·Ø§Ø¹ Ø§Ù„Ø§ØªØµØ§Ù„ (Ø§Ù„ØµÙØ­Ø§Øª ÙˆÙ…Ù„ÙØ§Øª Ø§Ù„ØªØ·Ø¨ÙŠÙ‚)
+// الشبكة أولًا، ثم النسخة المخزنة عند انقطاع الاتصال (الصفحات وملفات التطبيق)
 self.addEventListener('fetch', event => {
     const req = event.request;
     if (req.method !== 'GET') return;
@@ -48,7 +51,7 @@ self.addEventListener('fetch', event => {
     );
 });
 
-// ---------- Ø¨ÙŠØ§Ù†Ø§Øª Ù…Ø´ØªØ±ÙƒØ© Ù…Ø¹ Ø§Ù„ØµÙØ­Ø© ----------
+// ---------- بيانات مشتركة مع الصفحة ----------
 async function getJSON(name, fallback) {
     try { const c = await caches.open(DATA); const r = await c.match(dataUrl(name)); return r ? await r.json() : fallback; } catch (e) { return fallback; }
 }
@@ -56,7 +59,7 @@ async function putJSON(name, value) {
     try { const c = await caches.open(DATA); await c.put(dataUrl(name), new Response(JSON.stringify(value), { headers: { 'Content-Type': 'application/json' } })); } catch (e) {}
 }
 
-// ---------- Ù…ÙˆØ§Ø¹ÙŠØ¯ Ø§Ù„ØªØ°ÙƒÙŠØ±Ø§Øª (Ù†ÙØ³ Ù…Ù†Ø·Ù‚ Sched ÙÙŠ index.html) ----------
+// ---------- مواعيد التذكيرات (نفس منطق Sched في index.html) ----------
 const pad = n => String(n).padStart(2, '0');
 const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 function occurrence(r, now) {
@@ -72,7 +75,7 @@ function occurrence(r, now) {
     return null;
 }
 
-// Ù†ÙØ³Ù„Ø³Ù„ Ø§Ù„ÙØ­ÙˆØµ Ø­ØªÙ‰ Ù„Ø§ ÙŠÙØ¹Ø±Ø¶ Ø§Ù„ØªØ°ÙƒÙŠØ± Ù…Ø±ØªÙŠÙ† (Ø¥Ø´Ø¹Ø§Ø± Ø§Ù„Ø³ÙŠØ±ÙØ± + ÙØ­Øµ Ø§Ù„ØµÙØ­Ø© Ù…Ø¹Ù‹Ø§)
+// نُسلسل الفحوص حتى لا يُعرض التذكير مرتين (إشعار السيرفر + فحص الصفحة معًا)
 let chain = Promise.resolve();
 const serial = fn => (chain = chain.then(fn, fn));
 
@@ -92,7 +95,7 @@ async function checkReminders(now = Date.now()) {
     if (!fired.length) return fired;
     for (const k of Object.keys(shown)) if (now - shown[k] > 3 * 864e5) delete shown[k];
     await putJSON('shown', shown);
-    await Promise.all(fired.map(r => self.registration.showNotification(r.title || 'ØªØ°ÙƒÙŠØ±', {
+    await Promise.all(fired.map(r => self.registration.showNotification(r.title || 'تذكير', {
         body: r.text, tag: 'rem-' + r.id, renotify: true, lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE,
         requireInteraction: true, data: { kind: 'reminder', id: r.id }
     })));
@@ -101,16 +104,21 @@ async function checkReminders(now = Date.now()) {
     return fired;
 }
 
-// Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ù…ÙØªÙˆØ­Ø© ØªØ·Ù„Ø¨ ÙØ­ØµÙ‹Ø§ Ø¯ÙˆØ±ÙŠÙ‹Ø§
+// الصفحة المفتوحة تطلب فحصًا دوريًا
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'mdk-check') event.waitUntil(serial(() => checkReminders()));
 });
 
-// Ø§Ù„Ø¶ØºØ· Ø¹Ù„Ù‰ Ø§Ù„Ø¥Ø´Ø¹Ø§Ø± ÙŠÙØªØ­ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ø£Ùˆ ÙŠØ¹ÙŠØ¯ Ø§Ù„ØªØ±ÙƒÙŠØ² Ø¹Ù„ÙŠÙ‡
+// الضغط على الإشعار يفتح التطبيق أو يعيد التركيز عليه (وإشعار التحديث يفتح الموقع ليُحمَّل الجديد)
 self.addEventListener('notificationclick', event => {
     event.notification.close();
+    const url = event.notification.data && event.notification.data.url;
     event.waitUntil(
         self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+            if (url) {
+                for (const client of list) if ('navigate' in client) return client.navigate(url).then(c => c && c.focus()).catch(() => self.clients.openWindow(url));
+                return self.clients.openWindow(url);
+            }
             for (const client of list) {
                 if ('focus' in client) return client.focus();
             }
@@ -119,25 +127,49 @@ self.addEventListener('notificationclick', event => {
     );
 });
 
-// Ù†Ø¨Ø¶Ø© Ù…Ù† Ø§Ù„Ø³ÙŠØ±ÙØ± (Web Push) â€” ØªØ¹Ù…Ù„ ÙˆØ§Ù„ØªØ·Ø¨ÙŠÙ‚ Ù…ØºÙ„Ù‚
-// Ø§Ù„Ø³ÙŠØ±ÙØ± ÙŠØ±Ø³Ù„ Ù†Ø¨Ø¶Ø© Ø¹Ù†Ø¯ ÙƒÙ„ Ø±Ø¨Ø¹ Ø³Ø§Ø¹Ø© (Ø§Ù„Ø£Ø°ÙƒØ§Ø± Ø§Ù„Ø¹Ø§Ù…Ø©) ÙˆØ¹Ù†Ø¯ ÙˆÙ‚Øª ÙƒÙ„ ØªØ°ÙƒÙŠØ± Ø´Ø®ØµÙŠØŒ ÙˆÙ†Ø­Ù† Ù†Ù‚Ø±Ø± Ù‡Ù†Ø§ Ù…Ø§Ø°Ø§ Ù†Ø¹Ø±Ø¶
+// إشعار «تحديث جديد» لمن لم يفتح التطبيق منذ نشر إصدار أحدث (نفحص مرة كل ١٢ ساعة عند وصول نبضة)
+async function checkUpdateNotice() {
+    try {
+        const meta = await getJSON('update-meta', {});
+        if (Date.now() - (meta.checkedAt || 0) < 12 * 3600 * 1000) return;
+        meta.checkedAt = Date.now();
+        await putJSON('update-meta', meta);
+        const res = await fetch('./version.json?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return;
+        const v = await res.json();
+        const seen = await getJSON('seen', { build: 0 });
+        const build = Number(v.build) || 0;
+        if (!seen.build || build <= seen.build || meta.notified === build) return;
+        meta.notified = build;
+        await putJSON('update-meta', meta);
+        await self.registration.showNotification(v.title || 'تحديث جديد لمُذكّر', {
+            body: 'صار في تحديث جديد، افتح التطبيق لتنزيله.' + (v.notes && v.notes[0] ? ' ' + v.notes[0] : ''),
+            tag: 'app-update', lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE,
+            data: { url: v.url || self.registration.scope }
+        });
+    } catch (e) {}
+}
+
+// نبضة من السيرفر (Web Push) — تعمل والتطبيق مغلق
+// السيرفر يرسل نبضة عند كل ربع ساعة (الأذكار العامة) وعند وقت كل تذكير شخصي، ونحن نقرر هنا ماذا نعرض
 let lastIdx = -1;
 self.addEventListener('push', event => {
     event.waitUntil(serial(async () => {
         const now = Date.now();
         const fired = await checkReminders(now);
+        await checkUpdateNotice();
         const state = await getJSON('state', null);
         const generalOn = !state || state.general !== false;
         const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-        if (wins.some(w => w.visibilityState === 'visible')) return; // Ø§Ù„ØµÙØ­Ø© Ù…ÙØªÙˆØ­Ø© ÙˆØªØªÙˆÙ„Ù‰ Ø§Ù„Ø£Ø°ÙƒØ§Ø± Ø§Ù„Ø¹Ø§Ù…Ø© Ø¨Ù†ÙØ³Ù‡Ø§
+        if (wins.some(w => w.visibilityState === 'visible')) return; // الصفحة مفتوحة وتتولى الأذكار العامة بنفسها
         const minute = new Date(now).getMinutes() % 15;
         const generalSlot = minute <= 3 || minute >= 13;
-        // Ù†Ø¹Ø±Ø¶ Ø§Ù„Ø°ÙƒØ± Ø§Ù„Ø¹Ø§Ù… ÙÙŠ Ù…ÙˆØ¹Ø¯Ù‡ØŒ Ø£Ùˆ Ø¥Ù† ÙˆØµÙ„Øª Ù†Ø¨Ø¶Ø© Ø¯ÙˆÙ† ØªØ°ÙƒÙŠØ± Ù…Ø³ØªØ­Ù‚ (Ø­ØªÙ‰ Ù„Ø§ ØªÙƒÙˆÙ† Ø§Ù„Ù†Ø¨Ø¶Ø© ØµØ§Ù…ØªØ©)
+        // نعرض الذكر العام في موعده، أو إن وصلت نبضة دون تذكير مستحق (حتى لا تكون النبضة صامتة)
         if (!generalOn || (fired.length && !generalSlot)) return;
         let i;
         do { i = Math.floor(Math.random() * ADHKAR.length); } while (i === lastIdx && ADHKAR.length > 1);
         lastIdx = i;
-        await self.registration.showNotification('Ø£Ø°ÙƒØ§Ø± Ø¹Ø§Ù…Ø©', {
+        await self.registration.showNotification('أذكار عامة', {
             body: ADHKAR[i], tag: 'general-adhkar', renotify: true, lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE
         });
     }));
