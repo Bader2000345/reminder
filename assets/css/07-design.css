@@ -263,3 +263,61 @@ body.dark-mode .category-card[data-adhkar-group="morning"] > span { color:#e8b85
 .wn-link a { color:var(--olive); font-weight:600; direction:ltr; unicode-bidi:isolate; }
 .whatsnew-card .primary-button { width:100%; }
 @media (prefers-reduced-motion: reduce) { .update-banner { transition:opacity .2s ease; } .ub-icon svg { animation:none; } }
+
+/* ===== تثبيت التطبيق: بطاقة الرئيسية + بطاقة الإعدادات ===== */
+.install-card { position:relative; overflow:hidden; margin-top:22px; padding:22px 22px 20px; border-radius:28px; color:#f3f6f2;
+  background:radial-gradient(120% 90% at 0% 0%, rgba(217,182,110,.30), transparent 55%), radial-gradient(110% 90% at 100% 100%, #2c8d6f, transparent 62%), linear-gradient(160deg, #18543f, #0f382d);
+  box-shadow:0 24px 50px rgba(15,56,45,.24); transition:opacity .35s ease, transform .35s ease; }
+.install-card.is-leaving { opacity:0; transform:translateY(10px) scale(.98); }
+.ic-glow { position:absolute; width:300px; height:300px; left:-110px; top:-150px; border-radius:50%; pointer-events:none; background:radial-gradient(circle, rgba(255,255,255,.16), transparent 65%); animation:icGlow 9s ease-in-out infinite alternate; }
+@keyframes icGlow { to { transform:translate3d(60px, 40px, 0) scale(1.1); } }
+.ic-head { position:relative; display:flex; gap:16px; align-items:center; }
+.ic-icon { flex:none; width:68px; height:68px; border-radius:20px; background:#fffdf8; box-shadow:0 14px 26px rgba(0,0,0,.28), 0 0 0 1px rgba(255,255,255,.3); animation:icFloat 5s ease-in-out infinite; }
+@keyframes icFloat { 50% { transform:translateY(-4px) rotate(-3deg); } }
+.ic-kicker { display:block; font-size:12px; color:#ebd29a; }
+.ic-copy h2 { margin:2px 0 4px; font-size:19px; font-weight:700; color:#fff; }
+.ic-copy p { margin:0; font-size:13px; line-height:1.7; color:rgba(255,255,255,.8); }
+.ic-perks { position:relative; display:flex; flex-wrap:wrap; gap:8px; list-style:none; margin:14px 0 0; padding:0; }
+.ic-perks li { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.1); font-size:12px; font-weight:500; }
+.ic-perks svg { width:15px; height:15px; color:#ebd29a; }
+.ic-actions { position:relative; display:flex; gap:10px; margin-top:16px; }
+.ic-btn { position:relative; overflow:hidden; flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; height:50px; border-radius:16px; background:#fffdf8; color:#14503f; font-size:15px; font-weight:700; box-shadow:0 10px 24px rgba(0,0,0,.22); transition:transform .25s var(--spring), box-shadow .2s ease; }
+.ic-btn svg { width:20px; height:20px; }
+.ic-btn:hover { transform:translateY(-2px); }
+.ic-btn:active { transform:scale(.96); }
+/* لمعة متحركة حين يكون التثبيت المباشر متاحًا */
+.ic-btn.is-ready::after, .install-setting .primary-button.is-ready::after { content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 35%, rgba(176,141,71,.35) 50%, transparent 65%); transform:translateX(120%); animation:icShine 2.8s ease-in-out infinite; pointer-events:none; }
+@keyframes icShine { 60%, 100% { transform:translateX(-120%); } }
+.ic-later { height:50px; padding:0 18px; border-radius:16px; background:rgba(255,255,255,.12); color:#fff; font-size:13.5px; font-weight:600; }
+.ic-how { position:relative; margin-top:16px; padding-top:14px; border-top:1px dashed rgba(255,255,255,.22); }
+.ic-how-title { display:block; font-size:12px; color:rgba(255,255,255,.72); }
+.ic-steps { list-style:none; margin:10px 0 0; padding:0; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; counter-reset:icstep; }
+.ic-steps li { counter-increment:icstep; position:relative; padding:12px; border-radius:16px; background:rgba(255,255,255,.08); font-size:12.5px; line-height:1.8; }
+.ic-steps li::before { content:counter(icstep, arabic-indic); display:grid; place-items:center; width:24px; height:24px; margin-bottom:6px; border-radius:50%; background:#ebd29a; color:#14503f; font-size:12px; font-weight:700; }
+.ic-steps b { font-weight:600; }
+.ic-steps .k { display:inline-grid; place-items:center; min-width:24px; height:24px; padding:0 4px; margin:0 2px; border-radius:7px; background:rgba(255,255,255,.16); font-style:normal; vertical-align:middle; }
+.ic-steps .k svg { width:15px; height:15px; }
+.ic-steps .k-dots { font-size:16px; line-height:1; }
+.ic-steps.pulse li { animation:stepPulse .9s var(--spring) both; animation-delay:calc(var(--i) * 130ms); }
+@keyframes stepPulse { 0% { transform:scale(1); } 35% { transform:scale(1.05); box-shadow:0 0 0 3px rgba(235,210,154,.55); } 100% { transform:scale(1); } }
+.ic-note { position:relative; margin:12px 0 0; padding:12px 14px; border-radius:16px; background:rgba(0,0,0,.2); font-size:12.5px; line-height:1.9; }
+
+/* نسخة الإعدادات: بألوان البطاقات الفاتحة */
+.install-setting .install-how { flex-basis:100%; margin-top:4px; }
+.install-setting .ic-how-title { color:var(--muted); }
+.install-setting .ic-steps li { background:var(--surface-2); color:var(--ink); }
+.install-setting .ic-steps li::before { background:var(--olive); color:#fff; }
+.install-setting .ic-steps .k { background:var(--paper); color:var(--olive); box-shadow:var(--shadow); }
+.install-setting .ic-note { flex-basis:100%; background:var(--gold-light); color:var(--ink); border:1px solid color-mix(in srgb, var(--gold) 30%, transparent); }
+.install-setting .ic-steps.pulse li { --pulse:var(--olive); }
+.install-setting .primary-button { position:relative; overflow:hidden; }
+
+@media (max-width:700px) {
+  .install-card { padding:18px 16px 16px; border-radius:24px; }
+  .ic-icon { width:58px; height:58px; border-radius:17px; }
+  .ic-copy h2 { font-size:17px; }
+  .ic-steps { grid-template-columns:1fr; gap:6px; }
+  .ic-steps li { display:flex; align-items:center; gap:10px; padding:9px 12px; }
+  .ic-steps li::before { flex:none; margin:0; }
+}
+@media (prefers-reduced-motion: reduce) { .ic-glow, .ic-icon, .ic-btn.is-ready::after, .ic-steps.pulse li { animation:none !important; } }

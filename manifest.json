@@ -9,6 +9,10 @@
   "display": "standalone",
   "background_color": "#f6f2e6",
   "theme_color": "#1f4b3d",
+  "related_applications": [
+    { "platform": "webapp", "url": "https://bader2000345.github.io/reminder/manifest.json" }
+  ],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "assets/img/icon-192.png",

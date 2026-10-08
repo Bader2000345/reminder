@@ -91,6 +91,33 @@
                 </article>
             </section>
 
+            <!-- تثبيت التطبيق: زر بضغطة واحدة + الطريقة تحته (يختفي داخل التطبيق المثبّت) -->
+            <section class="install-card" data-install-card data-install-box hidden aria-labelledby="install-title">
+                <div class="ic-glow" aria-hidden="true"></div>
+                <div class="ic-head">
+                    <img class="ic-icon" src="assets/img/icon-192.png" alt="" width="68" height="68">
+                    <div class="ic-copy">
+                        <span class="ic-kicker">تطبيق مُذكّر</span>
+                        <h2 id="install-title">ثبّت مُذكّر على شاشتك الرئيسية</h2>
+                        <p>يفتح بلمسة كأي تطبيق، يعمل دون إنترنت، وتصلك التذكيرات حتى وهو مغلق.</p>
+                    </div>
+                </div>
+                <ul class="ic-perks" aria-label="مزايا التطبيق">
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg>فتح فوري</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><path d="M3 3l18 18"/></svg>دون إنترنت</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>تذكيرات دائمة</li>
+                </ul>
+                <div class="ic-actions">
+                    <button class="ic-btn" type="button" data-install><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>تثبيت التطبيق</button>
+                    <button class="ic-later" type="button" data-install-later>لاحقًا</button>
+                </div>
+                <div class="ic-how" data-install-how>
+                    <span class="ic-how-title" data-install-how-title>الطريقة:</span>
+                    <ol class="ic-steps" data-install-steps></ol>
+                </div>
+                <p class="ic-note" data-install-note hidden></p>
+            </section>
+
             <section class="smart-section">
                 <div class="section-title"><div><span class="soft-label">اقتراح يتكيّف مع وقتك</span><h2>الأذكار الذكية حسب الوقت</h2></div><span class="time-context" id="smart-time-context">الآن</span></div>
                 <article class="home-card smart-card">
@@ -293,6 +320,19 @@
                     </div>
                     <button class="ghost-button" type="button" id="check-update-btn">فحص التحديث</button>
                 </article>
+                <article class="setting-card install-setting" data-install-box>
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3M10.5 18.5h3"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>تثبيت التطبيق</h2>
+                        <p data-install-status>ثبّته ليفتح بلمسة كأي تطبيق، ويعمل دون إنترنت</p>
+                    </div>
+                    <button class="primary-button" type="button" data-install>تثبيت</button>
+                    <div class="install-how" data-install-how>
+                        <span class="ic-how-title" data-install-how-title>الطريقة:</span>
+                        <ol class="ic-steps" data-install-steps></ol>
+                    </div>
+                    <p class="ic-note" data-install-note hidden></p>
+                </article>
             </section>
             <footer><span>مُذكّر</span><span>إعداداتك محفوظة تلقائيًا</span></footer>
         </section>
@@ -469,15 +509,6 @@
     </div>
 </div>
 
-<!-- Modal طريقة تثبيت التطبيق -->
-<div class="modal" id="install-help-modal">
-    <div class="modal-card">
-        <button class="modal-close" type="button" data-close-modal aria-label="إغلاق">×</button>
-        <h2>تثبيت تطبيق مُذكّر</h2>
-        <p id="install-help-intro" style="font-size:12px;color:var(--muted);margin:-8px 0 14px;"></p>
-        <ol id="install-help-steps" style="margin:0;padding-inline-start:20px;font-size:13px;line-height:2;"></ol>
-    </div>
-</div>
 
 <!-- البيانات: الأذكار العامة وأذكار الأقسام مع الأدلة -->
 <script src="general-adhkar.js"></script>
@@ -492,6 +523,7 @@
 <script src="assets/js/notifications.js"></script>
 <script src="assets/js/reminders.js"></script>
 <script src="assets/js/updates.js"></script>
+<script src="assets/js/install.js"></script>
 <script src="assets/js/home.js"></script>
 <script src="assets/js/share.js"></script>
 <script src="assets/js/time-context.js"></script>

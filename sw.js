@@ -12,11 +12,11 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v14';
+const CACHE = 'mudhakkir-v15';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
 const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'reader', 'notifications', 'reminders', 'updates', 'home', 'share', 'time-context', 'motion', 'main'].map(n => `./assets/js/${n}.js`);
+const JS_FILES = ['preload-theme', 'splash', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'reader', 'notifications', 'reminders', 'updates', 'install', 'home', 'share', 'time-context', 'motion', 'main'].map(n => `./assets/js/${n}.js`);
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
     './assets/img/logo-light.png', './assets/img/logo-dark.png', './assets/img/icon-192.png', './assets/img/icon-512.png', './assets/img/favicon-64.png', './assets/img/apple-touch-icon.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';

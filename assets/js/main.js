@@ -30,6 +30,7 @@ syncNotifications();
 TimeContext.init();
 Motion.init();
 UpdateNotice.init();
+Install.init();
 Wird.init();
 Reader.setAdvanceHook(Wird.onReaderAdvance);
 Share.init();

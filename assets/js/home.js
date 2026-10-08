@@ -1,50 +1,8 @@
 /* =====================================================================
  * مُذكّر — home.js
- * الرئيسية: تثبيت التطبيق، إحصائيات اليوم، المسبحة وبطاقة الذكر.
+ * الرئيسية: إحصائيات اليوم، المسبحة وبطاقة الذكر. (تثبيت التطبيق صار في install.js)
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
-
-// ===== تثبيت التطبيق (PWA) =====
-(() => {
-    const banner = document.getElementById('pwa-install-banner');
-    const btn = document.getElementById('btn-install-pwa');
-    let deferred = null;
-
-    const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-    if (installed() && banner) banner.style.display = 'none';
-
-    const ua = navigator.userAgent;
-    const isIOS = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isAndroid = /android/i.test(ua);
-
-    const GUIDE = {
-        ios: ['على الآيفون والآيباد يتم التثبيت من متصفح Safari فقط:', ['افتح الموقع في متصفح Safari.', 'اضغط زر المشاركة (المربع الذي يخرج منه سهم للأعلى).', 'اختر «إضافة إلى الشاشة الرئيسية».', 'اضغط «إضافة» وسيظهر التطبيق بين تطبيقاتك.']],
-        android: ['على أندرويد يتم التثبيت من متصفح Chrome:', ['افتح الموقع في متصفح Chrome.', 'اضغط على قائمة النقاط الثلاث ⋮ أعلى الشاشة.', 'اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».', 'أكّد بالضغط على «تثبيت» وسيظهر التطبيق بين تطبيقاتك.']],
-        desktop: ['على الكمبيوتر يتم التثبيت من Chrome أو Edge:', ['افتح الموقع في Chrome أو Edge.', 'اضغط أيقونة التثبيت في نهاية شريط العنوان، أو افتح القائمة ⋮ واختر «تثبيت مُذكّر».', 'أكّد بالضغط على «تثبيت».']]
-    };
-
-    function showGuide() {
-        const g = GUIDE[isIOS ? 'ios' : isAndroid ? 'android' : 'desktop'];
-        document.getElementById('install-help-intro').textContent = g[0];
-        const ol = document.getElementById('install-help-steps');
-        ol.replaceChildren(...g[1].map(t => { const li = document.createElement('li'); li.textContent = t; return li; }));
-        document.getElementById('install-help-modal').classList.add('open');
-    }
-
-    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; });
-    window.addEventListener('appinstalled', () => { if (banner) banner.style.display = 'none'; });
-
-    btn?.addEventListener('click', async () => {
-        if (deferred) {
-            deferred.prompt();
-            try { await deferred.userChoice; } catch (e) {}
-            deferred = null;
-        } else {
-            showGuide();
-        }
-    });
-})();
-
 
 // ===== إحصائيات الاستخدام اليومية =====
 const DailyStats = (() => {

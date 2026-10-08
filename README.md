@@ -35,6 +35,7 @@ assets/js/                  ← المنطق (بالترتيب، main.js آخر�
    notifications.js             الإشعارات والسيرفر (PUSH_SERVER في أوله)
    reminders.js                 أذكاري (التذكيرات الشخصية)
    updates.js                   إشعار التحديثات (APP_BUILD في أوله)
+   install.js                   زر تثبيت التطبيق والطريقة لكل جهاز
    home.js                      الرئيسية والمسبحة والإحصائيات
    share.js                     صورة المشاركة
    time-context.js              التحية والأذكار حسب الوقت
