@@ -285,6 +285,14 @@
                     </div>
                     <div class="segmented theme-seg" role="group" aria-label="المظهر"><button type="button" data-theme-opt="light">فاتح</button><button type="button" data-theme-opt="dark">داكن</button><button type="button" data-theme-opt="auto">حسب الجهاز</button><button type="button" data-theme-opt="sun">حسب الشمس</button></div>
                 </article>
+                <article class="setting-card">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>التحديثات</h2>
+                        <p id="app-version-label">الإصدار الحالي</p>
+                    </div>
+                    <button class="ghost-button" type="button" id="check-update-btn">فحص التحديث</button>
+                </article>
             </section>
             <footer><span>مُذكّر</span><span>إعداداتك محفوظة تلقائيًا</span></footer>
         </section>
@@ -365,11 +373,11 @@
 <div class="update-banner" id="update-banner" role="status" aria-live="polite" hidden>
     <span class="ub-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6z"/><path d="M19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg></span>
     <div class="ub-copy">
-        <strong id="update-title">صار في تحديث جديد</strong>
-        <p>يرجى تحديث التطبيق للحصول على أحدث الميزات:</p>
+        <strong id="update-title">تم تنزيل تحديث جديد</strong>
+        <p>حدّث من هنا لتحصل على آخر الميزات:</p>
         <ul id="update-notes"></ul>
         <div class="ub-actions">
-            <button class="primary-button" type="button" id="update-now">حدّث الآن</button>
+            <button class="primary-button" type="button" id="update-now">تحديث</button>
             <a class="ghost-button" id="update-link" href="https://bader2000345.github.io/reminder/" target="_blank" rel="noopener">فتح الموقع</a>
         </div>
     </div>

@@ -1,4 +1,9 @@
-/* مُذكّر — Service Worker: إشعارات الأذكار العامة + التذكيرات الشخصية + إشعار التحديثات + تخزين مؤقت للعمل دون اتصال */
+/* مُذكّر — Service Worker
+ * - التحديث بموافقة المستخدم: التطبيق يعمل من نسخته المحفوظة، والنسخة الجديدة تُنزَّل في الخلفية
+ *   ولا تُستخدم إلا بعد أن يضغط المستخدم «تحديث».
+ * - إشعارات الأذكار العامة والتذكيرات الشخصية وإشعار التحديثات.
+ * - العمل دون اتصال.
+ */
 // إن تعذّر تحميل general-adhkar.js لا يتعطل الـ Service Worker كله
 try { importScripts('general-adhkar.js'); } catch (e) {}
 const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIST.length) ? GENERAL_ADHKAR_LIST : [
@@ -6,50 +11,17 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ',
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
-const CACHE = 'mudhakkir-v13';
-const DATA = 'mudhakkir-data'; // إعدادات التذكير التي يكتبها التطبيق (لا تُحذف عند التحديث)
-// ملفات التطبيق التي تُخزَّن للعمل دون اتصال (أضف أي ملف جديد هنا)
+// ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
+const CACHE = 'mudhakkir-v14';
+const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
+// ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
 const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design'].map(n => `./assets/css/${n}.css`);
 const JS_FILES = ['preload-theme', 'splash', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'reader', 'notifications', 'reminders', 'updates', 'home', 'share', 'time-context', 'motion', 'main'].map(n => `./assets/js/${n}.js`);
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
-    './assets/img/logo-light.png', './assets/img/logo-dark.png', './assets/img/icon-192.png', './assets/img/favicon-64.png'];
+    './assets/img/logo-light.png', './assets/img/logo-dark.png', './assets/img/icon-192.png', './assets/img/icon-512.png', './assets/img/favicon-64.png', './assets/img/apple-touch-icon.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
 const DUE_WINDOW = 30 * 60 * 1000; // يُعرض التذكير إن تأخر وصول الإشعار حتى ٣٠ دقيقة
 const dataUrl = name => new URL('__mdk/' + name, self.registration.scope).href;
-
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE)
-            .then(cache => Promise.allSettled(CORE.map(url => cache.add(url))))
-            .then(() => self.skipWaiting())
-    );
-});
-
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys()
-            .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== DATA).map(k => caches.delete(k))))
-            .then(() => self.clients.claim())
-    );
-});
-
-// الشبكة أولًا، ثم النسخة المخزنة عند انقطاع الاتصال (الصفحات وملفات التطبيق)
-self.addEventListener('fetch', event => {
-    const req = event.request;
-    if (req.method !== 'GET') return;
-    const url = new URL(req.url);
-    const sameOrigin = url.origin === self.location.origin;
-    const isAsset = sameOrigin && ['script', 'image', 'manifest', 'style'].includes(req.destination);
-    if (req.mode !== 'navigate' && !isAsset) return;
-    event.respondWith(
-        fetch(req)
-            .then(res => {
-                if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {}); }
-                return res;
-            })
-            .catch(() => caches.match(req).then(r => r || (req.mode === 'navigate' ? caches.match('./index.html') : Response.error())))
-    );
-});
 
 // ---------- بيانات مشتركة مع الصفحة ----------
 async function getJSON(name, fallback) {
@@ -59,7 +31,75 @@ async function putJSON(name, value) {
     try { const c = await caches.open(DATA); await c.put(dataUrl(name), new Response(JSON.stringify(value), { headers: { 'Content-Type': 'application/json' } })); } catch (e) {}
 }
 
-// ---------- مواعيد التذكيرات (نفس منطق Sched في index.html) ----------
+// ---------- النسخة المعتمدة (التي يراها المستخدم) ----------
+// approved = اسم مخزن النسخة التي وافق عليها المستخدم؛ CACHE = أحدث نسخة نزلت
+let approvedName = null;
+async function approvedCache() {
+    if (!approvedName) approvedName = (await getJSON('approved', null) || {}).cache || CACHE;
+    return approvedName;
+}
+async function setApproved(name) {
+    approvedName = name;
+    await putJSON('approved', { cache: name });
+}
+async function cleanup() {
+    const keep = new Set([CACHE, DATA, await approvedCache()]);
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => !keep.has(k)).map(k => caches.delete(k)));
+}
+
+// التنزيل في الخلفية: نجلب الملفات الجديدة مباشرة من السيرفر (دون ذاكرة المتصفح) ونحفظها جانبًا
+self.addEventListener('install', event => {
+    event.waitUntil((async () => {
+        const cache = await caches.open(CACHE);
+        const results = await Promise.allSettled(CORE.map(url => cache.add(new Request(url, { cache: 'reload' }))));
+        await putJSON('ready-' + CACHE, { ok: results.filter(r => r.status === 'fulfilled').length, total: CORE.length });
+        await self.skipWaiting(); // الكود يعمل فورًا، لكن الملفات المعروضة تبقى من النسخة المعتمدة
+    })());
+});
+
+self.addEventListener('activate', event => {
+    event.waitUntil((async () => {
+        const saved = await getJSON('approved', null);
+        // أول تثبيت (أو اختفت النسخة القديمة): نعتمد هذه النسخة مباشرة
+        if (!saved || !saved.cache || !(await caches.has(saved.cache))) await setApproved(CACHE);
+        else approvedName = saved.cache;
+        await cleanup();
+        await self.clients.claim();
+        // نخبر الصفحات المفتوحة أن تحديثًا جاهزًا للتطبيق
+        if (approvedName !== CACHE) {
+            const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+            wins.forEach(w => w.postMessage({ type: 'mdk-update-ready' }));
+        }
+    })());
+});
+
+// ملفات التطبيق تُقدَّم من النسخة المعتمدة أولًا، ثم من الشبكة إن لم تكن محفوظة
+self.addEventListener('fetch', event => {
+    const req = event.request;
+    if (req.method !== 'GET') return;
+    const url = new URL(req.url);
+    if (url.origin !== self.location.origin || url.pathname.includes('/__mdk/') || url.pathname.endsWith('/version.json')) return;
+    const isApp = req.mode === 'navigate' || ['script', 'style', 'image', 'manifest', 'font'].includes(req.destination);
+    if (!isApp) return;
+    event.respondWith((async () => {
+        const name = await approvedCache();
+        const cache = await caches.open(name);
+        let hit = await cache.match(req, { ignoreSearch: true });
+        if (!hit && req.mode === 'navigate') hit = await cache.match('./index.html') || await cache.match('./');
+        if (hit) return hit;
+        try {
+            const res = await fetch(req);
+            // لا نخلط ملفات جديدة بالنسخة القديمة: نحفظ فقط إن كانت النسخة المعتمدة هي الأحدث
+            if (res.ok && name === CACHE) cache.put(req, res.clone()).catch(() => {});
+            return res;
+        } catch (e) {
+            return req.mode === 'navigate' ? (await cache.match('./index.html')) || Response.error() : Response.error();
+        }
+    })());
+});
+
+// ---------- مواعيد التذكيرات (نفس منطق Sched في notifications.js) ----------
 const pad = n => String(n).padStart(2, '0');
 const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 function occurrence(r, now) {
@@ -104,12 +144,23 @@ async function checkReminders(now = Date.now()) {
     return fired;
 }
 
-// الصفحة المفتوحة تطلب فحصًا دوريًا
+// رسائل الصفحة: فحص التذكيرات، حالة التحديث، والموافقة على التحديث
 self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'mdk-check') event.waitUntil(serial(() => checkReminders()));
+    const d = event.data || {}, port = event.ports && event.ports[0];
+    if (d.type === 'mdk-check') event.waitUntil(serial(() => checkReminders()));
+    if (d.type === 'mdk-status' && port) event.waitUntil((async () => {
+        const approved = await approvedCache();
+        const ready = await getJSON('ready-' + CACHE, null);
+        port.postMessage({ approved, latest: CACHE, ready: !!ready && ready.ok === ready.total, update: approved !== CACHE });
+    })());
+    if (d.type === 'mdk-approve') event.waitUntil((async () => {
+        await setApproved(CACHE);
+        await cleanup();
+        if (port) port.postMessage({ ok: true, cache: CACHE });
+    })());
 });
 
-// الضغط على الإشعار يفتح التطبيق أو يعيد التركيز عليه (وإشعار التحديث يفتح الموقع ليُحمَّل الجديد)
+// الضغط على الإشعار يفتح التطبيق أو يعيد التركيز عليه (وإشعار التحديث يفتح الموقع)
 self.addEventListener('notificationclick', event => {
     event.notification.close();
     const url = event.notification.data && event.notification.data.url;
@@ -143,7 +194,7 @@ async function checkUpdateNotice() {
         meta.notified = build;
         await putJSON('update-meta', meta);
         await self.registration.showNotification(v.title || 'تحديث جديد لمُذكّر', {
-            body: 'صار في تحديث جديد، افتح التطبيق لتنزيله.' + (v.notes && v.notes[0] ? ' ' + v.notes[0] : ''),
+            body: 'صار في تحديث جديد، افتح التطبيق واضغط «تحديث».' + (v.notes && v.notes[0] ? ' ' + v.notes[0] : ''),
             tag: 'app-update', lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE,
             data: { url: v.url || self.registration.scope }
         });
