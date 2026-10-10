@@ -37,3 +37,92 @@ const TimeContext = (() => {
     }
     return { init };
 })();
+
+// ===== اسمك في التحية (ويناديك به المساعد) =====
+const UserName = (() => {
+    const KEY = 'mudhakkir-name';
+    const $ = id => document.getElementById(id);
+    const get = () => { try { return (localStorage.getItem(KEY) || '').trim(); } catch (e) { return ''; } };
+    function paint() {
+        const name = get();
+        if ($('greeting-name')) { $('greeting-name').textContent = name; $('greeting-name-wrap').hidden = !name; }
+        if ($('name-input') && document.activeElement !== $('name-input')) $('name-input').value = name;
+        if ($('name-status')) $('name-status').textContent = name ? `أهلًا ${name} — يظهر اسمك في التحية ويناديك به المساعد` : 'يظهر في التحية بالرئيسية، ويناديك به المساعد';
+    }
+    function set(v) {
+        v = String(v || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24);
+        try { if (v) localStorage.setItem(KEY, v); else localStorage.removeItem(KEY); } catch (e) {}
+        paint();
+        return v;
+    }
+    function init() {
+        paint();
+        $('name-form')?.addEventListener('submit', e => {
+            e.preventDefault();
+            const v = set($('name-input').value);
+            $('name-input').blur();
+            Toast.show(v ? `أهلًا ${v}، تم حفظ اسمك` : 'تم حذف الاسم من التحية');
+        });
+        // الضغط على الاسم في التحية يفتح تعديله
+        $('greeting-name')?.addEventListener('click', () => {
+            navigateTo('settings');
+            setTimeout(() => { $('name-input')?.focus({ preventScroll: true }); $('name-setting')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 350);
+        });
+    }
+    return { init, get, set };
+})();
+
+// ===== تذكير الجمعة: سورة الكهف والصلاة على النبي ﷺ =====
+// يُرسل للسيرفر كتذكير عادي (الجمعة ٩:٠٠ بتوقيت الجهاز) فيصل حتى والتطبيق مغلق
+const FridayReminder = (() => {
+    const KEY = 'mudhakkir-friday', SINCE = 'mudhakkir-friday-since';
+    const KAHF_PAGE = 293;
+    const read = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const write = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+    const isOn = () => read(KEY) !== '0';
+    const isFriday = (d = new Date()) => d.getDay() === 5;
+    function since() {
+        let s = Number(read(SINCE));
+        if (!s) { s = Date.now(); write(SINCE, String(s)); }
+        return s;
+    }
+    // بنفس شكل التذكيرات الشخصية (يقرؤه sw.js و PushSync)
+    function entries() {
+        if (!isOn()) return [];
+        return [{
+            id: 'friday', on: true, title: 'يوم الجمعة 🕌',
+            text: 'لا تنسَ قراءة سورة الكهف، وأكثِر من الصلاة على النبي ﷺ. اللهم صلِّ وسلم على نبينا محمد.',
+            time: '09:00', repeat: 'days', days: [5], date: '', since: since(), url: './?open=kahf'
+        }];
+    }
+    function paintCard() {
+        const card = document.getElementById('friday-card');
+        if (card) card.hidden = !(isOn() && isFriday());
+    }
+    function openKahf() {
+        navigateTo('free-reading');
+        if (typeof Reader !== 'undefined' && Reader.openAt) Reader.openAt(KAHF_PAGE, '18:1', true);
+    }
+    function init() {
+        const sw = document.getElementById('friday-switch');
+        if (sw) {
+            sw.checked = isOn();
+            sw.addEventListener('change', async () => {
+                write(KEY, sw.checked ? '1' : '0');
+                if (sw.checked) { write(SINCE, String(Date.now())); await Notifier.ensurePermission(); }
+                paintCard();
+                syncNotifications();
+                Toast.show(sw.checked ? 'سيصلك تذكير الجمعة صباح كل جمعة بإذن الله' : 'تم إيقاف تذكير الجمعة');
+            });
+        }
+        document.getElementById('friday-read')?.addEventListener('click', openKahf);
+        // من إشعار الجمعة: ?open=kahf (فتح جديد) أو رسالة من sw.js (التطبيق مفتوح)
+        const params = new URLSearchParams(location.search);
+        if (params.get('open') === 'kahf') { history.replaceState(history.state, '', location.pathname); setTimeout(openKahf, 400); }
+        if (SW_OK) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'mdk-open-kahf') openKahf(); });
+        paintCard();
+        setInterval(paintCard, 10 * 60 * 1000);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') paintCard(); });
+    }
+    return { init, entries, openKahf, isOn };
+})();

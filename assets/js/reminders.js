@@ -105,20 +105,22 @@ const Reminders = (() => {
         });
     }
     function showError(msg) { const e = $('rem-error'); e.textContent = msg || ''; e.hidden = !msg; }
+    // r بلا id = تذكير جديد بعنوان ونص جاهزين (من المساعد مثلًا)
     function openForm(r = null) {
         showError('');
-        $('rem-modal-title').textContent = r ? 'تعديل التذكير' : 'تذكير جديد';
-        $('rem-submit').textContent = r ? 'حفظ التعديلات' : 'حفظ التذكير';
-        $('rem-id').value = r ? r.id : '';
-        $('rem-title').value = r ? r.title : '';
-        $('rem-text').value = r ? r.text : '';
-        const time = r ? r.time : '06:30';
+        const editing = !!(r && r.id);
+        $('rem-modal-title').textContent = editing ? 'تعديل التذكير' : 'تذكير جديد';
+        $('rem-submit').textContent = editing ? 'حفظ التعديلات' : 'حفظ التذكير';
+        $('rem-id').value = editing ? r.id : '';
+        $('rem-title').value = r ? (r.title || '') : '';
+        $('rem-text').value = r ? (r.text || '') : '';
+        const time = r && r.time ? r.time : '06:30';
         $('rem-preset').value = [...$('rem-preset').options].some(o => o.value === time) ? time : 'custom';
         Picker.setValue($('rem-time'), time, false);
         Picker.setValue($('rem-date'), r && r.date ? r.date : Sched.dayKey(new Date()), false);
         $('rem-date').min = Sched.dayKey(new Date());
         formDays.clear(); (r && r.days && r.days.length ? r.days : [0, 1, 2, 3, 4, 5, 6]).forEach(d => formDays.add(d)); paintDays();
-        setRepeat(r ? r.repeat : 'daily');
+        setRepeat(r && r.repeat ? r.repeat : 'daily');
         setModalState($('reminder-modal'), true);
         setTimeout(() => $('rem-title').focus(), 60);
     }
@@ -153,7 +155,8 @@ const Reminders = (() => {
 
     // فحص دوري: الـ Service Worker يعرض التذكير (ويمنع التكرار)، وإن لم يتوفر نفحص هنا
     async function tick() {
-        if (!list.some(r => r.on)) return;
+        const all = allReminders(); // مع تذكير الجمعة
+        if (!all.some(r => r.on)) return;
         // الـ Service Worker هو المرجع الوحيد لما عُرض (حتى لا يتكرر التذكير عند فتح التطبيق)
         if (SW_OK) {
             try {
@@ -166,7 +169,7 @@ const Reminders = (() => {
         let shown = {};
         try { shown = JSON.parse(localStorage.getItem(SHOWN_KEY)) || {}; } catch (e) {}
         const fired = [];
-        list.forEach(r => {
+        all.forEach(r => {
             const at = Sched.occurrence(r, now); if (!at) return;
             const k = r.id + '@' + Sched.dayKey(at);
             if (shown[k]) return;

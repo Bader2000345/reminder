@@ -1,0 +1,157 @@
+/* =====================================================================
+ * مُذكّر — 09-assistant.css
+ * المساعد «اسأل مُذكّر» (الزر العائم ولوحة المحادثة وبطاقات الأذكار)،
+ * وأذكار المناسبات، وبطاقة الجمعة، والاسم في التحية.
+ * ترتيب الملفات مهم: هذا آخر ملف.
+ * ===================================================================== */
+
+/* ===================== الزر العائم ===================== */
+.ask-fab { position:fixed; z-index:60; left:24px; bottom:calc(24px + env(safe-area-inset-bottom, 0px)); display:inline-flex; align-items:center; gap:8px; height:52px; padding:0 20px 0 18px; border-radius:999px; background:var(--olive); color:#fff; font-weight:600; font-size:14px; box-shadow:0 12px 28px color-mix(in srgb, var(--olive) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.18); transition:transform .45s var(--spring), opacity .25s ease, box-shadow .25s ease; }
+.ask-fab svg { width:22px; height:22px; }
+.ask-fab:hover { transform:translateY(-2px); box-shadow:0 16px 34px color-mix(in srgb, var(--olive) 45%, transparent); }
+.ask-fab:active { transform:scale(.95); }
+body.immersive .ask-fab, body.modal-open .ask-fab, body.reader-open .ask-fab, body.ask-open .ask-fab { transform:translateY(140%) scale(.8); opacity:0; pointer-events:none; }
+@media (max-width:700px) {
+  .ask-fab { left:14px; bottom:calc(84px + env(safe-area-inset-bottom, 0px)); width:52px; padding:0; justify-content:center; }
+  .ask-fab span { display:none; }
+}
+
+/* ===================== لوحة المحادثة ===================== */
+.ask-panel { position:fixed; z-index:90; top:12px; bottom:12px; left:12px; width:min(430px, calc(100% - 24px)); display:flex; flex-direction:column; background:var(--paper); color:var(--ink); border:1px solid color-mix(in srgb, var(--line) 80%, transparent); border-radius:26px; box-shadow:0 30px 70px rgba(10,30,22,.22); overflow:hidden; transform:translateX(-24px) scale(.98); opacity:0; transition:transform .5s var(--spring-soft), opacity .25s ease; }
+.ask-panel.open { transform:none; opacity:1; }
+body.dark-mode .ask-panel { box-shadow:0 30px 70px rgba(0,0,0,.55); }
+@media (max-width:700px) {
+  .ask-panel { inset:0; width:auto; border:0; border-radius:0; transform:translateY(40px); }
+}
+.ask-head { display:flex; align-items:center; gap:10px; padding:calc(12px + env(safe-area-inset-top, 0px)) 14px 12px; border-bottom:1px solid var(--line); background:color-mix(in srgb, var(--paper) 92%, var(--olive)); }
+@media (min-width:701px) { .ask-head { padding-top:12px; } }
+.ask-id { flex:1; min-width:0; display:flex; align-items:center; gap:10px; }
+.ask-id h2 { margin:0; font-size:16.5px; font-weight:700; }
+.ask-id small { display:block; color:var(--muted); font-size:11.5px; }
+.ask-avatar { width:30px !important; flex:none; }
+.ask-icon-btn { width:40px; height:40px; flex:none; display:grid; place-items:center; border-radius:13px; background:var(--surface-2); color:var(--ink); transition:transform .2s var(--spring); }
+.ask-icon-btn svg { width:20px; height:20px; }
+.ask-icon-btn:active { transform:scale(.92); }
+
+.ask-log { flex:1; overflow-y:auto; overscroll-behavior:contain; padding:16px 14px 8px; display:flex; flex-direction:column; gap:12px; scroll-padding-bottom:12px; }
+.ask-log, .qsheet-body { scrollbar-width:thin; scrollbar-color:color-mix(in srgb, var(--muted) 40%, transparent) transparent; }
+.ask-row { display:flex; }
+/* مثل تطبيقات المحادثة بالعربية: رسالتك على اليسار، والمساعد على اليمين */
+.ask-row.is-user { justify-content:flex-end; }
+.ask-row.is-bot { justify-content:flex-start; }
+.ask-bubble { max-width:88%; padding:11px 14px; border-radius:20px; font-size:15px; line-height:1.85; overflow-wrap:anywhere; animation:askIn .45s var(--spring-soft) both; }
+.ask-row.is-user .ask-bubble { background:var(--olive); color:#fff; border-end-end-radius:6px; white-space:pre-wrap; }
+.ask-row.is-bot .ask-bubble { background:var(--surface-2); border-start-start-radius:6px; width:100%; max-width:100%; }
+.ask-bubble p { margin:0 0 8px; }
+.ask-bubble p:last-child { margin-bottom:0; }
+.ask-list { margin:0 0 8px; padding-inline-start:20px; }
+.ask-list li { margin:2px 0; }
+.ask-general { color:var(--muted); font-size:14px; }
+.ask-row.is-local .ask-bubble { border:1px dashed color-mix(in srgb, var(--gold) 55%, transparent); }
+.ask-bubble.is-streaming > :last-child::after { content:"▍"; color:var(--olive); animation:askCaret 1s steps(2) infinite; }
+@keyframes askCaret { 50% { opacity:0; } }
+@keyframes askIn { from { opacity:0; transform:translateY(8px) scale(.98); } }
+.ask-typing { display:inline-flex; gap:5px; padding:6px 2px; }
+.ask-typing i { width:7px; height:7px; border-radius:50%; background:var(--olive); opacity:.35; animation:askDot 1.2s ease-in-out infinite; }
+.ask-typing i:nth-child(2) { animation-delay:.15s; } .ask-typing i:nth-child(3) { animation-delay:.3s; }
+@keyframes askDot { 30% { opacity:1; transform:translateY(-4px); } }
+.ask-ayah { margin:0 0 8px; padding:8px 10px; border-radius:12px; background:rgba(255,255,255,.14); font-family:"Amiri Quran", "Amiri", serif; font-size:16px; line-height:1.9; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.ask-ayah cite { display:block; font-family:var(--font-main); font-style:normal; font-size:11.5px; opacity:.85; }
+
+/* ----- بطاقة الذكر الموثّقة ----- */
+.ask-card { margin:10px 0; padding:14px; border-radius:18px; background:var(--paper); border:1px solid color-mix(in srgb, var(--gold) 35%, transparent); box-shadow:0 6px 18px rgba(30,45,35,.06); }
+.ask-card:last-child { margin-bottom:2px; }
+.ask-card-head { display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }
+.ask-card-kicker { font-size:11px; font-weight:700; color:var(--gold); }
+.ask-card-head strong { font-size:14px; }
+.ask-card-text { margin:0 0 6px !important; font-family:"Amiri", serif; font-size:19px; line-height:2; white-space:pre-line; }
+.ask-card-text.is-quran { font-family:"Amiri Quran", "Amiri", serif; }
+.ask-card.is-long .ask-card-text { max-height:11em; overflow:hidden; -webkit-mask-image:linear-gradient(#000 70%, transparent); mask-image:linear-gradient(#000 70%, transparent); }
+.ask-more { background:none; color:var(--olive); font-weight:600; font-size:13px; padding:0; margin-bottom:6px; }
+.ask-card-meta { color:var(--muted); font-size:12.5px; margin:0 0 6px !important; }
+.ask-card-tip { margin:6px 0 0 !important; padding-inline-start:10px; border-inline-start:3px solid color-mix(in srgb, var(--olive) 45%, transparent); font-size:13.5px; line-height:1.85; color:var(--ink); }
+.ask-card-hadith { margin:8px 0 0; padding:10px 12px; border-radius:12px; background:var(--gold-light); font-size:13.5px; line-height:1.85; }
+.ask-card-hadith cite { display:block; margin-top:4px; font-style:normal; color:var(--muted); font-size:12px; }
+.ask-card-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.ask-chip-btn { padding:7px 12px; border-radius:999px; background:var(--surface-2); color:var(--ink); font-size:12.5px; font-weight:600; transition:background .2s ease, transform .2s var(--spring); }
+.ask-chip-btn:hover { background:color-mix(in srgb, var(--olive) 14%, var(--surface-2)); }
+.ask-chip-btn:active { transform:scale(.95); }
+
+/* ----- شاشة البداية ----- */
+.ask-welcome { margin:auto 0; text-align:center; padding:12px 6px 4px; }
+.ask-welcome-mark { width:60px !important; margin:0 auto 10px; }
+.ask-welcome h3 { margin:0 0 6px; font-size:20px; }
+.ask-welcome p { margin:0 auto 16px; max-width:330px; color:var(--muted); font-size:14px; line-height:1.85; }
+.ask-suggest { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
+.ask-chip { padding:9px 14px; border-radius:999px; background:var(--surface-2); color:var(--ink); font-size:13.5px; border:1px solid transparent; transition:border-color .2s ease, transform .25s var(--spring); }
+.ask-chip:hover { border-color:color-mix(in srgb, var(--olive) 40%, transparent); }
+.ask-chip:active { transform:scale(.95); }
+
+/* ----- خانة الكتابة ----- */
+.ask-form { display:flex; align-items:flex-end; gap:8px; padding:10px 12px 6px; border-top:1px solid var(--line); background:var(--paper); }
+.ask-form textarea { flex:1; min-width:0; min-height:44px; max-height:140px; resize:none; overflow-y:hidden; box-sizing:border-box; border:1px solid transparent; border-radius:22px; background:var(--surface-2); color:var(--ink); padding:10px 16px; font:inherit; font-size:16px; line-height:1.5; }
+.ask-form textarea:focus { outline:0; border-color:var(--olive); background:var(--paper); }
+.ask-send { width:44px; height:44px; flex:none; border-radius:50%; display:grid; place-items:center; background:var(--olive); color:#fff; transition:transform .25s var(--spring), opacity .2s ease; }
+.ask-send svg { width:20px; height:20px; }
+.ask-send:active { transform:scale(.9); }
+.ask-form.is-busy .ask-send { opacity:.5; pointer-events:none; }
+.ask-mic.is-on { background:#d6455d; color:#fff; animation:askPulse 1.2s ease-in-out infinite; }
+@keyframes askPulse { 50% { box-shadow:0 0 0 6px rgba(214,69,93,.18); } }
+.ask-note { margin:0; padding:2px 16px calc(10px + env(safe-area-inset-bottom, 0px)); color:var(--muted); font-size:11px; text-align:center; background:var(--paper); }
+@media (min-width:701px) { .ask-note { padding-bottom:10px; } }
+
+/* ===================== أذكار المناسبات ===================== */
+.category-card.situations { grid-column:1 / -1; min-height:120px; background:radial-gradient(360px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--gold) 10%, transparent), transparent 46%), radial-gradient(90% 140% at 0% 100%, color-mix(in srgb, var(--gold) 18%, transparent), transparent 60%), var(--paper) !important; }
+.category-card.situations > span { background:color-mix(in srgb, var(--gold) 18%, transparent); color:#a5701c; }
+body.dark-mode .category-card.situations > span { color:#e8b85e; }
+.sit-view input { width:100%; border:1px solid transparent; border-radius:14px; background:var(--surface-2); color:var(--ink); padding:12px 14px; font:inherit; font-size:16px; margin-bottom:12px; }
+.sit-view input:focus { outline:0; border-color:var(--olive); background:var(--paper); }
+.sit-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px; }
+.sit-item { display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:12px; border-radius:16px; background:var(--surface-2); color:var(--ink); text-align:start; transition:transform .2s var(--spring-soft), background .2s ease; }
+.sit-item:hover { background:color-mix(in srgb, var(--olive) 8%, var(--surface-2)); }
+.sit-item:active { transform:scale(.97); }
+.sit-icon { width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:var(--paper); color:var(--olive); margin-bottom:4px; }
+.sit-icon svg { width:19px; height:19px; }
+.sit-item strong { font-size:14px; line-height:1.5; }
+.sit-item small { color:var(--muted); font-size:11.5px; }
+.sit-grid .qm-empty { grid-column:1 / -1; }
+@media (min-width:701px) { .sit-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); } }
+
+/* ===================== بطاقة الجمعة ===================== */
+.friday-card { position:relative; display:flex; align-items:center; gap:16px; margin:0 0 22px; padding:18px 20px; border-radius:24px; color:#fbfaf4; background:radial-gradient(120% 140% at 0% 0%, rgba(232,184,94,.32), transparent 55%), linear-gradient(135deg, #1f5444, #163d32); box-shadow:0 18px 40px rgba(22,61,50,.25); overflow:hidden; }
+.friday-card[hidden] { display:none; }
+.fc-icon { width:54px; height:54px; flex:none; border-radius:18px; display:grid; place-items:center; background:rgba(255,255,255,.12); color:#f3d791; }
+.fc-icon svg { width:28px; height:28px; }
+.fc-copy { flex:1; min-width:0; }
+.fc-kicker { font-size:12px; font-weight:700; color:#f3d791; }
+.fc-copy h2 { margin:2px 0 4px; font-size:18px; color:#fff; }
+.fc-copy p { margin:0; font-size:13px; line-height:1.8; color:rgba(255,255,255,.86); }
+.fc-copy small { display:block; font-size:11px; color:rgba(255,255,255,.65); }
+.friday-card .primary-button { flex:none; background:#f3d791; color:#1f3d33; }
+@media (max-width:700px) {
+  .friday-card { flex-wrap:wrap; padding:16px; gap:12px; }
+  .friday-card .primary-button { width:100%; }
+}
+
+/* ===================== الاسم في التحية والإعدادات ===================== */
+#greeting-name-wrap { color:var(--ink); }
+.greeting-name { font:inherit; color:var(--olive); background:none; padding:0; border-radius:8px; text-decoration:underline dashed transparent; text-underline-offset:6px; transition:text-decoration-color .2s ease; cursor:pointer; }
+.greeting-name:hover, .greeting-name:focus-visible { text-decoration-color:color-mix(in srgb, var(--olive) 55%, transparent); }
+.name-setting { flex-wrap:wrap; }
+.name-form { display:flex; gap:8px; flex:1 1 260px; max-width:360px; }
+.name-form input { flex:1; min-width:0; border:1px solid transparent; border-radius:14px; background:var(--surface-2); color:var(--ink); padding:10px 14px; font:inherit; font-size:16px; }
+.name-form input:focus { outline:0; border-color:var(--olive); background:var(--paper); }
+@media (max-width:700px) { .name-form { flex-basis:100%; max-width:none; } }
+
+/* ===================== الوصول السريع: ٥ أزرار ===================== */
+.quick-actions { grid-template-columns:repeat(5, minmax(0, 1fr)); }
+.quick-actions [data-ask-open] span { background:var(--olive); color:#fff; }
+@media (max-width:600px) {
+  .quick-actions { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .quick-actions [data-ask-open] { grid-column:1 / -1; flex-direction:row; min-height:60px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-bubble, .ask-typing i, .ask-mic.is-on { animation:none !important; }
+  .ask-panel { transition:opacity .2s ease !important; transform:none !important; }
+}

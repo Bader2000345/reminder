@@ -9,7 +9,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300..700&family=Amiri+Quran&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300..700&family=Amiri+Quran&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="assets/css/05-viewer-reminders-picker.css">
     <link rel="stylesheet" href="assets/css/06-immersive-and-mobile.css">
     <link rel="stylesheet" href="assets/css/07-design.css">
+    <link rel="stylesheet" href="assets/css/08-quran-tools.css">
+    <link rel="stylesheet" href="assets/css/09-assistant.css">
 </head>
 <body>
 
@@ -63,7 +65,7 @@
         <section id="page-home" class="page-view active-page">
             <div class="brand-logo home-logo" role="img" aria-label="شعار مُذكّر"></div>
             <header class="home-intro">
-                <div><p class="eyebrow">لوحتك اليومية في مُذكّر</p><h1 id="home-greeting"><b id="greeting-word">مرحباً</b>، <span>مبارك</span></h1></div>
+                <div><p class="eyebrow">لوحتك اليومية في مُذكّر</p><h1 id="home-greeting"><b id="greeting-word">مرحباً</b><span id="greeting-name-wrap" hidden>، <button class="greeting-name" id="greeting-name" type="button" title="تعديل الاسم"></button></span></h1></div>
                 <div class="home-tools">
                     <div class="home-date"><i></i><span id="home-date-label">اليوم · —</span></div>
                     <button class="theme-quick" id="theme-quick" type="button" aria-label="تبديل الوضع الفاتح والداكن" title="فاتح / داكن">
@@ -118,6 +120,17 @@
                 <p class="ic-note" data-install-note hidden></p>
             </section>
 
+            <!-- يوم الجمعة: تظهر يوم الجمعة فقط (ويمكن إيقافها من الإعدادات) -->
+            <section class="friday-card" id="friday-card" hidden aria-labelledby="friday-title">
+                <div class="fc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V12a8 6 0 0 1 16 0v9M2 21h20M12 2v3M9 21v-4a3 3 0 0 1 6 0v4"/></svg></div>
+                <div class="fc-copy">
+                    <span class="fc-kicker">جمعة مباركة</span>
+                    <h2 id="friday-title">سورة الكهف والصلاة على النبي ﷺ</h2>
+                    <p>«من قرأ سورة الكهف يوم الجمعة أضاء له من النور ما بين الجمعتين» <small>رواه الحاكم والبيهقي، وصححه الألباني في صحيح الجامع (٦٤٧٠)</small></p>
+                </div>
+                <button class="primary-button" id="friday-read" type="button">اقرأ الكهف</button>
+            </section>
+
             <section class="smart-section">
                 <div class="section-title"><div><span class="soft-label">اقتراح يتكيّف مع وقتك</span><h2>الأذكار الذكية حسب الوقت</h2></div><span class="time-context" id="smart-time-context">الآن</span></div>
                 <article class="home-card smart-card">
@@ -133,6 +146,7 @@
                     <button class="nav-btn" data-target="adhkar" type="button"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke-width="3" stroke-dasharray="0.1 3.6"/></svg></span>المسبحة الشاملة</button>
                     <button class="nav-btn" data-target="my-adhkar" type="button"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg></span>أذكاري الخاصة</button>
                     <button class="nav-btn" data-target="settings" type="button"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>الإحصائيات</button>
+                    <button type="button" data-ask-open><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.2l.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8z"/></svg></span>اسأل مُذكّر</button>
                 </div>
             </section>
 
@@ -149,7 +163,7 @@
             <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="adhkar-search" type="search" placeholder="ابحث في الأذكار..." aria-label="البحث في الأذكار"></div>
 
             <section class="content-section" id="adhkar-categories-section">
-                <div class="section-title"><div><span class="soft-label">أذكار وعبادات بحسب الوقت</span><h2>أقسام مرتبطة بأوقات اليوم</h2></div><span class="count-label">٦ أقسام</span></div>
+                <div class="section-title"><div><span class="soft-label">أذكار وعبادات بحسب الوقت</span><h2>أقسام مرتبطة بأوقات اليوم</h2></div><span class="count-label">٧ أقسام</span></div>
                 <div class="category-grid">
                     <article class="category-card morning" role="button" tabindex="0" data-adhkar-group="morning"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg></span><strong>أذكار الصباح</strong><small>أذكار وطمأنينة مع إشراقة اليوم</small></article>
                     <article class="category-card evening" role="button" tabindex="0" data-adhkar-group="evening"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M20 14a8 8 0 1 1-10-10 6.500 6.500 0 0 0 10 10z"/></svg></span><strong>أذكار المساء</strong><small>ذكر وسكينة عند المساء</small></article>
@@ -157,6 +171,7 @@
                     <article class="category-card travel" data-adhkar-group="sleep"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M3 18v-7h18v7M3 15h18M6 11V8h5v3"/></svg></span><strong>أذكار النوم</strong><small>حصن نفسك قبل النوم</small></article>
                     <article class="category-card relief" data-adhkar-group="wake"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg></span><strong>أذكار الاستيقاظ</strong><small>الحمد لله الذي أحيانا</small></article>
                     <article class="category-card sleep" data-adhkar-group="praise"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><circle cx="12" cy="12" r="8" stroke-width="3.2" stroke-dasharray="0.1 3.9"/></svg></span><strong>تسبيح واستغفار</strong><small>فضل الذكر العظيم</small></article>
+                    <article class="category-card situations" role="button" tabindex="0" data-situations><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z"/></svg></span><strong>أذكار المناسبات</strong><small>الغضب، الهمّ، السفر، المطر… لكل موقف ذكره</small></article>
                 </div>
             </section>
 
@@ -263,7 +278,7 @@
 
             <section class="reader-hero">
                 <h2>اقرأ القرآن بتركيز كامل</h2>
-                <p>وضع قراءة بملء الشاشة: تنقّل بين الصفحات، بدّل بين المصحف النصي والمصوّر، واختر الخلفية فاتحة أو داكنة أو تلقائية.</p>
+                <p>وضع قراءة بملء الشاشة: «تنسيق المصحف» للعرض القرآني أو المصوّر والخط وألوان التجويد، واضغط مطوّلًا على أي آية لتفسيرها ونسخها وتمييزها، مع البحث في القرآن.</p>
                 <button class="primary-button" id="reader-enter" type="button">الدخول في وضع القراءة</button>
                 <small id="reader-resume"></small>
             </section>
@@ -304,6 +319,25 @@
             </header>
 
             <section class="settings-list">
+                <article class="setting-card name-setting" id="name-setting">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>اسمك</h2>
+                        <p id="name-status">يظهر في التحية بالرئيسية، ويناديك به المساعد</p>
+                    </div>
+                    <form class="name-form" id="name-form" autocomplete="off">
+                        <input id="name-input" type="text" maxlength="24" placeholder="اكتب اسمك" aria-label="اسمك" enterkeyhint="done">
+                        <button class="primary-button" type="submit">حفظ</button>
+                    </form>
+                </article>
+                <article class="setting-card">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V12a8 6 0 0 1 16 0v9M2 21h20M12 2v3M9 21v-4a3 3 0 0 1 6 0v4"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>تذكير الجمعة</h2>
+                        <p>صباح كل جمعة: سورة الكهف والإكثار من الصلاة على النبي ﷺ</p>
+                    </div>
+                    <label class="switch" title="تفعيل أو إيقاف تذكير الجمعة"><input id="friday-switch" type="checkbox" checked aria-label="تفعيل تذكير الجمعة"><span></span></label>
+                </article>
                 <article class="setting-card">
                     <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor" stroke="none"/></svg></div>
                     <div style="flex:1;">
@@ -457,7 +491,12 @@
 
 <div class="wird-float-plus" id="wird-float-plus" aria-hidden="true">+١ آية</div>
 <div class="wird-focus" id="wird-focus" role="dialog" aria-modal="true" aria-label="وضع التركيز على آية واحدة">
-    <div class="wird-focus-card"><button class="wird-focus-close" id="wird-focus-close" type="button" aria-label="إغلاق وضع التركيز">×</button><small id="focus-verse-badge">الآية الحالية</small><div class="single-verse-content" id="focus-verse-text"></div><button class="primary-button wird-complete-btn" id="focus-complete-btn" type="button">أتممت هذه الآية · التالية</button></div>
+    <div class="wird-focus-card"><button class="wird-focus-close" id="wird-focus-close" type="button" aria-label="إغلاق وضع التركيز">×</button><small id="focus-verse-badge">الآية الحالية</small><div class="single-verse-content" id="focus-verse-text"></div>
+        <div class="focus-tools" role="group" aria-label="أدوات الآية">
+            <button type="button" class="focus-tool" id="focus-tajweed" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="3.2"/><circle cx="16" cy="9" r="3.2"/><circle cx="12" cy="16" r="3.2"/></svg>ألوان التجويد</button>
+            <button type="button" class="focus-tool" id="focus-tafsir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h11a3 3 0 0 1 3 3v12H7a3 3 0 0 1-3-3z"/><path d="M8 9h6M8 13h6"/></svg>التفسير</button>
+        </div>
+        <button class="primary-button wird-complete-btn" id="focus-complete-btn" type="button">أتممت هذه الآية · التالية</button></div>
 </div>
 
 <!-- وضع القراءة (ملء الشاشة) -->
@@ -465,15 +504,64 @@
     <div class="reader-bar">
         <button class="reader-x" id="reader-close" type="button" aria-label="الخروج من وضع القراءة">×</button>
         <select id="reader-surah" aria-label="السورة"><option>السورة…</option></select>
-        <div class="segmented" id="reader-mode"><button type="button" data-mode="text">نصي</button><button type="button" data-mode="image">مصوّر</button></div>
-        <div class="segmented" id="reader-theme"><button type="button" data-rt="light">فاتح</button><button type="button" data-rt="auto">تلقائي</button><button type="button" data-rt="dark">داكن</button></div>
-        <div class="segmented" id="reader-size"><button type="button" data-d="-2" aria-label="تصغير الخط">أ−</button><output id="rd-size-val" aria-live="polite">٣٠</output><button type="button" data-d="2" aria-label="تكبير الخط">أ+</button></div>
+        <div class="rd-tools">
+            <button class="rd-icon" id="rd-search-btn" type="button" aria-label="البحث في القرآن" title="البحث في القرآن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
+            <button class="rd-icon" id="rd-marks-btn" type="button" aria-label="العلامات والملاحظات" title="العلامات والملاحظات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/></svg></button>
+            <button class="rd-layout-btn" id="rd-layout-btn" type="button" aria-label="تنسيق المصحف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19l5-14 5 14M6 14h6"/><path d="M15.5 19c0-2.2 1.2-3.5 3-3.5s2.5 1 2.5 2.4V19M21 17.5h-3"/></svg><span>تنسيق المصحف</span></button>
+        </div>
     </div>
     <div class="reader-stage" id="reader-stage"></div>
     <div class="reader-foot">
         <button type="button" id="rd-prev">الصفحة السابقة →</button>
         <label>صفحة <input type="number" id="rd-page" min="1" max="604" inputmode="numeric"> / ٦٠٤</label>
         <button type="button" id="rd-next">← الصفحة التالية</button>
+    </div>
+</div>
+
+<!-- اللوحة المنبثقة المشتركة لأدوات القرآن: تنسيق المصحف، أدوات الآية، التفسير، العلامات، البحث -->
+<div class="qsheet-layer" id="qsheet" hidden>
+    <div class="qsheet-backdrop" data-qsheet-close></div>
+    <section class="qsheet-panel" role="dialog" aria-modal="true" aria-labelledby="qsheet-title">
+        <div class="qsheet-grip" aria-hidden="true"></div>
+        <header class="qsheet-head">
+            <button class="qsheet-back" id="qsheet-back" type="button" aria-label="رجوع" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+            <h3 id="qsheet-title"></h3>
+            <button class="qsheet-x" type="button" data-qsheet-close aria-label="إغلاق">×</button>
+        </header>
+        <div class="qsheet-body" id="qsheet-body"></div>
+    </section>
+</div>
+<div id="qsheet-stash" hidden>
+    <!-- تنسيق المصحف -->
+    <div class="rd-layout" id="rd-layout">
+        <div class="lay-row">
+            <span class="lay-label">العرض</span>
+            <div class="segmented" id="reader-mode"><button type="button" data-mode="text">قرآني (نصي)</button><button type="button" data-mode="image">مصوّر</button></div>
+        </div>
+        <div class="lay-text-only" id="lay-text-only">
+            <div class="lay-preview" id="lay-preview" aria-hidden="true"></div>
+            <div class="lay-row">
+                <span class="lay-label">الخط</span>
+                <div class="segmented" id="reader-font"><button type="button" data-font="amiri">عثماني</button><button type="button" data-font="scheherazade">شهرزاد</button><button type="button" data-font="naskh">نسخ</button></div>
+            </div>
+            <div class="lay-row">
+                <span class="lay-label">حجم الخط</span>
+                <div class="segmented" id="reader-size"><button type="button" data-d="-2" aria-label="تصغير الخط">أ−</button><output id="rd-size-val" aria-live="polite">٣٠</output><button type="button" data-d="2" aria-label="تكبير الخط">أ+</button></div>
+            </div>
+            <div class="lay-row">
+                <span class="lay-label">ألوان التجويد</span>
+                <div class="lay-inline">
+                    <button type="button" class="lay-link" id="rd-tajweed-legend-btn" aria-expanded="false">دليل الألوان</button>
+                    <label class="switch"><input type="checkbox" id="rd-tajweed" aria-label="ألوان التجويد"><span></span></label>
+                </div>
+            </div>
+            <div class="tj-legend" id="rd-tajweed-legend" hidden></div>
+        </div>
+        <p class="lay-note" id="lay-image-note" hidden>الخط وحجمه وألوان التجويد متاحة في العرض القرآني (النصي).</p>
+        <div class="lay-row">
+            <span class="lay-label">المظهر</span>
+            <div class="segmented" id="reader-theme"><button type="button" data-rt="light">فاتح</button><button type="button" data-rt="sepia">ورقي</button><button type="button" data-rt="dark">داكن</button><button type="button" data-rt="auto">تلقائي</button></div>
+        </div>
     </div>
 </div>
 
@@ -509,16 +597,41 @@
     </div>
 </div>
 
+<!-- «اسأل مُذكّر»: زر عائم + لوحة المحادثة (assets/js/assistant.js) -->
+<button class="ask-fab" id="ask-fab" type="button" aria-label="اسأل مُذكّر" aria-controls="ask-panel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M12 7.8l.9 2 2 .9-2 .9-.9 2-.9-2-2-.9 2-.9z"/></svg>
+    <span>اسأل مُذكّر</span>
+</button>
+<section class="ask-panel" id="ask-panel" role="dialog" aria-modal="true" aria-labelledby="ask-title" hidden>
+    <header class="ask-head">
+        <button class="ask-icon-btn" id="ask-close" type="button" aria-label="إغلاق المحادثة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <div class="ask-id">
+            <span class="ask-avatar brand-logo" aria-hidden="true"></span>
+            <div><h2 id="ask-title">اسأل مُذكّر</h2><small>من أذكار التطبيق وأدلته · مساعد آلي</small></div>
+        </div>
+        <button class="ask-icon-btn" id="ask-new" type="button" aria-label="محادثة جديدة" title="محادثة جديدة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h8"/><path d="M15.5 4.5l4 4L9 19l-5 1 1-5z"/></svg></button>
+    </header>
+    <div class="ask-log" id="ask-log" aria-live="polite"></div>
+    <form class="ask-form" id="ask-form" autocomplete="off">
+        <button class="ask-icon-btn ask-mic" id="ask-mic" type="button" aria-label="تحدّث بدل الكتابة" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <textarea id="ask-input" rows="1" maxlength="600" placeholder="اكتب شيئًا تريده…" aria-label="سؤالك" enterkeyhint="send"></textarea>
+        <button class="ask-send" id="ask-send" type="submit" aria-label="إرسال"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></button>
+    </form>
+    <p class="ask-note">مساعد آلي قد يخطئ. نصوص الأذكار وأدلتها في البطاقات من محتوى التطبيق، وللفتوى ارجع لأهل العلم.</p>
+</section>
 
 <!-- البيانات: الأذكار العامة وأذكار الأقسام مع الأدلة -->
 <script src="general-adhkar.js"></script>
 <script src="adhkar-data.js"></script>
+<script src="situations-adhkar.js"></script>
 <!-- منطق التطبيق: الترتيب مهم، و main.js آخرها لأنه يشغّل الكل -->
+<script src="assets/js/knowledge.js"></script>
 <script src="assets/js/core.js"></script>
 <script src="assets/js/adhkar-viewer.js"></script>
 <script src="assets/js/theme.js"></script>
 <script src="assets/js/modals-and-picker.js"></script>
 <script src="assets/js/wird.js"></script>
+<script src="assets/js/quran-tools.js"></script>
 <script src="assets/js/reader.js"></script>
 <script src="assets/js/notifications.js"></script>
 <script src="assets/js/reminders.js"></script>
@@ -528,6 +641,7 @@
 <script src="assets/js/share.js"></script>
 <script src="assets/js/time-context.js"></script>
 <script src="assets/js/motion.js"></script>
+<script src="assets/js/assistant.js"></script>
 <script src="assets/js/main.js"></script>
 
 </body>

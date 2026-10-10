@@ -72,13 +72,14 @@ const Notifier = (() => {
         if (supported && Notification.permission === 'default') { try { await Notification.requestPermission(); } catch (e) {} }
         return permission();
     }
-    async function system(title, body, tag) {
+    // extra: أزرار الإشعار وبياناته (تعمل فقط عبر الـ Service Worker)
+    async function system(title, body, tag, extra = null) {
         if (permission() !== 'granted') return false;
         const options = { body, tag, renotify: true, lang: 'ar', dir: 'rtl', icon: 'assets/img/icon-192.png', badge: 'assets/img/favicon-64.png' };
         try {
             if (SW_OK) {
                 const reg = await navigator.serviceWorker.getRegistration();
-                if (reg) { await reg.showNotification(title, options); return true; }
+                if (reg) { await reg.showNotification(title, { ...options, ...(extra || {}) }); return true; }
             }
             new Notification(title, options);
             return true;
@@ -138,7 +139,7 @@ const PushSync = (() => {
         if (!PUSH_SERVER) return setState('nourl');
         if (!SW_OK || !('PushManager' in window)) return setState('unsupported');
         const general = GeneralReminder.isActive();
-        const reminders = Reminders.list().filter(r => r.on && Sched.next(r)).map(({ id, time, repeat, days, date }) => ({ id, time, repeat, days, date }));
+        const reminders = allReminders().filter(r => r.on && Sched.next(r)).map(({ id, time, repeat, days, date }) => ({ id, time, repeat, days, date }));
         const need = Notifier.permission() === 'granted' && (general || reminders.length > 0);
         try {
             const reg = await navigator.serviceWorker.ready;
@@ -176,9 +177,12 @@ const PushSync = (() => {
     return { sync, state: () => state, onChange: f => listeners.add(f) };
 })();
 
+// التذكيرات الشخصية + تذكير الجمعة (time-context.js)
+const allReminders = () => Reminders.list().concat(typeof FridayReminder !== 'undefined' ? FridayReminder.entries() : []);
+
 // كل تغيير في الإعدادات: نحدّث نسخة الـ Service Worker ثم السيرفر
 function syncNotifications() {
-    NotifyStore.put('state', { general: GeneralReminder.isActive(), reminders: Reminders.list() });
+    NotifyStore.put('state', { general: GeneralReminder.isActive(), reminders: allReminders() });
     PushSync.sync();
 }
 
@@ -188,6 +192,11 @@ const GeneralReminder = (() => {
     const KEY_SLOT = 'mudhakkir-general-lastslot';
     const KEY_BAG  = 'mudhakkir-general-bag';
     const TITLE = 'أذكار عامة';
+    // نفس أزرار إشعار sw.js: «اسأل مُذكّر» (مع خانة كتابة إن دعمها المتصفح) و«ذكر آخر»
+    const EXTRA = { data: { kind: 'general' }, actions: [
+        { action: 'ask', title: '✍️ اسأل مُذكّر', type: 'text', placeholder: 'اكتب ما تريد… مثلًا: ذكر عند الغضب' },
+        { action: 'next', title: 'ذكر آخر ↻' }
+    ] };
     let timer = null;
 
     const store = {
@@ -224,7 +233,7 @@ const GeneralReminder = (() => {
         const last = parseInt(store.get(KEY_SLOT) || '0', 10);
         if (current > last) {
             store.set(KEY_SLOT, String(current));
-            Notifier.system(TITLE, nextDhikr(), 'general-adhkar');
+            Notifier.system(TITLE, nextDhikr(), 'general-adhkar', EXTRA);
         }
     }
 
@@ -276,7 +285,7 @@ const GeneralReminder = (() => {
         const before = Notifier.permission();
         if (await Notifier.ensurePermission() !== 'granted') return updateUI();
         if (before !== 'granted') { schedule(); syncNotifications(); }
-        Notifier.system(TITLE, nextDhikr(), 'general-adhkar');
+        Notifier.system(TITLE, nextDhikr(), 'general-adhkar', EXTRA);
     }
 
     function init() {

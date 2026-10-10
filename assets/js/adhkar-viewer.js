@@ -168,7 +168,8 @@ const AdhkarViewer = (() => {
     }
 
     // يُفتح بملء الشاشة (دون شريط التنقل) ويُغلق بزر «الأقسام» أو زر الرجوع في الجوال
-    function open(key) {
+    // start: رقم الذكر الذي يُفتح عليه (من المساعد مثلًا)
+    function open(key, start = 0) {
         const data = ADHKAR_DATABASE[key]; if (!data) return;
         group = data; items = data.items; counts = items.map(() => 0); idx = 0;
         const root = $('adhkar-detail');
@@ -176,8 +177,58 @@ const AdhkarViewer = (() => {
         root.hidden = false;
         Immersive.enter(root, { onClose: close });
         $('dk-book').replaceChildren();
-        show(0);
+        show(Math.min(Math.max(0, start | 0), items.length - 1));
         $('dk-counter').focus({ preventScroll: true });
+    }
+
+    // أيقونات المواقف (أسماؤها في situations-adhkar.js)
+    const SIT_ICONS = {
+        flame: '<path d="M12 21c-4 0-6.5-2.6-6.5-6 0-3.6 3-5.6 3.5-9 2.5 1.6 3.8 3.6 4 6 .8-.7 1.3-1.8 1.4-3 2 1.6 3.1 3.6 3.1 6 0 3.4-2.5 6-5.5 6z"/>',
+        cloud: '<path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7 18z"/>',
+        storm: '<path d="M7 15h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 6.5 4.3 4.3 0 0 0 7 15z"/><path d="M12 15l-2 4h3l-2 3"/>',
+        plane: '<path d="M10.5 13.5L3 11l1.5-1.5 8 .5 4-4.5a1.8 1.8 0 0 1 2.5 2.5l-4.5 4 .5 8L14 21.5l-2.5-7.5-3 3V20l-1.5 1-1-3.5-3.5-1 1-1.5h3z"/>',
+        car: '<path d="M5 16V12l2-5h10l2 5v4"/><path d="M3 16h18v3H3zM5 12h14"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/>',
+        door: '<path d="M6 21V4h12v17M3 21h18"/><circle cx="14.5" cy="12.5" r=".8"/>',
+        home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+        mosque: '<path d="M4 21V12a8 6 0 0 1 16 0v9M2 21h20M12 2v3M9 21v-4a3 3 0 0 1 6 0v4"/>',
+        food: '<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M16 3c-2 0-3 2.5-3 6h3v12"/>',
+        rain: '<path d="M7 14h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 5.5 4.3 4.3 0 0 0 7 14z"/><path d="M8 17l-1 3M12 17l-1 3M16 17l-1 3"/>',
+        heart: '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+        drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+        moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+        compass: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+        chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+        coin: '<circle cx="12" cy="12" r="8.5"/><path d="M14.5 9.5c-.5-1-1.4-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1.2 0-2.1-.5-2.6-1.5M12 6.5V8M12 16v1.5"/>',
+        shirt: '<path d="M8 3l-5 3 2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
+        shield: '<path d="M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/>',
+        sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z"/>'
+    };
+    const sitIcon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SIT_ICONS[name] || SIT_ICONS.sparkle}</svg>`;
+
+    // «أذكار المناسبات»: قائمة المواقف مع بحث ← العارض
+    function openSituations() {
+        if (typeof SITUATION_ADHKAR === 'undefined' || typeof QSheet === 'undefined') return;
+        const box = el('div', 'sit-view');
+        const input = el('input'); input.type = 'search'; input.placeholder = 'ابحث عن موقف… (غضب، سفر، مطر)'; input.setAttribute('aria-label', 'البحث في أذكار المناسبات');
+        const grid = el('div', 'sit-grid');
+        const norm = typeof Knowledge !== 'undefined' ? Knowledge.norm : s => s;
+        const paint = q => {
+            q = norm(q);
+            grid.replaceChildren();
+            const list = SITUATION_ADHKAR.filter(g => !q || norm(g.title + ' ' + g.keywords.join(' ')).includes(q));
+            if (!list.length) { grid.append(el('p', 'qm-empty', 'لا يوجد موقف بهذا الاسم. جرّب «اسأل مُذكّر».')); return; }
+            list.forEach(g => {
+                const b = el('button', 'sit-item'); b.type = 'button';
+                const ic = el('span', 'sit-icon'); ic.innerHTML = sitIcon(g.icon);
+                b.append(ic, el('strong', '', g.title),el('small', '', g.items.length === 1 ? 'ذكر واحد' : g.items.length === 2 ? 'ذكران' : `${ar(g.items.length)} أذكار`));
+                b.addEventListener('click', () => { QSheet.close(); open(g.key); });
+                grid.append(b);
+            });
+        };
+        input.addEventListener('input', () => paint(input.value));
+        box.append(input, grid);
+        paint('');
+        QSheet.open('أذكار المناسبات', box);
     }
     function close(fromPop = false) {
         const root = $('adhkar-detail');
@@ -196,6 +247,11 @@ const AdhkarViewer = (() => {
                 card.append(el('em', 'cat-count', n === 1 ? 'ذكر واحد' : n === 2 ? 'ذكران' : n <= 10 ? `${ar(n)} أذكار` : `${ar(n)} ذكرًا`));
             }
             card.addEventListener('click', () => open(card.dataset.adhkarGroup));
+        });
+        document.querySelectorAll('[data-situations]').forEach(card => {
+            if (typeof SITUATION_ADHKAR !== 'undefined' && !card.querySelector('.cat-count')) card.append(el('em', 'cat-count', `${ar(SITUATION_ADHKAR.length)} موقفًا`));
+            card.addEventListener('click', openSituations);
+            card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSituations(); } });
         });
         $('adhkar-back').addEventListener('click', () => close());
         Immersive.bindTap($('adhkar-detail'), $('dk-stage'), () => swiped);
@@ -222,7 +278,7 @@ const AdhkarViewer = (() => {
         });
         stage.addEventListener('pointercancel', () => { tracking = false; });
     }
-    return { init, open, close };
+    return { init, open, close, openSituations };
 })();
 
 // البحث الفوري في الأذكار

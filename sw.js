@@ -1,23 +1,26 @@
 /* مُذكّر — Service Worker
  * - التحديث بموافقة المستخدم: التطبيق يعمل من نسخته المحفوظة، والنسخة الجديدة تُنزَّل في الخلفية
  *   ولا تُستخدم إلا بعد أن يضغط المستخدم «تحديث».
- * - إشعارات الأذكار العامة والتذكيرات الشخصية وإشعار التحديثات.
+ * - إشعارات الأذكار العامة (مع زرّي «اسأل مُذكّر» و«ذكر آخر») والتذكيرات الشخصية وتذكير الجمعة وإشعار التحديثات.
  * - العمل دون اتصال.
  */
-// إن تعذّر تحميل general-adhkar.js لا يتعطل الـ Service Worker كله
+// إن تعذّر تحميل أحد ملفات البيانات لا يتعطل الـ Service Worker كله
 try { importScripts('general-adhkar.js'); } catch (e) {}
+try { importScripts('adhkar-data.js', 'situations-adhkar.js', 'assets/js/knowledge.js'); } catch (e) {}
+// نفس الرابط في assets/js/notifications.js (للرد على «اسأل مُذكّر» من داخل الإشعار)
+const PUSH_SERVER = 'https://mudhakkir-push.bader-bm-2000.workers.dev';
 const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIST.length) ? GENERAL_ADHKAR_LIST : [
     'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
     'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ',
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v15';
+const CACHE = 'mudhakkir-v16';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
-const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'reader', 'notifications', 'reminders', 'updates', 'install', 'home', 'share', 'time-context', 'motion', 'main'].map(n => `./assets/js/${n}.js`);
-const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
+const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant'].map(n => `./assets/css/${n}.css`);
+const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'quran-tools', 'reader', 'notifications', 'reminders', 'updates', 'install', 'home', 'share', 'time-context', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
+const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
     './assets/img/logo-light.png', './assets/img/logo-dark.png', './assets/img/icon-192.png', './assets/img/icon-512.png', './assets/img/favicon-64.png', './assets/img/apple-touch-icon.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
 const DUE_WINDOW = 30 * 60 * 1000; // يُعرض التذكير إن تأخر وصول الإشعار حتى ٣٠ دقيقة
@@ -137,7 +140,8 @@ async function checkReminders(now = Date.now()) {
     await putJSON('shown', shown);
     await Promise.all(fired.map(r => self.registration.showNotification(r.title || 'تذكير', {
         body: r.text, tag: 'rem-' + r.id, renotify: true, lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE,
-        requireInteraction: true, data: { kind: 'reminder', id: r.id }
+        requireInteraction: true, data: { kind: 'reminder', id: r.id, open: r.id === 'friday' ? 'kahf' : undefined },
+        actions: r.id === 'friday' ? [{ action: 'kahf', title: '📖 اقرأ الكهف' }] : []
     })));
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     wins.forEach(w => w.postMessage({ type: 'mdk-reminder', reminders: fired.map(({ id, title, text }) => ({ id, title, text })) }));
@@ -160,22 +164,97 @@ self.addEventListener('message', event => {
     })());
 });
 
-// الضغط على الإشعار يفتح التطبيق أو يعيد التركيز عليه (وإشعار التحديث يفتح الموقع)
+// ---------- إشعار الأذكار العامة: زر «اسأل مُذكّر» (مع خانة كتابة إن دعمها المتصفح) و«ذكر آخر» ----------
+const GENERAL_ACTIONS = [
+    { action: 'ask', title: '✍️ اسأل مُذكّر', type: 'text', placeholder: 'اكتب ما تريد… مثلًا: ذكر عند الغضب' },
+    { action: 'next', title: 'ذكر آخر ↻' }
+];
+let lastIdx = -1;
+function showGeneral() {
+    let i;
+    do { i = Math.floor(Math.random() * ADHKAR.length); } while (i === lastIdx && ADHKAR.length > 1);
+    lastIdx = i;
+    return self.registration.showNotification('أذكار عامة', {
+        body: ADHKAR[i], tag: 'general-adhkar', renotify: true, lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE,
+        actions: GENERAL_ACTIONS, data: { kind: 'general' }
+    });
+}
+
+// يفتح التطبيق (أو يعيد التركيز عليه) ثم يرسل له ما يجب فتحه
+async function focusApp(message, path) {
+    const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of list) {
+        if (!('focus' in client)) continue;
+        try { await client.focus(); } catch (e) {}
+        client.postMessage(message);
+        return;
+    }
+    return self.clients.openWindow(new URL(path, self.registration.scope).href);
+}
+
+// الرد من داخل الإشعار (المتصفحات التي تدعم الكتابة في الإشعار): نسأل السيرفر ونعرض الجواب كإشعار
+const stripIds = text => String(text || '').replace(/\[\[([\w-]+:\d+)\]\]/g, (m, id) => {
+    const it = typeof Knowledge !== 'undefined' ? Knowledge.get(id) : null;
+    return it ? `\n«${it.text.slice(0, 260)}»` : '';
+}).replace(/\*\*/g, '').replace(/\n{3,}/g, '\n\n').trim();
+async function readSSE(res) {
+    const type = res.headers.get('Content-Type') || '';
+    const raw = await res.text();
+    if (!type.includes('event-stream')) { try { const j = JSON.parse(raw); return j.response || ''; } catch (e) { return ''; } }
+    let text = '';
+    raw.split('\n').forEach(line => {
+        const l = line.trim();
+        if (!l.startsWith('data:')) return;
+        const p = l.slice(5).trim();
+        if (!p || p === '[DONE]') return;
+        try { const j = JSON.parse(p); text += typeof j.response === 'string' ? j.response : (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) || ''; } catch (e) {}
+    });
+    return text;
+}
+async function answerFromNotification(q) {
+    q = String(q).trim().slice(0, 600);
+    const items = typeof Knowledge !== 'undefined' ? Knowledge.search(q, { limit: 6 }) : [];
+    let a = '', local = false;
+    try {
+        const res = await fetch(PUSH_SERVER + '/chat', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: [{ role: 'user', content: q }], items: typeof Knowledge !== 'undefined' ? Knowledge.forModel(items) : [] })
+        });
+        if (res.ok) a = (await readSSE(res)).trim();
+    } catch (e) {}
+    if (!a) {
+        local = true;
+        const help = typeof Knowledge !== 'undefined' ? Knowledge.helpFor(q) : null;
+        a = help ? help.answer : items.length ? 'من محتوى التطبيق:\n' + items.slice(0, 2).map(it => `[[${it.id}]]`).join('\n') : 'افتح المحادثة لتكمل سؤالك مع مُذكّر.';
+    }
+    // نحفظ السؤال والجواب لتظهر في المحادثة عند فتح التطبيق
+    const inbox = await getJSON('ask-inbox', []);
+    inbox.push({ q, a, at: Date.now(), local });
+    await putJSON('ask-inbox', inbox.slice(-10));
+    await self.registration.showNotification('مُذكّر يجيبك', {
+        body: stripIds(a).slice(0, 900), tag: 'ask-answer', lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE,
+        data: { kind: 'ask-answer' }, actions: [{ action: 'open-ask', title: 'افتح المحادثة' }]
+    });
+}
+
+// الضغط على الإشعار أو أحد أزراره
 self.addEventListener('notificationclick', event => {
-    event.notification.close();
-    const url = event.notification.data && event.notification.data.url;
-    event.waitUntil(
-        self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-            if (url) {
-                for (const client of list) if ('navigate' in client) return client.navigate(url).then(c => c && c.focus()).catch(() => self.clients.openWindow(url));
-                return self.clients.openWindow(url);
-            }
-            for (const client of list) {
-                if ('focus' in client) return client.focus();
-            }
-            return self.clients.openWindow('./');
-        })
-    );
+    const n = event.notification, data = n.data || {}, action = event.action;
+    n.close();
+    event.waitUntil((async () => {
+        if (action === 'next') return showGeneral();
+        if (action === 'ask' && typeof event.reply === 'string' && event.reply.trim()) return answerFromNotification(event.reply);
+        if (action === 'ask' || action === 'open-ask' || data.kind === 'ask-answer') return focusApp({ type: 'mdk-open-ask' }, './?ask=1');
+        if (action === 'kahf' || data.open === 'kahf') return focusApp({ type: 'mdk-open-kahf' }, './?open=kahf');
+        const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        if (data.url) {
+            const url = new URL(data.url, self.registration.scope).href;
+            for (const client of list) if ('navigate' in client) return client.navigate(url).then(c => c && c.focus()).catch(() => self.clients.openWindow(url));
+            return self.clients.openWindow(url);
+        }
+        for (const client of list) if ('focus' in client) return client.focus();
+        return self.clients.openWindow('./');
+    })());
 });
 
 // إشعار «تحديث جديد» لمن لم يفتح التطبيق منذ نشر إصدار أحدث (نفحص مرة كل ١٢ ساعة عند وصول نبضة)
@@ -203,7 +282,6 @@ async function checkUpdateNotice() {
 
 // نبضة من السيرفر (Web Push) — تعمل والتطبيق مغلق
 // السيرفر يرسل نبضة عند كل ربع ساعة (الأذكار العامة) وعند وقت كل تذكير شخصي، ونحن نقرر هنا ماذا نعرض
-let lastIdx = -1;
 self.addEventListener('push', event => {
     event.waitUntil(serial(async () => {
         const now = Date.now();
@@ -217,11 +295,6 @@ self.addEventListener('push', event => {
         const generalSlot = minute <= 3 || minute >= 13;
         // نعرض الذكر العام في موعده، أو إن وصلت نبضة دون تذكير مستحق (حتى لا تكون النبضة صامتة)
         if (!generalOn || (fired.length && !generalSlot)) return;
-        let i;
-        do { i = Math.floor(Math.random() * ADHKAR.length); } while (i === lastIdx && ADHKAR.length > 1);
-        lastIdx = i;
-        await self.registration.showNotification('أذكار عامة', {
-            body: ADHKAR[i], tag: 'general-adhkar', renotify: true, lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE
-        });
+        await showGeneral();
     }));
 });

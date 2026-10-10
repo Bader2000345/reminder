@@ -216,21 +216,12 @@ body.dark-mode .category-card[data-adhkar-group="morning"] > span { color:#e8b85
 .rd-text p { margin:0; }
 .rd-surah { font-family:var(--font-main); font-size:max(15px, .55em); font-weight:600; }
 .rd-basmala { font-size:.9em; }
-#reader-size { align-items:center; }
-#rd-size-val { min-width:30px; text-align:center; font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--rd-fg); opacity:.85; }
 .reader-bar { gap:8px; }
 .reader-x { flex:none; }
+/* أدوات الشريط (البحث، العلامات، تنسيق المصحف) في 08-quran-tools.css */
 @media (max-width:700px) {
-  /* الصف الأول: إغلاق + السورة، والصف الثاني: نصي/مصوّر، المظهر، حجم الخط */
-  .reader-bar { display:grid !important; grid-template-columns:auto 1fr; gap:8px; padding:calc(8px + env(safe-area-inset-top, 0px)) 10px 10px !important; }
-  .reader-bar select { max-width:none !important; width:100%; min-height:40px; border-radius:12px; }
-  .reader-bar .segmented { justify-content:space-between; }
-  #reader-mode { grid-column:1 / -1; }
-  #reader-theme, #reader-size { grid-column:span 1; }
-  .reader-bar > .segmented:nth-of-type(2), .reader-bar > .segmented:nth-of-type(3) { grid-column:auto; }
-  .reader-bar { grid-template-areas:"x s" "m m" "t z"; }
-  .reader-x { grid-area:x; } #reader-surah { grid-area:s; } #reader-mode { grid-area:m; } #reader-theme { grid-area:t; } #reader-size { grid-area:z; }
-  .reader .segmented button { flex:1; min-height:36px; padding:6px 8px !important; }
+  .reader-bar { padding:calc(8px + env(safe-area-inset-top, 0px)) 10px 8px !important; flex-wrap:nowrap !important; }
+  .reader-bar select { flex:1; min-width:0; max-width:none !important; min-height:40px; border-radius:12px; }
   .reader-stage { padding-top:calc(16px + env(safe-area-inset-top, 0px)) !important; padding-inline:8px !important; }
   .reader-bar { box-shadow:0 10px 30px rgba(0,0,0,.12); }
   .rd-text { padding:18px 16px !important; }

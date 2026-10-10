@@ -9,7 +9,7 @@
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
-const APP_BUILD = 4;
+const APP_BUILD = 5;
 const SITE_URL = 'https://bader2000345.github.io/reminder/';
 const UpdateNotice = (() => {
     const $ = id => document.getElementById(id);

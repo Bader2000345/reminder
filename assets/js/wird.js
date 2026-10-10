@@ -337,6 +337,7 @@ const Wird = (() => {
         $('verse-page-note').textContent = `الصفحة ${fmt(pageNo(view.count))} · الجزء ${fmt(ayah.juz || QuranData.juzOfPage(pageNo(view.count)))}`;
         $('wird-current-aya-num').textContent = fmt(ayah.numberInSurah);
         paintVerse($('focus-verse-text'), ayah);
+        if (typeof FocusTools !== 'undefined') FocusTools.update(ayah, pageNo(view.count), view.idx); // التجويد والتفسير في وضع التركيز
         $('focus-verse-badge').textContent = $('verse-badge-num').textContent;
         if (atReached) { S.pos = { surah: ayah.surah.number, juz: ayah.juz || QuranData.juzOfPage(pageNo(view.count)), page: pageNo(view.count) }; save(); }
         renderAll();
