@@ -45,15 +45,15 @@ html:not([data-daytime="night"]) .motes { display:none; }
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='black' stroke-width='1'%3E%3Crect x='14' y='14' width='20' height='20'/%3E%3Crect x='14' y='14' width='20' height='20' transform='rotate(45 24 24)'/%3E%3Cpath d='M0 24h9.9M38.1 24H48M24 0v9.9M24 38.1V48'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='48' cy='0' r='6'/%3E%3Ccircle cx='0' cy='48' r='6'/%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3C/g%3E%3C/svg%3E") 0 0/54px 54px repeat; }
 body.dark-mode .fx-pat { opacity:.5; }
 /* الإصدار ٨: النقش ظاهر على كامل الشاشة بهدوء، ويتوضّح أثناء التمرير واللمس (fx.js ← .is-awake) ثم يهدأ */
-.fx-pat-all { position:absolute; inset:0; opacity:.34; will-change:opacity; transition:opacity 1.2s ease;
+.fx-pat-all { position:absolute; inset:0; opacity:.24; will-change:opacity; transition:opacity 1.2s ease;
   -webkit-mask:linear-gradient(180deg, #000, rgba(0,0,0,.62) 45%, rgba(0,0,0,.5));
   mask:linear-gradient(180deg, #000, rgba(0,0,0,.62) 45%, rgba(0,0,0,.5)); }
-.fx-pattern.is-awake .fx-pat-all { opacity:.9; transition-duration:.35s; }
+.fx-pattern.is-awake .fx-pat-all { opacity:.72; transition-duration:.35s; }
 html.fx-lite .fx-pat-all { transition:none; }
 /* أعلى الصفحة: النقش أوضح كأن ضوءًا ينزل عليه */
 .fx-pat-top { position:absolute; inset:0;
-  -webkit-mask:radial-gradient(140% 48% at 50% -6%, #000, rgba(0,0,0,.4) 48%, transparent 78%);
-  mask:radial-gradient(140% 48% at 50% -6%, #000, rgba(0,0,0,.4) 48%, transparent 78%); }
+  -webkit-mask:radial-gradient(140% 48% at 50% -6%, rgba(0,0,0,.75), rgba(0,0,0,.3) 48%, transparent 78%);
+  mask:radial-gradient(140% 48% at 50% -6%, rgba(0,0,0,.75), rgba(0,0,0,.3) 48%, transparent 78%); }
 /* بقعة الضوء: تتحرك بالـ transform فقط (fx.js) والنقش داخلها ثابت مع الشاشة */
 .fx-lens { position:absolute; left:0; top:0; width:300px; height:300px; margin:-150px 0 0 -150px; overflow:hidden; border-radius:50%; will-change:transform;
   -webkit-mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.6) 55%, transparent 100%);
