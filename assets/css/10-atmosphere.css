@@ -1,0 +1,141 @@
+/* =====================================================================
+ * مُذكّر — 10-atmosphere.css
+ * جوّ التطبيق حسب الوقت وتحسينات الشكل والحركة (فوق التصميم المعتمد، لا بدلًا منه):
+ *   ألوان الخلفية والبطاقة الرئيسية حسب فترة اليوم، نجوم بالليل، زخرفة النجمة الثمانية،
+ *   جوّ لكل قسم في عارض الأذكار، ألوان بطاقات الأقسام، انتقال الصفحات، حلقة المسبحة، هيكل تحميل المصحف.
+ * ترتيب الملفات مهم: هذا آخر ملف.
+ * ===================================================================== */
+
+/* ----- ١) العربية لا يُباعد بين حروفها (التباعد يقطع وصل الحروف) ----- */
+.home-intro h1, .card-kicker, .dk-page-title, .rd-text, .single-verse-content, .lay-preview, .ay-text, .tf-ayah-text, .ask-card-text { letter-spacing:0; }
+
+/* ----- ٢) ألوان حسب الوقت ----- */
+@property --sky-1 { syntax:'<color>'; inherits:true; initial-value:#1f6b57; }
+@property --sky-2 { syntax:'<color>'; inherits:true; initial-value:#b08d47; }
+@property --sky-3 { syntax:'<color>'; inherits:true; initial-value:#7cc4a8; }
+@property --hero-hi { syntax:'<color>'; inherits:true; initial-value:#2c8d6f; }
+@property --hero-a { syntax:'<color>'; inherits:true; initial-value:#18543f; }
+@property --hero-b { syntax:'<color>'; inherits:true; initial-value:#0f382d; }
+@property --hero-glow { syntax:'<color>'; inherits:true; initial-value:rgba(217,182,110,.3); }
+@property --p { syntax:'<number>'; inherits:true; initial-value:0; }
+
+/* نهار (الألوان المعتمدة كما هي) */
+:root, html[data-daytime="day"] { --sky-1:#1f6b57; --sky-2:#b08d47; --sky-3:#7cc4a8; --hero-hi:#2c8d6f; --hero-a:#18543f; --hero-b:#0f382d; --hero-glow:rgba(217,182,110,.3); }
+/* فجر: وردي هادئ وفيروزي */
+html[data-daytime="dawn"] { --sky-1:#c46f86; --sky-2:#e2a964; --sky-3:#5fa9bd; --hero-hi:#3d8f8e; --hero-a:#21515c; --hero-b:#162f3f; --hero-glow:rgba(238,158,150,.36); }
+/* عصر: ذهبي أدفأ */
+html[data-daytime="afternoon"] { --sky-1:#2c7a5c; --sky-2:#d29a48; --sky-3:#a7c98a; --hero-hi:#3c8c63; --hero-a:#1c5741; --hero-b:#11392b; --hero-glow:rgba(233,172,92,.34); }
+/* مغرب: كهرماني ونحاسي مع لمسة بنفسجية */
+html[data-daytime="sunset"] { --sky-1:#b9653f; --sky-2:#de8f4f; --sky-3:#8d5c93; --hero-hi:#b0623f; --hero-a:#5b3346; --hero-b:#2b1d33; --hero-glow:rgba(243,154,84,.4); }
+/* ليل: نيلي عميق وذهبي كضوء القمر */
+html[data-daytime="night"] { --sky-1:#3c519e; --sky-2:#c2a160; --sky-3:#5d7cbd; --hero-hi:#33509a; --hero-a:#1b2853; --hero-b:#0d1430; --hero-glow:rgba(217,182,110,.26); }
+/* تتبدل الألوان بنعومة (بعد أول رسم فقط) */
+html[data-sky-ready] { transition:--sky-1 4s ease, --sky-2 4s ease, --sky-3 4s ease, --hero-hi 4s ease, --hero-a 4s ease, --hero-b 4s ease, --hero-glow 4s ease; }
+
+.aurora--emerald { background:radial-gradient(circle, color-mix(in srgb, var(--sky-1) 20%, transparent), transparent 62%); }
+.aurora--gold { background:radial-gradient(circle, color-mix(in srgb, var(--sky-2) 22%, transparent), transparent 62%); }
+.aurora--mint { background:radial-gradient(circle, color-mix(in srgb, var(--sky-3) 14%, transparent), transparent 65%); }
+body.dark-mode .aurora--emerald { background:radial-gradient(circle, color-mix(in srgb, var(--sky-1) 32%, transparent), transparent 62%); }
+body.dark-mode .aurora--gold { background:radial-gradient(circle, color-mix(in srgb, var(--sky-2) 17%, transparent), transparent 62%); }
+body.dark-mode .aurora--mint { background:radial-gradient(circle, color-mix(in srgb, var(--sky-3) 16%, transparent), transparent 65%); }
+
+/* البطاقة الرئيسية (الذكر التفاعلي، والورد) بلون الوقت */
+.dhikr-card, .quran-hero {
+  background:radial-gradient(120% 90% at 100% 0%, var(--hero-hi) 0%, transparent 55%), radial-gradient(90% 80% at 0% 100%, var(--hero-glow), transparent 60%), linear-gradient(160deg, var(--hero-a), var(--hero-b)) !important;
+  box-shadow:0 24px 50px color-mix(in srgb, var(--hero-b) 32%, transparent); }
+.dhikr-card { overflow:hidden; isolation:isolate; }
+
+/* بالليل: نقاط النور تصير نجومًا تتلألأ */
+html[data-daytime="night"] .mote { background:color-mix(in srgb, var(--sky-1) 55%, #fff); box-shadow:0 0 calc(var(--s) * 2.5) color-mix(in srgb, var(--sky-1) 45%, transparent); animation:starTwinkle var(--t) ease-in-out var(--d) infinite; }
+html[data-daytime="night"] .mote.is-gold { background:color-mix(in srgb, var(--sky-2) 75%, #fff); box-shadow:0 0 calc(var(--s) * 2.5) color-mix(in srgb, var(--sky-2) 50%, transparent); }
+html[data-daytime="night"] body.dark-mode .mote:not(.is-gold) { background:#fff; box-shadow:0 0 calc(var(--s) * 2.5) rgba(255,255,255,.6); }
+@keyframes starTwinkle { 0%, 100% { opacity:.15; transform:translateZ(var(--z)) scale(.7); } 50% { opacity:.95; transform:translateZ(var(--z)) scale(1.15); } }
+
+/* أيقونة السماء في شريط التاريخ */
+.home-date .sky-icon { width:20px; height:20px; display:grid; place-items:center; flex:none; color:var(--sky-2); }
+.home-date .sky-icon svg { width:20px; height:20px; animation:skyIn .7s cubic-bezier(.34,1.56,.64,1) both; }
+html[data-daytime="night"] .home-date .sky-icon, html[data-daytime="dawn"] .home-date .sky-icon { color:var(--sky-1); }
+body.dark-mode .home-date .sky-icon { color:color-mix(in srgb, var(--sky-2) 70%, #fff); }
+html[data-daytime="night"] body.dark-mode .home-date .sky-icon { color:#c9d3ff; }
+@keyframes skyIn { from { opacity:0; transform:translateY(5px) rotate(-20deg) scale(.7); } }
+
+/* ----- ٣) زخرفة النجمة الثمانية: صارت «زخرفة تحت الضوء» في 11-refresh.css و fx.js ----- */
+
+/* ----- ٤) عارض الأذكار: جوّ لكل قسم ----- */
+.adhkar-detail[data-group="morning"] { background:radial-gradient(900px 520px at 85% -10%, rgba(244,184,96,.32), transparent 62%), radial-gradient(700px 460px at 0% 110%, rgba(236,160,120,.16), transparent 60%), var(--cream); }
+.adhkar-detail[data-group="evening"] { background:radial-gradient(900px 520px at 85% -10%, rgba(140,110,190,.24), transparent 62%), radial-gradient(700px 460px at 0% 110%, rgba(230,150,90,.22), transparent 60%), var(--cream); }
+.adhkar-detail[data-group="post_prayer"] { background:radial-gradient(900px 520px at 85% -10%, rgba(31,138,110,.2), transparent 62%), radial-gradient(700px 460px at 0% 110%, rgba(176,141,71,.14), transparent 60%), var(--cream); }
+.adhkar-detail[data-group="sleep"] { background:radial-gradient(900px 560px at 80% -10%, rgba(80,96,190,.24), transparent 60%), radial-gradient(700px 460px at 0% 110%, rgba(150,120,200,.16), transparent 60%), var(--cream); }
+.adhkar-detail[data-group="wake"] { background:radial-gradient(900px 520px at 85% -10%, rgba(214,120,140,.22), transparent 62%), radial-gradient(700px 460px at 0% 110%, rgba(95,169,189,.2), transparent 60%), var(--cream); }
+.adhkar-detail[data-group="praise"] { background:radial-gradient(900px 520px at 85% -10%, rgba(196,157,80,.28), transparent 62%), radial-gradient(700px 460px at 0% 110%, rgba(31,107,87,.14), transparent 60%), var(--cream); }
+.adhkar-detail[data-group="situations"] { background:radial-gradient(900px 520px at 85% -10%, rgba(47,143,154,.22), transparent 62%), radial-gradient(700px 460px at 0% 110%, rgba(207,111,136,.16), transparent 60%), var(--cream); }
+/* النوم بالوضع الداكن: سماء ليل بنجوم */
+body.dark-mode .adhkar-detail[data-group="sleep"] {
+  background:
+    radial-gradient(1.4px 1.4px at 14% 22%, rgba(255,255,255,.85) 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 62% 12%, rgba(255,255,255,.7) 50%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 84% 46%, rgba(255,255,255,.75) 50%, transparent 52%),
+    radial-gradient(1.1px 1.1px at 34% 68%, rgba(255,255,255,.6) 50%, transparent 52%),
+    radial-gradient(1.3px 1.3px at 74% 84%, rgba(255,255,255,.65) 50%, transparent 52%),
+    radial-gradient(900px 600px at 80% -10%, rgba(80,100,210,.32), transparent 60%),
+    linear-gradient(180deg, #0c1431, #0b1411 75%);
+  background-size:280px 280px, 340px 340px, 300px 300px, 260px 260px, 380px 380px, auto, auto; }
+
+/* ----- ٥) بطاقات الأقسام: لكل قسم لونه ----- */
+.category-card[data-adhkar-group="morning"] { --cat:#c98a2e; }
+.category-card[data-adhkar-group="evening"] { --cat:#6d5aa6; }
+.category-card[data-adhkar-group="post_prayer"] { --cat:#1f8a6e; }
+.category-card[data-adhkar-group="sleep"] { --cat:#3f57a6; }
+.category-card[data-adhkar-group="wake"] { --cat:#cf6f88; }
+.category-card[data-adhkar-group="praise"] { --cat:#b08d47; }
+.category-card.situations { --cat:#2f8f9a; }
+body.dark-mode .category-card { --cat-ink:color-mix(in srgb, var(--cat) 58%, #fff); }
+.category-card[data-adhkar-group], .category-card.situations {
+  background:radial-gradient(360px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--cat) 10%, transparent), transparent 46%), radial-gradient(120% 110% at 100% 0%, color-mix(in srgb, var(--cat) 13%, transparent), transparent 58%), var(--paper) !important; }
+.category-card[data-adhkar-group] > span, .category-card.situations > span {
+  background:linear-gradient(145deg, color-mix(in srgb, var(--cat) 26%, transparent), color-mix(in srgb, var(--cat) 8%, transparent)); color:var(--cat-ink, var(--cat)); box-shadow:inset 0 1px 0 rgba(255,255,255,.35); }
+.category-card[data-adhkar-group] .cat-count, .category-card.situations .cat-count { color:var(--cat-ink, var(--cat)); background:color-mix(in srgb, var(--cat) 12%, transparent); }
+.category-card[data-adhkar-group]:hover, .category-card.situations:hover { border-color:color-mix(in srgb, var(--cat) 32%, transparent); }
+
+/* ----- ٦) انتقال الصفحات: المحتوى ينزلق باتجاه التنقل (الشريط والخلفية ثابتان) ----- */
+html[data-vt^="page"] .main-content { view-transition-name:page; }
+html[data-vt^="page"]::view-transition-old(root), html[data-vt^="page"]::view-transition-new(root) { animation:none; }
+html[data-vt^="page"]::view-transition-group(page) { animation:none; }
+html[data-vt="page-fwd"]::view-transition-old(page) { animation:pgOutR .2s ease-in both; }
+html[data-vt="page-fwd"]::view-transition-new(page) { animation:pgInL .42s cubic-bezier(.2,.8,.2,1) both; }
+html[data-vt="page-back"]::view-transition-old(page) { animation:pgOutL .2s ease-in both; }
+html[data-vt="page-back"]::view-transition-new(page) { animation:pgInR .42s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes pgOutR { to { opacity:0; transform:translateX(28px); } }
+@keyframes pgOutL { to { opacity:0; transform:translateX(-28px); } }
+@keyframes pgInL { from { opacity:0; transform:translateX(-28px); } }
+@keyframes pgInR { from { opacity:0; transform:translateX(28px); } }
+/* أيقونة شريط التنقل تقفز بنعومة عند اختيارها */
+.side-link.active svg { animation:navPop .55s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes navPop { 0% { transform:scale(.75); } 55% { transform:scale(1.15) translateY(-1px); } 100% { transform:none; } }
+
+/* ----- ٧) المسبحة: حلقة تقدّم تكتمل كل ٣٣ ----- */
+.tasbih-orb { transition:--p .35s cubic-bezier(.2,.8,.2,1), transform .2s cubic-bezier(.2,.8,.2,1), filter .2s; }
+.tasbih-orb::after { content:""; position:absolute; inset:-6px; border-radius:50%; pointer-events:none;
+  background:conic-gradient(#f1d48a calc(var(--p) * 360deg), rgba(255,255,255,.14) 0);
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); }
+.tasbih-orb.is-cycle::after { animation:cycleGlow .9s ease-out; }
+@keyframes cycleGlow { 40% { filter:drop-shadow(0 0 10px rgba(241,212,138,.95)); } }
+#tasbih-count { display:inline-block; }
+#tasbih-count.is-pop { animation:countPop .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes countPop { 40% { transform:scale(1.25); } }
+
+/* ----- ٨) هيكل تحميل صفحة المصحف ----- */
+.rd-skeleton { display:flex; flex-direction:column; gap:18px; min-height:60vh; padding-top:34px !important; }
+.rd-skeleton .sk-line { display:block; height:16px; border-radius:8px;
+  background:linear-gradient(90deg, color-mix(in srgb, var(--rd-fg) 7%, transparent) 25%, color-mix(in srgb, var(--rd-fg) 14%, transparent) 50%, color-mix(in srgb, var(--rd-fg) 7%, transparent) 75%);
+  background-size:200% 100%; animation:tfShimmer 1.2s linear infinite; }
+.rd-skeleton .sk-line:first-child { width:46%; height:30px; margin:0 auto 10px; border-radius:10px; }
+.rd-skeleton .sk-line:nth-child(4n) { width:78%; margin-inline-start:auto; }
+
+/* ----- تقليل الحركة: لا دوران ولا تلألؤ ولا انزلاق ----- */
+@media (prefers-reduced-motion: reduce) {
+  html[data-daytime="night"] .mote, .side-link.active svg, #tasbih-count.is-pop, .tasbih-orb.is-cycle::after, .rd-skeleton .sk-line, .home-date .sky-icon svg { animation:none !important; }
+  html[data-sky-ready] { transition:none !important; }
+  html[data-vt^="page"]::view-transition-old(page), html[data-vt^="page"]::view-transition-new(page) { animation:none !important; }
+}

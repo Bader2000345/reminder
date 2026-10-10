@@ -47,7 +47,40 @@ body.dark-mode .ask-panel { box-shadow:0 30px 70px rgba(0,0,0,.55); }
 .ask-list { margin:0 0 8px; padding-inline-start:20px; }
 .ask-list li { margin:2px 0; }
 .ask-general { color:var(--muted); font-size:14px; }
-.ask-row.is-local .ask-bubble { border:1px dashed color-mix(in srgb, var(--gold) 55%, transparent); }
+/* حالة حيّة بالرأس: متصل / يكتب… / بدون إنترنت */
+.ask-status { display:inline-flex !important; align-items:center; gap:6px; }
+.ask-status i { width:7px; height:7px; border-radius:50%; background:#2fb57c; box-shadow:0 0 0 3px color-mix(in srgb, #2fb57c 22%, transparent); flex:none; }
+.ask-status[data-state="typing"] { color:var(--olive) !important; }
+.ask-status[data-state="typing"] i { animation:askPulseDot 1s ease-in-out infinite; }
+.ask-status[data-state="offline"] i { background:var(--muted); box-shadow:none; }
+@keyframes askPulseDot { 50% { transform:scale(.6); opacity:.5; } }
+/* الوقت تحت الرسالة، وملاحظة خافتة للرد من محتوى التطبيق */
+.ask-meta { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:4px; font-size:10.5px; line-height:1.4; opacity:.7; }
+.ask-row.is-bot .ask-meta { justify-content:flex-start; }
+.ask-time { font-variant-numeric:tabular-nums; }
+.ask-note-line { color:var(--muted); }
+/* فقاعات متتالية من نفس الطرف */
+.ask-row.is-cont { margin-top:-8px; }
+.ask-row.is-user.is-cont .ask-bubble { border-end-end-radius:20px; border-start-end-radius:8px; }
+.ask-row.is-bot.is-cont .ask-bubble { border-start-start-radius:8px; }
+/* اقتراحات المتابعة تحت آخر رد */
+.ask-followups { display:flex; flex-wrap:wrap; gap:6px; margin:-4px 0 4px; animation:askIn .5s var(--spring-soft) .15s both; }
+.ask-followups .ask-chip { padding:7px 12px; font-size:12.5px; background:var(--paper); border-color:color-mix(in srgb, var(--olive) 22%, transparent); color:var(--olive); font-weight:600; }
+/* بطاقة «كيف» من دليل التطبيق */
+.ask-help { border-color:color-mix(in srgb, var(--olive) 30%, transparent); }
+.ask-help .ask-card-kicker { color:var(--olive); }
+.ask-steps { margin:2px 0 8px; padding-inline-start:22px; font-size:14px; line-height:1.85; }
+.ask-steps li::marker { color:var(--olive); font-weight:700; }
+.ask-action { width:100%; margin-top:6px; padding:11px 14px; border-radius:14px; background:var(--olive); color:#fff; font-weight:700; font-size:14px; box-shadow:0 8px 18px color-mix(in srgb, var(--olive) 25%, transparent); transition:transform .25s var(--spring), filter .2s ease; }
+.ask-action:hover { filter:brightness(1.07); }
+.ask-action:active { transform:scale(.97); }
+.ask-extra { margin:2px 0 4px; }
+.ask-extra summary { cursor:pointer; color:var(--olive); font-weight:600; font-size:13px; list-style:none; }
+.ask-extra summary::-webkit-details-marker { display:none; }
+.ask-extra summary::after { content:" ▾"; }
+.ask-extra[open] summary::after { content:" ▴"; }
+.ask-chip-btn.is-proof { color:var(--gold); }
+.ask-card-hadith[hidden] { display:none; }
 .ask-bubble.is-streaming > :last-child::after { content:"▍"; color:var(--olive); animation:askCaret 1s steps(2) infinite; }
 @keyframes askCaret { 50% { opacity:0; } }
 @keyframes askIn { from { opacity:0; transform:translateY(8px) scale(.98); } }

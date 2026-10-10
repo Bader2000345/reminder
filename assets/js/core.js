@@ -92,17 +92,32 @@ function updateNavPill(instant = false) {
 addEventListener('resize', () => updateNavPill(true));
 
 // 1. Navigation SPA
+const PAGE_ORDER = ['home', 'adhkar', 'quran', 'free-reading', 'my-adhkar', 'settings'];
 function navigateTo(pageId) {
-    document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active-page'));
-    const targetPage = document.getElementById('page-' + pageId);
-    if (targetPage) targetPage.classList.add('active-page');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const current = document.querySelector('.page-view.active-page');
+    const from = current ? current.id.replace('page-', '') : null;
+    const swap = () => {
+        document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active-page'));
+        const targetPage = document.getElementById('page-' + pageId);
+        if (targetPage) targetPage.classList.add('active-page');
 
-    document.querySelectorAll('.side-link').forEach(link => {
-        if (link.getAttribute('data-target') === pageId) link.classList.add('active');
-        else link.classList.remove('active');
-    });
-    updateNavPill();
-    window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        document.querySelectorAll('.side-link').forEach(link => {
+            if (link.getAttribute('data-target') === pageId) link.classList.add('active');
+            else link.classList.remove('active');
+        });
+        updateNavPill();
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    };
+    // انتقال ناعم بين الصفحات (المحتوى ينزلق باتجاه التنقل: لليسار للأمام في العربية)
+    if (!document.startViewTransition || reduce || document.hidden || !from || from === pageId || document.body.classList.contains('immersive')) return swap();
+    const html = document.documentElement;
+    html.dataset.vt = PAGE_ORDER.indexOf(pageId) >= PAGE_ORDER.indexOf(from) ? 'page-fwd' : 'page-back';
+    const vt = document.startViewTransition(swap);
+    // احتياط: إن توقف الرسم (نافذة مخفية مثلًا) لا تبقى صورة الصفحة القديمة عالقة
+    const guard = setTimeout(() => { try { vt.skipTransition(); } catch (e) {} }, 1200);
+    const done = () => { clearTimeout(guard); if (html.dataset.vt && html.dataset.vt.startsWith('page')) delete html.dataset.vt; };
+    vt.finished.then(done, done); vt.ready.catch(() => {});
 }
 
 document.querySelectorAll('[data-target]').forEach(btn => {

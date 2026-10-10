@@ -174,6 +174,7 @@ const AdhkarViewer = (() => {
         group = data; items = data.items; counts = items.map(() => 0); idx = 0;
         const root = $('adhkar-detail');
         $('adhkar-detail-title').textContent = data.title;
+        root.dataset.group = key.startsWith('sit-') ? 'situations' : key; // جوّ خاص لكل قسم (10-atmosphere.css)
         root.hidden = false;
         Immersive.enter(root, { onClose: close });
         $('dk-book').replaceChildren();

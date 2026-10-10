@@ -4,31 +4,17 @@
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
-// ===== حركة وعمق ثلاثي الأبعاد هادئ =====
+// ===== عمق هادئ للخلفية مع حركة المؤشر =====
+// (ميلان البطاقات ثلاثي الأبعاد أُزيل في الإصدار ٧: «إطار النور» وزخرفة الخلفية تكفي)
 (() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     const ambient = document.querySelector('.ambient');
     let frame = 0, px = 0, py = 0;
     const flush = () => { frame = 0; ambient.style.setProperty('--px', px.toFixed(3)); ambient.style.setProperty('--py', py.toFixed(3)); };
-
-    const TILT = '.home-card, .category-card, .khatma-card, .reader-hero, .setting-card, .quick-card';
-    let active = null;
-    const resetTilt = el => { el.classList.remove('is-tilting'); ['--tilt-x', '--tilt-y', '--tilt-z'].forEach(p => el.style.removeProperty(p)); };
-
     document.addEventListener('pointermove', e => {
-        if (reduce.matches || e.pointerType !== 'mouse') return;
-        if (ambient && !frame) { px = e.clientX / innerWidth - .5; py = e.clientY / innerHeight - .5; frame = requestAnimationFrame(flush); }
-        const el = e.target.closest ? e.target.closest(TILT) : null;
-        if (active && active !== el) { resetTilt(active); active = null; }
-        if (!el) return;
-        const r = el.getBoundingClientRect(), k = Math.min(1, 520 / r.width);
-        el.classList.add('tilt', 'is-tilting');
-        el.style.setProperty('--tilt-y', (((e.clientX - r.left) / r.width - .5) * 10 * k).toFixed(2) + 'deg');
-        el.style.setProperty('--tilt-x', ((.5 - (e.clientY - r.top) / r.height) * 8 * k).toFixed(2) + 'deg');
-        el.style.setProperty('--tilt-z', '-3px');
-        active = el;
+        if (reduce.matches || e.pointerType !== 'mouse' || !ambient || frame) return;
+        px = e.clientX / innerWidth - .5; py = e.clientY / innerHeight - .5; frame = requestAnimationFrame(flush);
     }, { passive: true });
-    document.documentElement.addEventListener('mouseleave', () => { if (active) { resetTilt(active); active = null; } });
 })();
 
 // ===== حركات الظهور والتموّج =====
@@ -49,34 +35,6 @@ const Motion = (() => {
         dot.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
         b.append(dot);
         dot.addEventListener('animationend', () => dot.remove());
-    }
-    // إضاءة ناعمة تتبع المؤشر داخل البطاقة (Spotlight)
-    const SPOT = '.home-card, .category-card, .setting-card, .personal-reminder, .khatma-card, .adhkar-list article';
-    function spotlight(e) {
-        if (e.pointerType !== 'mouse') return;
-        const c = e.target.closest && e.target.closest(SPOT); if (!c) return;
-        const r = c.getBoundingClientRect();
-        c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-        c.style.setProperty('--my', (e.clientY - r.top) + 'px');
-    }
-    // على الجوال: لمس البطاقة يضيئها من نقطة اللمس ويميلها قليلًا نحو الإصبع (بدل حركة الماوس)
-    const TOUCH_CARDS = SPOT + ', .quick-actions button, .smart-card';
-    function touchPress(e) {
-        if (e.pointerType === 'mouse' || reduce.matches) return;
-        const c = e.target.closest && e.target.closest(TOUCH_CARDS); if (!c) return;
-        const r = c.getBoundingClientRect(), k = Math.min(1, 420 / r.width);
-        const x = e.clientX - r.left, y = e.clientY - r.top;
-        c.style.setProperty('--mx', x + 'px'); c.style.setProperty('--my', y + 'px');
-        c.classList.add('tilt', 'is-pressed');
-        c.style.setProperty('--tilt-y', ((x / r.width - .5) * 8 * k).toFixed(2) + 'deg');
-        c.style.setProperty('--tilt-x', ((.5 - y / r.height) * 6 * k).toFixed(2) + 'deg');
-        c.style.setProperty('--tilt-z', '-2px');
-        const release = () => {
-            setTimeout(() => { c.classList.remove('is-pressed'); ['--tilt-x', '--tilt-y', '--tilt-z'].forEach(p => c.style.removeProperty(p)); }, 140);
-            setTimeout(() => { c.style.removeProperty('--mx'); c.style.removeProperty('--my'); }, 700);
-            removeEventListener('pointerup', release); removeEventListener('pointercancel', release);
-        };
-        addEventListener('pointerup', release); addEventListener('pointercancel', release);
     }
     // الخلفية تتحرك بعمق مع التمرير، ومع إمالة الهاتف على أندرويد
     function ambientMotion() {
@@ -111,8 +69,6 @@ const Motion = (() => {
     function init() {
         buildMotes();
         document.addEventListener('pointerdown', ripple, { passive: true });
-        document.addEventListener('pointerdown', touchPress, { passive: true });
-        document.addEventListener('pointermove', spotlight, { passive: true });
         if (!reduce.matches) ambientMotion();
         if (reduce.matches || !('IntersectionObserver' in window)) return;
         io = new IntersectionObserver(entries => entries.forEach(en => {

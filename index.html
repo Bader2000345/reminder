@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#384836">
+    <meta name="theme-color" content="#0b4234">
     <title>مُذكّر | التطبيق الشامل للقرآن الكريم والأذكار</title>
     
     <!-- Google Fonts -->
@@ -26,6 +26,8 @@
     <link rel="stylesheet" href="assets/css/07-design.css">
     <link rel="stylesheet" href="assets/css/08-quran-tools.css">
     <link rel="stylesheet" href="assets/css/09-assistant.css">
+    <link rel="stylesheet" href="assets/css/10-atmosphere.css">
+    <link rel="stylesheet" href="assets/css/11-refresh.css">
 </head>
 <body>
 
@@ -607,7 +609,7 @@
         <button class="ask-icon-btn" id="ask-close" type="button" aria-label="إغلاق المحادثة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
         <div class="ask-id">
             <span class="ask-avatar brand-logo" aria-hidden="true"></span>
-            <div><h2 id="ask-title">اسأل مُذكّر</h2><small>من أذكار التطبيق وأدلته · مساعد آلي</small></div>
+            <div><h2 id="ask-title">مُذكّر</h2><small class="ask-status" id="ask-status" data-state="online" aria-live="polite"><i></i><span>متصل</span></small></div>
         </div>
         <button class="ask-icon-btn" id="ask-new" type="button" aria-label="محادثة جديدة" title="محادثة جديدة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h8"/><path d="M15.5 4.5l4 4L9 19l-5 1 1-5z"/></svg></button>
     </header>
@@ -617,7 +619,7 @@
         <textarea id="ask-input" rows="1" maxlength="600" placeholder="اكتب شيئًا تريده…" aria-label="سؤالك" enterkeyhint="send"></textarea>
         <button class="ask-send" id="ask-send" type="submit" aria-label="إرسال"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></button>
     </form>
-    <p class="ask-note">مساعد آلي قد يخطئ. نصوص الأذكار وأدلتها في البطاقات من محتوى التطبيق، وللفتوى ارجع لأهل العلم.</p>
+    <p class="ask-note">قد يخطئ أحيانًا · نصوص الأذكار وأدلتها من التطبيق نفسه · وللفتوى ارجع لأهل العلم</p>
 </section>
 
 <!-- البيانات: الأذكار العامة وأذكار الأقسام مع الأدلة -->
@@ -637,9 +639,11 @@
 <script src="assets/js/reminders.js"></script>
 <script src="assets/js/updates.js"></script>
 <script src="assets/js/install.js"></script>
+<script src="assets/js/fx.js"></script>
 <script src="assets/js/home.js"></script>
 <script src="assets/js/share.js"></script>
 <script src="assets/js/time-context.js"></script>
+<script src="assets/js/atmosphere.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/assistant.js"></script>
 <script src="assets/js/main.js"></script>

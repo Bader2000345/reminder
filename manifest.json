@@ -7,8 +7,8 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f6f2e6",
-  "theme_color": "#1f4b3d",
+  "background_color": "#f6f1e7",
+  "theme_color": "#0b4234",
   "related_applications": [
     { "platform": "webapp", "url": "https://bader2000345.github.io/reminder/manifest.json" }
   ],

@@ -112,6 +112,18 @@ const Install = (() => {
         highlight(btn);
     }
 
+    // للمساعد «اسأل مُذكّر»: نوع الجهاز وحالة التثبيت، وبدء التثبيت من أي زر
+    const info = () => ({ platform: platform(), standalone: isStandalone(), canPrompt: !!deferred, installedHere });
+    function start() {
+        if (isStandalone()) { Toast.show('أنت فاتح مُذكّر كتطبيق مثبّت ✓'); return; }
+        // نستعمل زر الإعدادات حتى تظهر الخطوات تحته إن لم يكن التثبيت المباشر متاحًا
+        navigateTo('settings');
+        const btn = document.querySelector('.install-setting [data-install]') || document.querySelector('[data-install]');
+        if (!btn) return;
+        if (deferred) return onInstall({ currentTarget: btn }); // التثبيت المباشر يحتاج ضغطة المستخدم نفسها
+        setTimeout(() => onInstall({ currentTarget: btn }), 350);
+    }
+
     function init() {
         addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; installedHere = false; render(); });
         addEventListener('appinstalled', () => { deferred = null; justInstalled = true; Toast.show('تم تثبيت مُذكّر ✓ ستجده بين تطبيقاتك'); render(); });
@@ -126,5 +138,5 @@ const Install = (() => {
         render();
         if (!isStandalone()) checkInstalledHere().then(v => { if (v && !deferred) { installedHere = true; render(); } });
     }
-    return { init };
+    return { init, info, start };
 })();

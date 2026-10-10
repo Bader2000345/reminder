@@ -34,6 +34,8 @@ Motion.init();
 UpdateNotice.init();
 Install.init();
 Wird.init();
+Atmosphere.init();
+FX.init();
 FocusTools.init();
 Reader.setAdvanceHook(Wird.onReaderAdvance);
 Share.init();

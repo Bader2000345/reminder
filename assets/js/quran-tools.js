@@ -143,7 +143,44 @@ const Tajweed = (() => {
         segs.forEach(s => { const end = pos + s.text.length; if (end > idx) out.push({ ...s, text: s.text.slice(Math.max(0, idx - pos)) }); pos = end; });
         return out;
     }
-    const toHtml = segs => segs.map(s => s.cls ? `<span class="${s.cls}" title="${qEsc(s.title)}">${qEsc(s.text)}</span>` : qEsc(s.text)).join('');
+    // ---- إبقاء الحروف موصولة بين الأجزاء الملوّنة ----
+    // بعض المتصفحات تشكّل كل <span> وحده فتنفصل الحروف؛ لذلك:
+    // ١) الحركة تبقى مع حرفها  ٢) حذف التطويل المضاف قبل الألف الخنجرية  ٣) محرف الوصل ZWJ على طرفي كل حدّ بين حرفين متصلين
+    const ZWJ = '‍';
+    const MARK = '[\\u0610-\\u061A\\u064B-\\u065F\\u0670\\u06D6-\\u06DC\\u06DF-\\u06E4\\u06E7\\u06E8\\u06EA-\\u06ED\\u08D3-\\u08FF]';
+    const LEAD_MARKS = new RegExp('^' + MARK + '+'), TAIL_CLUSTER = new RegExp('[^\\s\\u200D]' + MARK + '*$'), IS_MARK = new RegExp(MARK);
+    const RIGHT_ONLY = new Set('اأإآٱدذرزوؤةٲٳٵےۓۀۅۆۇۈۉۊۋۏڈډڊڋڌڍڎڏڐڑڒړڔڕږڗژڙ'); // تتصل بما قبلها فقط
+    const isLetter = c => !!c && /[ؠ-يٮ-ۓ]/.test(c) && !IS_MARK.test(c) && c !== 'ء';
+    const joinsLeft = c => c === 'ـ' || (isLetter(c) && !RIGHT_ONLY.has(c));
+    const joinsRight = c => c === 'ـ' || isLetter(c);
+    function lastBase(t) { for (let i = t.length - 1; i >= 0; i--) { const c = t[i]; if (c === ZWJ || IS_MARK.test(c)) continue; return c; } return ''; }
+    function joinSegs(input) {
+        const segs = input.map(s => ({ ...s, text: s.text.replace(/ـ(?=ٰ)/g, '') }));
+        for (let i = 1; i < segs.length; i++) {
+            const cur = segs[i];
+            const lead = cur.text.match(LEAD_MARKS);
+            if (!lead) continue;
+            // أقرب جزء سابق غير فارغ (قد يفرغ جزء كان فيه حركة فقط بعد نقلها)
+            let j = i - 1; while (j > 0 && !segs[j].text) j--;
+            const prev = segs[j];
+            if (cur.cls) {
+                // جزء ملوّن يبدأ بحركة: نضمّ إليه حرفها من الجزء السابق
+                const m = prev.text.match(TAIL_CLUSTER);
+                if (m) { prev.text = prev.text.slice(0, m.index); cur.text = m[0] + cur.text; }
+            } else {
+                // جزء عادي يبدأ بحركة: الحركة ترجع لحرفها في الجزء السابق
+                prev.text += lead[0]; cur.text = cur.text.slice(lead[0].length);
+            }
+        }
+        const out = segs.filter(s => s.text);
+        for (let i = 1; i < out.length; i++) {
+            const a = lastBase(out[i - 1].text), b = out[i].text[0];
+            if (/\s/.test(out[i - 1].text.slice(-1))) continue;
+            if (joinsLeft(a) && joinsRight(b)) { out[i - 1].text += ZWJ; out[i].text = ZWJ + out[i].text; }
+        }
+        return out;
+    }
+    const toHtml = segs => joinSegs(segs).map(s => s.cls ? `<span class="${s.cls}" title="${qEsc(s.title)}">${qEsc(s.text)}</span>` : qEsc(s.text)).join('');
 
     async function fetchRows(n) {
         const res = await fetch(`${API}${n}/quran-tajweed`);
@@ -178,7 +215,7 @@ const Tajweed = (() => {
         LEGEND.forEach(([cls, name]) => { const c = qEl('span', 'tj-chip'); c.innerHTML = `<i class="${cls}">ـ</i>${qEsc(name)}`; box.append(c); });
         return box;
     }
-    return { getPage, ayahHtml, legendNode, parse, toHtml };
+    return { getPage, ayahHtml, legendNode, parse, toHtml, joinSegs };
 })();
 
 // ===================== التفسير =====================

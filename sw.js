@@ -15,11 +15,11 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v16';
+const CACHE = 'mudhakkir-v19';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
-const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'quran-tools', 'reader', 'notifications', 'reminders', 'updates', 'install', 'home', 'share', 'time-context', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
+const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh'].map(n => `./assets/css/${n}.css`);
+const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'modals-and-picker', 'wird', 'quran-tools', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'home', 'share', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
     './assets/img/logo-light.png', './assets/img/logo-dark.png', './assets/img/icon-192.png', './assets/img/icon-512.png', './assets/img/favicon-64.png', './assets/img/apple-touch-icon.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
@@ -200,7 +200,7 @@ const stripIds = text => String(text || '').replace(/\[\[([\w-]+:\d+)\]\]/g, (m,
 async function readSSE(res) {
     const type = res.headers.get('Content-Type') || '';
     const raw = await res.text();
-    if (!type.includes('event-stream')) { try { const j = JSON.parse(raw); return j.response || ''; } catch (e) { return ''; } }
+    if (!type.includes('event-stream')) { try { const j = JSON.parse(raw); return j.response || (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ''; } catch (e) { return ''; } }
     let text = '';
     raw.split('\n').forEach(line => {
         const l = line.trim();
@@ -220,7 +220,8 @@ async function answerFromNotification(q) {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ messages: [{ role: 'user', content: q }], items: typeof Knowledge !== 'undefined' ? Knowledge.forModel(items) : [] })
         });
-        if (res.ok) a = (await readSSE(res)).trim();
+        // بعض النماذج ترسل نص «تفكير» قبل الرد: نحذفه
+        if (res.ok) a = (await readSSE(res)).replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<think>[\s\S]*$/i, '').trim();
     } catch (e) {}
     if (!a) {
         local = true;

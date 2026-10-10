@@ -94,7 +94,10 @@ const Reader = (() => {
             if (n < TOTAL) new Image().src = CDN(n + 1);
             return;
         }
-        stage.replaceChildren(msg('جارٍ التحميل…'));
+        // هيكل تحميل بشكل الصفحة بدل نص «جارٍ التحميل»
+        const sk = el('div', 'rd-text rd-skeleton'); sk.setAttribute('aria-label', 'جارٍ تحميل الصفحة');
+        for (let i = 0; i < 11; i++) sk.append(el('i', 'sk-line'));
+        stage.replaceChildren(sk);
         let ayahs, tj = null;
         try {
             [ayahs, tj] = await Promise.all([getPage(n), st.tajweed ? Tajweed.getPage(n).catch(() => null) : null]);

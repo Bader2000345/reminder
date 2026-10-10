@@ -1,0 +1,158 @@
+/* =====================================================================
+ * مُذكّر — 11-refresh.css  (الإصدار ٧)
+ * التصميم المختار من «معرض تصاميم مُذكّر»: خ٤ ب٢ ز٢ ل٢ ح١
+ *   ل٢  زمرّدي عميق وذهبي شمبانيا           (الألوان)
+ *   خ٤  زخرفة تحت الضوء                     (الخلفية — مع fx.js)
+ *   ب٢  إطار نور يسري                       (البطاقات — Border Beam · Magic UI)
+ *   ز٢  زجاج سائل                           (الأزرار — Liquid Glass Button)
+ *   ح١  حركة متوازنة                        (Text Generate · Blur Fade · Number Ticker)
+ * ترتيب الملفات مهم: هذا آخر ملف، يعدّل فوق 07 و 10 دون كسرهما.
+ * ===================================================================== */
+
+/* ===== ل٢ الألوان: زمرّدي عميق + ذهبي شمبانيا ===== */
+:root {
+  --ink:#17241f; --muted:#5f6b65; --olive:#0f5c48; --olive-dark:#0b4234; --primary-green:#0b4234;
+  --cream:#f6f1e7; --paper:#fffcf6; --surface-2:#efe8da; --line:#e6ddcb; --accent-soft:#efe8da;
+  --gold:#c9a45c; --gold-ink:#94722f; --gold-light:#f4ead6; --verse-bg:#fbf7ef;
+  --shadow:0 1px 2px rgba(15,52,40,.05), 0 10px 28px rgba(15,52,40,.08);
+  --lift:0 4px 10px rgba(15,52,40,.08), 0 24px 50px rgba(15,52,40,.14);
+}
+body.dark-mode {
+  --ink:#eef2ee; --muted:#9aa79f; --olive:#2f9474; --olive-dark:#6fd0ad; --primary-green:#0e3027;
+  --cream:#08110e; --paper:#0f1a16; --surface-2:#14211c; --line:#1d2b25; --accent-soft:#14211c;
+  --gold:#e0c27a; --gold-ink:#e0c27a; --gold-light:#241f12; --verse-bg:#111c18;
+}
+/* الذهبي الفاتح للزخارف والحدود؛ وللنصوص الصغيرة درجة أعمق حتى تُقرأ بوضوح */
+.eyebrow, .soft-label, .qs-item small { color:var(--gold-ink); }
+
+/* ألوان «النهار» بالدرجة الجديدة (فترات اليوم الأخرى كما في 10-atmosphere.css) */
+:root, html[data-daytime="day"] { --sky-1:#0f5c48; --sky-2:#c9a45c; --hero-hi:#3a7969; --hero-a:#0b4234; --hero-b:#06251d; --hero-glow:rgba(201,164,92,.32); }
+/* لون ضوء الزخرفة حسب الوقت */
+:root, html[data-daytime="day"] { --lamp:#c9a45c; }
+html[data-daytime="afternoon"] { --lamp:#d29a48; }
+html[data-daytime="dawn"] { --lamp:#e39c7c; }
+html[data-daytime="sunset"] { --lamp:#ea9356; }
+html[data-daytime="night"] { --lamp:#9fb0f0; }
+body.dark-mode .fx-pattern { --lamp-c:color-mix(in srgb, var(--lamp) 82%, #fff); }
+
+/* ===== خ٤ الخلفية: زخرفة تحت الضوء ===== */
+/* الشفق ونقاط النور النهارية أُزيلت لصالح الزخرفة؛ النجوم تبقى بالليل فقط */
+.aurora { display:none; }
+html:not([data-daytime="night"]) .motes { display:none; }
+.fx-pattern { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.fx-pat { position:absolute; left:0; top:0; width:100vw; height:100vh; height:100lvh; background:var(--lamp-c, var(--lamp)); opacity:.55;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='black' stroke-width='1'%3E%3Crect x='14' y='14' width='20' height='20'/%3E%3Crect x='14' y='14' width='20' height='20' transform='rotate(45 24 24)'/%3E%3Cpath d='M0 24h9.9M38.1 24H48M24 0v9.9M24 38.1V48'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='48' cy='0' r='6'/%3E%3Ccircle cx='0' cy='48' r='6'/%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3C/g%3E%3C/svg%3E") 0 0/54px 54px repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='black' stroke-width='1'%3E%3Crect x='14' y='14' width='20' height='20'/%3E%3Crect x='14' y='14' width='20' height='20' transform='rotate(45 24 24)'/%3E%3Cpath d='M0 24h9.9M38.1 24H48M24 0v9.9M24 38.1V48'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='48' cy='0' r='6'/%3E%3Ccircle cx='0' cy='48' r='6'/%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3C/g%3E%3C/svg%3E") 0 0/54px 54px repeat; }
+body.dark-mode .fx-pat { opacity:.5; }
+/* الإصدار ٨: النقش ظاهر على كامل الشاشة بهدوء، ويتوضّح أثناء التمرير واللمس (fx.js ← .is-awake) ثم يهدأ */
+.fx-pat-all { position:absolute; inset:0; opacity:.34; will-change:opacity; transition:opacity 1.2s ease;
+  -webkit-mask:linear-gradient(180deg, #000, rgba(0,0,0,.62) 45%, rgba(0,0,0,.5));
+  mask:linear-gradient(180deg, #000, rgba(0,0,0,.62) 45%, rgba(0,0,0,.5)); }
+.fx-pattern.is-awake .fx-pat-all { opacity:.9; transition-duration:.35s; }
+html.fx-lite .fx-pat-all { transition:none; }
+/* أعلى الصفحة: النقش أوضح كأن ضوءًا ينزل عليه */
+.fx-pat-top { position:absolute; inset:0;
+  -webkit-mask:radial-gradient(140% 48% at 50% -6%, #000, rgba(0,0,0,.4) 48%, transparent 78%);
+  mask:radial-gradient(140% 48% at 50% -6%, #000, rgba(0,0,0,.4) 48%, transparent 78%); }
+/* بقعة الضوء: تتحرك بالـ transform فقط (fx.js) والنقش داخلها ثابت مع الشاشة */
+.fx-lens { position:absolute; left:0; top:0; width:300px; height:300px; margin:-150px 0 0 -150px; overflow:hidden; border-radius:50%; will-change:transform;
+  -webkit-mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.6) 55%, transparent 100%);
+  mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.6) 55%, transparent 100%); }
+.fx-lens .fx-pat { will-change:transform; }
+
+/* ===== الإصدار ٨: الوضع الفاتح بنفس روح الداكن ===== */
+/* سرّ جمال الداكن: خلفية عميقة موحّدة يلمع فوقها الذهبي، وبطاقات لها حدّ وعمق.
+   الفاتح يأخذ الفكرة نفسها بدرجات النهار: رقّ دافئ تحت سماء تتلوّن حسب الوقت،
+   ونقش ذهبي أعمق، وبطاقات عاجية بحدّ ذهبي رفيع وظل زمرّدي طويل، وشريط تنقّل زجاجي. */
+/* لون سماء الوضع الفاتح حسب الوقت: نعناعي نهارًا، عسلي عصرًا، وردي فجرًا، مشمشي مغربًا، لافندري ليلًا */
+@property --sky-l { syntax:'<color>'; inherits:true; initial-value:#cfe4d8; }
+:root, html[data-daytime="day"] { --sky-l:#cfe4d8; }
+html[data-daytime="afternoon"] { --sky-l:#efdfb9; }
+html[data-daytime="dawn"] { --sky-l:#f0d5d7; }
+html[data-daytime="sunset"] { --sky-l:#f3d0b4; }
+html[data-daytime="night"] { --sky-l:#d4daee; }
+html[data-sky-ready] { transition:--sky-1 4s ease, --sky-2 4s ease, --sky-3 4s ease, --sky-l 4s ease, --hero-hi 4s ease, --hero-a 4s ease, --hero-b 4s ease, --hero-glow 4s ease; }
+body:not(.dark-mode) {
+  --cream:#efe6d4; --paper:#fffefa; --surface-2:#ece3d0; --line:#ddcfb2; --accent-soft:#ece3d0;
+  --edge:inset 0 1px 0 #fff;
+  --shadow:0 1px 2px rgba(11,66,52,.06), 0 16px 34px -14px rgba(11,66,52,.24);
+  --lift:0 6px 14px rgba(11,66,52,.1), 0 30px 60px -20px rgba(11,66,52,.34); }
+/* السماء: على الطبقة الثابتة (.ambient) لا على body، حتى تبقى بمكانها على الآيفون أيضًا */
+body:not(.dark-mode) .ambient { background:
+  radial-gradient(70% 30% at 88% -4%, color-mix(in srgb, var(--sky-2) 42%, transparent), transparent 80%),
+  linear-gradient(180deg, var(--sky-l) 0, color-mix(in srgb, var(--sky-l) 45%, #efe6d4) 28%, #f1e9d8 55%, #ece2ce 100%); }
+/* النقش في الفاتح: ذهبي أعمق مع حافة بيضاء تحته، فيبدو محفورًا كالجصّ في المساجد */
+body:not(.dark-mode) .fx-pattern { --lamp-c:color-mix(in srgb, var(--lamp) 72%, #4a3510); }
+body:not(.dark-mode) .fx-pat { opacity:.5; }
+body:not(.dark-mode) :is(.fx-pat-all, .fx-pat-top) { filter:drop-shadow(0 1.2px 0 rgba(255,255,255,.95)); }
+/* البطاقات: حدّ ذهبي رفيع بدل الرمادي */
+body:not(.dark-mode) :is(.category-card, .quick-card, .khatma-card, .setting-card, .progress-card, .reader-hero, .personal-reminder, .adhkar-list article, .home-card:not(.dhikr-card), .wird-streak-bar, .search-box) {
+  border-color:color-mix(in srgb, var(--gold) 30%, #fff); }
+/* التحية بزمرّدي عميق بدل الأسود */
+body:not(.dark-mode) .home-intro h1 { color:#0b3d31; }
+/* شريط التنقّل: زجاج عاجي بحدّ ذهبي وظل طويل */
+body:not(.dark-mode) .sidebar { background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,251,242,.66)) !important;
+  border:1px solid color-mix(in srgb, var(--gold) 32%, #fff) !important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.5); backdrop-filter:blur(16px) saturate(1.5);
+  box-shadow:inset 0 1px 0 #fff, 0 18px 38px -12px rgba(11,66,52,.3) !important; }
+/* شريط التقدّم: مجرى أوضح */
+body:not(.dark-mode) :is(.progress-track, .khatma-track, .wird-live-track) { background:color-mix(in srgb, var(--olive) 10%, var(--surface-2)); }
+
+/* ===== ب٢ البطاقات: إطار نور يسري ===== */
+.fx-beam-host { position:relative; }
+.beam-ring { position:absolute; inset:0; z-index:3; border-radius:inherit; padding:1.6px; overflow:hidden; pointer-events:none;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.beam-ring::before { content:""; position:absolute; top:50%; left:50%; width:160%; aspect-ratio:1; translate:-50% -50%;
+  background:conic-gradient(transparent 0 66%, color-mix(in srgb, var(--gold) 35%, transparent) 77%, #f6dd9c 88%, transparent 97%);
+  animation:beamSpin 7s linear infinite; }
+.beam-ring.is-paused::before { animation-play-state:paused; }
+@keyframes beamSpin { to { rotate:360deg; } }
+/* الأجهزة الضعيفة: الإطار على بطاقة الذكر فقط */
+html.fx-lite .progress-card > .beam-ring, html.fx-lite .khatma-card > .beam-ring { display:none; }
+/* باقي البطاقات هادئة، ويلمع حدّها بالذهبي عند المرور أو اللمس */
+.category-card, .setting-card, .personal-reminder, .adhkar-list article, .smart-card, .quick-card { transition:border-color .3s ease, box-shadow .3s ease, transform .35s var(--spring-soft); }
+.category-card:hover, .category-card:active, .setting-card:hover, .setting-card:active, .personal-reminder:hover, .personal-reminder:active,
+.adhkar-list article:hover, .adhkar-list article:active, .smart-card:hover, .smart-card:active {
+  border-color:color-mix(in srgb, var(--gold) 55%, transparent); box-shadow:var(--edge), 0 0 0 3px color-mix(in srgb, var(--gold) 14%, transparent), var(--shadow); }
+
+/* ===== ز٢ الأزرار: زجاج سائل ===== */
+/* الأساسي زمرّدي صلب بلمعة علوية وعمق خفيف */
+.primary-button, .primary-button:hover { background-image:linear-gradient(180deg, rgba(255,255,255,.24), transparent 55%); }
+.primary-button { box-shadow:inset 0 1px 1px rgba(255,255,255,.35), inset 0 -2px 4px rgba(0,0,0,.12), 0 8px 18px color-mix(in srgb, var(--olive) 30%, transparent); }
+/* الثانوية والرقائق: زجاج شفاف بانعكاس ضوء */
+.ghost-button, .focus-button, .home-date, .theme-quick {
+  background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.14)), color-mix(in srgb, var(--surface-2) 62%, transparent);
+  -webkit-backdrop-filter:blur(12px) saturate(1.4); backdrop-filter:blur(12px) saturate(1.4);
+  border:1px solid color-mix(in srgb, var(--gold) 24%, rgba(255,255,255,.7));
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.85), inset 0 -2px 6px rgba(15,52,40,.05), 0 6px 16px rgba(15,52,40,.07); }
+.ghost-button:hover, .focus-button:hover { background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.22)), color-mix(in srgb, var(--gold-light) 70%, transparent); border-color:color-mix(in srgb, var(--gold) 45%, transparent); }
+body.dark-mode .ghost-button, body.dark-mode .focus-button, body.dark-mode .home-date, body.dark-mode .theme-quick {
+  background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.02)), color-mix(in srgb, var(--surface-2) 70%, transparent);
+  border-color:color-mix(in srgb, #fff 13%, transparent); box-shadow:inset 0 1px 1px rgba(255,255,255,.14), 0 6px 16px rgba(0,0,0,.3); }
+body.dark-mode .ghost-button:hover, body.dark-mode .focus-button:hover { background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), color-mix(in srgb, var(--surface-2) 80%, transparent); border-color:color-mix(in srgb, var(--gold) 35%, transparent); }
+/* أزرار بطاقة الذكر (فوق الخلفية الداكنة) */
+.dhikr-next, .sound-toggle { background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); border:1px solid rgba(255,255,255,.26);
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); box-shadow:inset 0 1px 1px rgba(255,255,255,.35), 0 4px 12px rgba(0,0,0,.12); }
+
+/* ===== ح١ الحركة المتوازنة ===== */
+/* الذكر يظهر كلمة كلمة (كل كلمة كاملة، فالحروف تبقى موصولة) */
+.fx-words .fx-w { display:inline-block; animation:fxWord .7s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--fx-wait, 0ms) + var(--i) * 110ms); }
+@keyframes fxWord { from { opacity:0; filter:blur(8px); transform:translateY(6px); } }
+.fx-fade { animation:fxFade .6s ease both; animation-delay:var(--fx-wait, 0ms); }
+@keyframes fxFade { from { opacity:0; } }
+/* العدّاد يتدحرج */
+.fx-ticker { display:inline-flex; direction:ltr; line-height:1.15; }
+.fx-ticker .tk { display:inline-block; height:1.15em; overflow:hidden; }
+.fx-ticker .tk-col { display:flex; flex-direction:column; transform:translateY(calc(var(--d, 0) * -1.15em)); transition:transform .7s cubic-bezier(.2,.8,.2,1); }
+.fx-ticker .tk-col i { display:block; height:1.15em; font-style:normal; }
+/* ظهور البطاقات: تلاشٍ مع تمويه ناعم (Blur Fade) بدل الدوران */
+.reveal.in { animation:fxBlurIn .75s cubic-bezier(.2,.8,.2,1) var(--d, 0ms) backwards; }
+@keyframes fxBlurIn { from { opacity:0; filter:blur(10px); transform:translateY(12px); } }
+html.fx-lite .reveal.in { animation-name:fxRise; }
+@keyframes fxRise { from { opacity:0; transform:translateY(10px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .beam-ring::before, .fx-w, .fx-fade { animation:none !important; }
+  .fx-ticker .tk-col { transition:none; }
+}

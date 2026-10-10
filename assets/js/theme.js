@@ -56,7 +56,7 @@ function applyTheme(origin) {
     try { localStorage.setItem(THEME_DARK_KEY, dark ? '1' : '0'); } catch (e) {}
     document.querySelectorAll('[data-theme-opt]').forEach(b => b.classList.toggle('active', b.dataset.themeOpt === themeMode));
     const status = document.getElementById('theme-status'); if (status) status.textContent = themeStatusText();
-    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = dark ? '#0e1714' : '#1f4b3d';
+    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = dark ? '#08110e' : '#0b4234';
     if (dark === document.body.classList.contains('dark-mode')) return;
     const flip = () => document.body.classList.toggle('dark-mode', dark);
     // انتقال دائري ناعم من مكان الضغط
