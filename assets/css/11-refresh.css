@@ -25,15 +25,36 @@ body.dark-mode {
 /* الذهبي الفاتح للزخارف والحدود؛ وللنصوص الصغيرة درجة أعمق حتى تُقرأ بوضوح */
 .eyebrow, .soft-label, .qs-item small { color:var(--gold-ink); }
 
-/* ألوان «النهار» بالدرجة الجديدة (فترات اليوم الأخرى كما في 10-atmosphere.css) */
-:root, html[data-daytime="day"] { --sky-1:#0f5c48; --sky-2:#c9a45c; --hero-hi:#3a7969; --hero-a:#0b4234; --hero-b:#06251d; --hero-glow:rgba(201,164,92,.32); }
-/* لون ضوء الزخرفة حسب الوقت */
-:root, html[data-daytime="day"] { --lamp:#c9a45c; }
-html[data-daytime="afternoon"] { --lamp:#d29a48; }
-html[data-daytime="dawn"] { --lamp:#e39c7c; }
-html[data-daytime="sunset"] { --lamp:#ea9356; }
-html[data-daytime="night"] { --lamp:#9fb0f0; }
-body.dark-mode .fx-pattern { --lamp-c:color-mix(in srgb, var(--lamp) 82%, #fff); }
+/* ===== ألوان الوقت (الإصدار ١٠): كل الفترات من عائلة الموقع نفسها (زمرّدي + ذهبي)، ولكل فترة لمسة ضوئها =====
+   الفجر: زمرّدي مائل للفيروزي مع ذهبي وردي هادئ    النهار: الزمرّدي والذهبي المعتمدان
+   العصر: زمرّدي زيتوني مع ذهبي كهرماني            المغرب: زمرّدي غامق مع نحاسي دافئ
+   الليل: زمرّدي ليلي مع ذهبي فضّي كضوء القمر
+   --hero-*: البطاقة الرئيسية · --lamp: لون النقش · --sky-l: سماء الوضع الفاتح · --sky-d: لمسة الوقت بخلفية الداكن
+   (هذه تعلو على ألوان الأوقات القديمة في 10-atmosphere.css) */
+@property --sky-l { syntax:'<color>'; inherits:true; initial-value:#d5e5da; }
+@property --sky-d { syntax:'<color>'; inherits:true; initial-value:#0f5c48; }
+:root, html[data-daytime="day"] {
+  --sky-1:#0f5c48; --sky-2:#c9a45c; --sky-3:#8cc2aa; --lamp:#c9a45c; --sky-l:#d5e5da; --sky-d:#0f5c48;
+  --hero-hi:#33705f; --hero-a:#0b4234; --hero-b:#06251d; --hero-glow:rgba(201,164,92,.22); }
+html[data-daytime="dawn"] {
+  --sky-1:#2f6e66; --sky-2:#cfa086; --sky-3:#86b7ab; --lamp:#cda08a; --sky-l:#ece0d7; --sky-d:#245c56;
+  --hero-hi:#2e6b62; --hero-a:#0e4440; --hero-b:#062422; --hero-glow:rgba(207,160,134,.2); }
+html[data-daytime="afternoon"] {
+  --sky-1:#2d6447; --sky-2:#cf9e50; --sky-3:#b3c590; --lamp:#c99b52; --sky-l:#ebe1c6; --sky-d:#3b5a30;
+  --hero-hi:#466d4b; --hero-a:#164a36; --hero-b:#09271c; --hero-glow:rgba(207,158,80,.22); }
+html[data-daytime="sunset"] {
+  --sky-1:#7a5a3e; --sky-2:#cc8c5e; --sky-3:#a98a6c; --lamp:#c98d62; --sky-l:#eedccc; --sky-d:#5b3f2a;
+  --hero-hi:#6e4c34; --hero-a:#183d32; --hero-b:#0a1c17; --hero-glow:rgba(204,140,94,.22); }
+html[data-daytime="night"] {
+  --sky-1:#3f6f78; --sky-2:#c2b07e; --sky-3:#6f97a0; --lamp:#b9c2b6; --sky-l:#dce3e1; --sky-d:#1d4a52;
+  --hero-hi:#244c53; --hero-a:#0d2c30; --hero-b:#051416; --hero-glow:rgba(194,176,126,.14); }
+html[data-sky-ready] { transition:--sky-1 4s ease, --sky-2 4s ease, --sky-3 4s ease, --sky-l 4s ease, --sky-d 4s ease, --hero-hi 4s ease, --hero-a 4s ease, --hero-b 4s ease, --hero-glow 4s ease; }
+/* الداكن: الزخرفة أفتح قليلًا من لونها، بلا توهّج زائد */
+body.dark-mode .fx-pattern { --lamp-c:color-mix(in srgb, var(--lamp) 88%, #fff); }
+/* خلفية الداكن: لمسة خفيفة من لون الوقت بالأعلى */
+body.dark-mode .ambient { background:radial-gradient(130% 44% at 50% -8%, color-mix(in srgb, var(--sky-d) 24%, transparent), transparent 74%), var(--cream); }
+/* أيقونة القمر بالداكن: ذهبي فضّي بدل الأزرق */
+html[data-daytime="night"] body.dark-mode .home-date .sky-icon { color:#e3dcc2; }
 
 /* ===== خ٤ الخلفية: زخرفة تحت الضوء ===== */
 /* الشفق ونقاط النور النهارية أُزيلت لصالح الزخرفة؛ النجوم تبقى بالليل فقط */
@@ -56,22 +77,15 @@ html.fx-lite .fx-pat-all { transition:none; }
   mask:radial-gradient(140% 48% at 50% -6%, rgba(0,0,0,.75), rgba(0,0,0,.3) 48%, transparent 78%); }
 /* بقعة الضوء: تتحرك بالـ transform فقط (fx.js) والنقش داخلها ثابت مع الشاشة */
 .fx-lens { position:absolute; left:0; top:0; width:300px; height:300px; margin:-150px 0 0 -150px; overflow:hidden; border-radius:50%; will-change:transform;
-  -webkit-mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.6) 55%, transparent 100%);
-  mask:radial-gradient(closest-side, #000 0, rgba(0,0,0,.6) 55%, transparent 100%); }
+  -webkit-mask:radial-gradient(closest-side, rgba(0,0,0,.85) 0, rgba(0,0,0,.5) 55%, transparent 100%);
+  mask:radial-gradient(closest-side, rgba(0,0,0,.85) 0, rgba(0,0,0,.5) 55%, transparent 100%); }
 .fx-lens .fx-pat { will-change:transform; }
 
 /* ===== الإصدار ٨: الوضع الفاتح بنفس روح الداكن ===== */
 /* سرّ جمال الداكن: خلفية عميقة موحّدة يلمع فوقها الذهبي، وبطاقات لها حدّ وعمق.
    الفاتح يأخذ الفكرة نفسها بدرجات النهار: رقّ دافئ تحت سماء تتلوّن حسب الوقت،
    ونقش ذهبي أعمق، وبطاقات عاجية بحدّ ذهبي رفيع وظل زمرّدي طويل، وشريط تنقّل زجاجي. */
-/* لون سماء الوضع الفاتح حسب الوقت: نعناعي نهارًا، عسلي عصرًا، وردي فجرًا، مشمشي مغربًا، لافندري ليلًا */
-@property --sky-l { syntax:'<color>'; inherits:true; initial-value:#cfe4d8; }
-:root, html[data-daytime="day"] { --sky-l:#cfe4d8; }
-html[data-daytime="afternoon"] { --sky-l:#efdfb9; }
-html[data-daytime="dawn"] { --sky-l:#f0d5d7; }
-html[data-daytime="sunset"] { --sky-l:#f3d0b4; }
-html[data-daytime="night"] { --sky-l:#d4daee; }
-html[data-sky-ready] { transition:--sky-1 4s ease, --sky-2 4s ease, --sky-3 4s ease, --sky-l 4s ease, --hero-hi 4s ease, --hero-a 4s ease, --hero-b 4s ease, --hero-glow 4s ease; }
+/* لون سماء الفاتح (--sky-l) حسب الوقت: معرّف مع ألوان الوقت بأول الملف */
 body:not(.dark-mode) {
   --cream:#efe6d4; --paper:#fffefa; --surface-2:#ece3d0; --line:#ddcfb2; --accent-soft:#ece3d0;
   --edge:inset 0 1px 0 #fff;
@@ -79,7 +93,7 @@ body:not(.dark-mode) {
   --lift:0 6px 14px rgba(11,66,52,.1), 0 30px 60px -20px rgba(11,66,52,.34); }
 /* السماء: على الطبقة الثابتة (.ambient) لا على body، حتى تبقى بمكانها على الآيفون أيضًا */
 body:not(.dark-mode) .ambient { background:
-  radial-gradient(70% 30% at 88% -4%, color-mix(in srgb, var(--sky-2) 42%, transparent), transparent 80%),
+  radial-gradient(70% 30% at 88% -4%, color-mix(in srgb, var(--sky-2) 24%, transparent), transparent 80%),
   linear-gradient(180deg, var(--sky-l) 0, color-mix(in srgb, var(--sky-l) 45%, #efe6d4) 28%, #f1e9d8 55%, #ece2ce 100%); }
 /* النقش في الفاتح: ذهبي أعمق مع حافة بيضاء تحته، فيبدو محفورًا كالجصّ في المساجد */
 body:not(.dark-mode) .fx-pattern { --lamp-c:color-mix(in srgb, var(--lamp) 72%, #4a3510); }
