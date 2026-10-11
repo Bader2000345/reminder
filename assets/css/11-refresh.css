@@ -151,8 +151,12 @@ body.dark-mode .ghost-button:hover, body.dark-mode .focus-button:hover { backgro
 
 /* ===== ح١ الحركة المتوازنة ===== */
 /* الذكر يظهر كلمة كلمة (كل كلمة كاملة، فالحروف تبقى موصولة) */
-.fx-words .fx-w { display:inline-block; animation:fxWord .7s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--fx-wait, 0ms) + var(--i) * 110ms); }
+.fx-words .fx-w { display:inline-block; animation:fxWord .5s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--fx-wait, 0ms) + var(--i) * 75ms); }
 @keyframes fxWord { from { opacity:0; filter:blur(8px); transform:translateY(6px); } }
+/* عناوين كل صفحة عند فتحها: نفس الفكرة وأسرع (fx.js ← pageIn) */
+.fx-page-in .fx-pw { animation:fxWordSoft .4s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--fx-wait, 0ms) + var(--i) * 32ms); }
+@keyframes fxWordSoft { from { opacity:0; filter:blur(6px); } }
+html.fx-lite .fx-page-in .fx-pw { animation-name:fxFade; animation-duration:.3s; }
 .fx-fade { animation:fxFade .6s ease both; animation-delay:var(--fx-wait, 0ms); }
 @keyframes fxFade { from { opacity:0; } }
 /* العدّاد يتدحرج */
@@ -167,6 +171,6 @@ html.fx-lite .reveal.in { animation-name:fxRise; }
 @keyframes fxRise { from { opacity:0; transform:translateY(10px); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .beam-ring::before, .fx-w, .fx-fade { animation:none !important; }
+  .beam-ring::before, .fx-w, .fx-pw, .fx-fade { animation:none !important; }
   .fx-ticker .tk-col { transition:none; }
 }

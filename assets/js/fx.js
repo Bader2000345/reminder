@@ -107,6 +107,44 @@ const FX = (() => {
         el.classList.add('fx-words');
     }
 
+    // ---------- ح١ عناوين كل صفحة تظهر كلمة كلمة عند فتحها (أسرع من بطاقة الذكر) ----------
+    // كل كلمة كاملة بعنصر لحالها (الحروف تبقى موصولة)، وما يتغيّر هو الشفافية والتمويه فقط فلا يتحرك التخطيط
+    const PAGE_TEXT = ':is(.home-intro, .page-header) :is(.eyebrow, h1, .page-lead), :is(.section-title, .section-heading) :is(.soft-label, h2), .setting-card h2';
+    function splitWords(el) {
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        // نص جديد كتبه كود آخر (مثل التحية) يُقسَّم من جديد، والمقسَّم سابقًا يُترك
+        while (walker.nextNode()) { const n = walker.currentNode; if (n.nodeValue.trim() && !n.parentElement.classList.contains('fx-pw')) nodes.push(n); }
+        nodes.forEach(n => {
+            const frag = document.createDocumentFragment();
+            n.nodeValue.split(/(\s+)/).forEach(part => {
+                if (!part) return;
+                if (!part.trim()) { frag.append(part); return; }
+                const s = document.createElement('span');
+                s.className = 'fx-pw'; s.textContent = part;
+                frag.append(s);
+            });
+            n.replaceWith(frag);
+        });
+    }
+    function pageIn(page, wait = 0) {
+        if (!page || reduce.matches) return;
+        const words = new Set();
+        page.querySelectorAll(PAGE_TEXT).forEach(el => { splitWords(el); el.querySelectorAll('.fx-pw').forEach(w => words.add(w)); });
+        [...words].forEach((w, i) => w.style.setProperty('--i', Math.min(i, 14))); // أطول انتظار ≈ نصف ثانية
+        page.style.setProperty('--fx-wait', wait + 'ms');
+        page.classList.remove('fx-page-in'); void page.offsetWidth; page.classList.add('fx-page-in');
+    }
+    function pages() {
+        const was = /(^|\s)active-page(\s|$)/;
+        const mo = new MutationObserver(recs => recs.forEach(r => {
+            if (r.target.classList.contains('active-page') && !was.test(r.oldValue || '')) pageIn(r.target);
+        }));
+        document.querySelectorAll('.page-view').forEach(p => mo.observe(p, { attributes: true, attributeFilter: ['class'], attributeOldValue: true }));
+        // أول فتح للتطبيق: بعد شاشة البداية
+        pageIn(document.querySelector('.page-view.active-page'), Math.max(0, 1150 - (performance.now() - born)));
+    }
+
     // ---------- ح١ العدّاد يتدحرج ----------
     const DIGITS = '٠١٢٣٤٥٦٧٨٩';
     const column = () => `<span class="tk-col">${[...DIGITS].map(d => `<i>${d}</i>`).join('')}</span>`;
@@ -127,6 +165,7 @@ const FX = (() => {
     function init() {
         PatternLight.init();
         beams();
+        pages();
     }
     return { init, textIn, ticker, lite };
 })();
