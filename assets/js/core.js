@@ -91,9 +91,43 @@ function updateNavPill(instant = false) {
 }
 addEventListener('resize', () => updateNavPill(true));
 
+// صفحة «القرآن» (الإصدار ١٢): تبويبا «الورد اليومي» و«المصحف»، والتبويب الأخير محفوظ
+const QuranTabs = (() => {
+    const KEY = 'mudhakkir-quran-tab';
+    let current = (() => { try { return localStorage.getItem(KEY) === 'mushaf' ? 'mushaf' : 'wird'; } catch (e) { return 'wird'; } })();
+    function show(tab = current) {
+        current = tab === 'mushaf' ? 'mushaf' : 'wird';
+        try { localStorage.setItem(KEY, current); } catch (e) {}
+        document.querySelectorAll('[data-qtab]').forEach(b => {
+            const on = b.dataset.qtab === current;
+            b.classList.toggle('active', on); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
+        });
+        const wird = document.getElementById('quran-wird'), mushaf = document.getElementById('quran-mushaf');
+        if (wird) wird.hidden = current !== 'wird';
+        if (mushaf) mushaf.hidden = current !== 'mushaf';
+        document.getElementById('page-quran')?.setAttribute('data-tab', current);
+    }
+    function init() {
+        document.querySelectorAll('[data-qtab]').forEach(b => b.addEventListener('click', () => show(b.dataset.qtab)));
+        // أسهم لوحة المفاتيح بين التبويبين
+        document.querySelector('.quran-tabs')?.addEventListener('keydown', e => {
+            if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+            e.preventDefault();
+            show(current === 'wird' ? 'mushaf' : 'wird');
+            document.querySelector(`[data-qtab="${current}"]`)?.focus();
+        });
+        show(current);
+    }
+    return { init, show, get: () => current };
+})();
+
 // 1. Navigation SPA
-const PAGE_ORDER = ['home', 'adhkar', 'quran', 'free-reading', 'my-adhkar', 'settings'];
-function navigateTo(pageId) {
+const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings'];
+// صفحات قديمة صارت تبويبات: «القراءة الحرة» = القرآن ← المصحف (روابط المساعد وإشعار الكهف القديمة تبقى شغّالة)
+const PAGE_ALIAS = { 'free-reading': ['quran', 'mushaf'], wird: ['quran', 'wird'] };
+function navigateTo(pageId, tab) {
+    if (PAGE_ALIAS[pageId]) [pageId, tab] = PAGE_ALIAS[pageId];
+    if (pageId === 'quran' && tab) QuranTabs.show(tab);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const current = document.querySelector('.page-view.active-page');
     const from = current ? current.id.replace('page-', '') : null;
@@ -121,7 +155,7 @@ function navigateTo(pageId) {
 }
 
 document.querySelectorAll('[data-target]').forEach(btn => {
-    btn.addEventListener('click', () => navigateTo(btn.getAttribute('data-target')));
+    btn.addEventListener('click', () => navigateTo(btn.getAttribute('data-target'), btn.dataset.tab));
 });
 
 // الوضع الغامر: يخفي شريط التنقل، والضغط على الشاشة يُظهر الأدوات أو يخفيها، وزر الرجوع في الجوال يغلقه

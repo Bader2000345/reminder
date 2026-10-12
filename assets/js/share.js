@@ -51,7 +51,7 @@ const Share = (() => {
             const img = new Image();
             img.onload = () => { logoImage = img; resolve(img); };
             img.onerror = () => resolve(null);
-            img.src = 'assets/img/logo-light.png';
+            img.src = 'assets/img/logo-light.webp';
         });
     }
     function roundRect(g, x, y, w, h, r) {

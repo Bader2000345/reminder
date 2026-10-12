@@ -21,6 +21,8 @@ document.querySelectorAll('[data-adhkar-group]').forEach(card => {
 
 // التشغيل المبدئي
 renderGeneralAdhkar();
+QuranTabs.init();
+Prefs.init();
 updateNavPill(true);
 document.fonts?.ready.then(() => updateNavPill(true));
 AdhkarViewer.init();
@@ -34,8 +36,10 @@ Motion.init();
 UpdateNotice.init();
 Install.init();
 Wird.init();
+WirdIntro.init();
 Atmosphere.init();
 FX.init();
+Tasbih.init();
 FocusTools.init();
 Reader.setAdvanceHook(Wird.onReaderAdvance);
 Share.init();

@@ -7,8 +7,8 @@
 /* ===== الشعار الجديد ===== */
 :root {
   /* المسار نسبةً لهذا الملف (assets/css) */
-  --logo-light: url("../img/logo-light.png");
-  --logo-dark: url("../img/logo-dark.png");
+  --logo-light: url("../img/logo-light.webp");
+  --logo-dark: url("../img/logo-dark.webp");
 }
 .brand-logo { display:block; width:124px; max-width:100%; aspect-ratio:264/299; background:var(--logo-light) center/contain no-repeat; }
 body.dark-mode .brand-logo { background-image:var(--logo-dark); }

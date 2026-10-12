@@ -27,15 +27,18 @@ const FX = (() => {
             lens.style.transform = `translate3d(${x}px, ${y}px, 0)`;
             inner.style.transform = `translate3d(${LENS - x}px, ${LENS - y}px, 0)`; // النقش يبقى ثابتًا مع الشاشة
         }
-        // مكان الضوء حين لا يلمس المستخدم الشاشة: دوران هادئ بطيء حول أعلى الصفحة
-        function idle(t) { return [innerWidth * (.5 + .3 * Math.cos(t / 5200)), innerHeight * (.22 + .12 * Math.sin(t / 4100))]; }
+        // مكان الضوء حين لا يلمس المستخدم الشاشة: يرتاح بأعلى الصفحة
+        // (الإصدار ١٣: بلا دوران دائم، فما في حلقة رسم شغّالة طول الوقت وهيك أخف على الجوال والبطارية)
+        const rest = () => [innerWidth * .72, innerHeight * .2];
         function frame(t) {
             raf = 0;
             if (document.hidden || document.body.classList.contains('immersive')) return; // يُستأنف عند الرجوع
-            const [tx, ty] = t - lastPtr < 2600 ? [px, py] : idle(t);
+            const following = t - lastPtr < 2600;
+            const [tx, ty] = following ? [px, py] : rest();
             x += (tx - x) * .07; y += (ty - y) * .07;
             apply();
-            raf = requestAnimationFrame(frame);
+            // بيوقف لحاله لما يوصل مكانه
+            if (following || Math.abs(tx - x) > .5 || Math.abs(ty - y) > .5) raf = requestAnimationFrame(frame);
         }
         const run = () => { if (!raf && !reduce.matches && !lite) raf = requestAnimationFrame(frame); };
         // أثناء التمرير أو اللمس: الزخرفة تتوضّح أكثر (.is-awake) ثم تهدأ بعد لحظة من التوقف
@@ -66,7 +69,7 @@ const FX = (() => {
             addEventListener('scroll', awake, { passive: true, capture: true }); // capture: يلتقط تمرير أي قائمة داخلية أيضًا
             addEventListener('wheel', awake, { passive: true });
             document.addEventListener('visibilitychange', run);
-            new MutationObserver(run).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+            addEventListener('resize', run, { passive: true });
             run();
         }
         return { init };
@@ -107,9 +110,17 @@ const FX = (() => {
         el.classList.add('fx-words');
     }
 
-    // ---------- ح١ عناوين كل صفحة تظهر كلمة كلمة عند فتحها (أسرع من بطاقة الذكر) ----------
-    // كل كلمة كاملة بعنصر لحالها (الحروف تبقى موصولة)، وما يتغيّر هو الشفافية والتمويه فقط فلا يتحرك التخطيط
-    const PAGE_TEXT = ':is(.home-intro, .page-header) :is(.eyebrow, h1, .page-lead), :is(.section-title, .section-heading) :is(.soft-label, h2), .setting-card h2';
+    // ---------- ح١ النص كلمة كلمة بكل الموقع (الإصدار ١٣) ----------
+    // ١) عنوان الصفحة: أول ما تنفتح.  ٢) نصوص كل بطاقة: لما تبيّن البطاقة على الشاشة.
+    // كل كلمة كاملة بعنصر لحالها (الحروف تبقى موصولة)، وما يتغيّر هو الشفافية والتمويه فقط فلا يتحرك التخطيط.
+    // ما بيلمس: نص القرآن والذكر (إلهن حركتهن)، الأرقام المتغيّرة، الأزرار والحقول، والنصوص الطويلة.
+    const HEAD = ':scope > :is(.home-intro, .page-header)';
+    const HEAD_TEXT = '.eyebrow, h1, .page-lead';
+    const CARD = '.home-card:not(.dhikr-card), .smart-section, .quick-card, .category-card, .setting-card, .personal-reminder, .khatma-card, .wird-streak-bar, .reader-hero, .install-card, .friday-card, .section-title, .section-heading, .adhkar-detail-intro';
+    const CARD_TEXT = 'h2, h3, strong, small, p, .soft-label, .card-kicker, .ic-kicker, .fc-kicker, .rh-tools li, .ic-perks li';
+    const SKIP = '.dhikr-card, .quran-hero, button, input, select, textarea, label, details, .fx-ticker, [hidden]';
+    const HAS_NUM = /[0-9٠-٩]/;
+    const MAX_LEN = 140;
     function splitWords(el) {
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
         const nodes = [];
@@ -127,13 +138,48 @@ const FX = (() => {
             n.replaceWith(frag);
         });
     }
+    // كلمات كتلة (عنوان صفحة أو بطاقة)، بعد تقسيم نصوصها
+    function wordsIn(block) {
+        const words = new Set();
+        block.querySelectorAll(block.matches('.home-intro, .page-header') ? HEAD_TEXT : CARD_TEXT).forEach(el => {
+            const text = el.textContent;
+            if (el.closest(SKIP) || HAS_NUM.test(text) || text.trim().length > MAX_LEN) return;
+            splitWords(el);
+            el.querySelectorAll('.fx-pw').forEach(w => words.add(w));
+        });
+        return [...words];
+    }
+    const splashLeft = () => Math.max(0, 1150 - (performance.now() - born)); // أول فتح: بعد شاشة البداية
+    function play(block, wait = splashLeft()) {
+        block.classList.remove('fx-wait');
+        const words = wordsIn(block);
+        if (!words.length) return;
+        words.forEach((w, i) => w.style.setProperty('--i', Math.min(i, 12))); // أطول انتظار ≈ ثلث ثانية
+        block.style.setProperty('--fx-wait', wait + 'ms');
+        block.classList.remove('fx-text-in'); void block.offsetWidth; block.classList.add('fx-text-in');
+    }
+    // البطاقة بتبلّش حركة كلماتها أول ما تبيّن على الشاشة
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries => entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target); play(e.target);
+    }), { threshold: .15 }) : null;
     function pageIn(page, wait = 0) {
         if (!page || reduce.matches) return;
-        const words = new Set();
-        page.querySelectorAll(PAGE_TEXT).forEach(el => { splitWords(el); el.querySelectorAll('.fx-pw').forEach(w => words.add(w)); });
-        [...words].forEach((w, i) => w.style.setProperty('--i', Math.min(i, 14))); // أطول انتظار ≈ نصف ثانية
-        page.style.setProperty('--fx-wait', wait + 'ms');
-        page.classList.remove('fx-page-in'); void page.offsetWidth; page.classList.add('fx-page-in');
+        const head = page.querySelector(HEAD);
+        if (head) play(head, wait);
+        const blocks = [...page.querySelectorAll(CARD)].filter(b => !b.parentElement.closest(CARD) && !b.closest('[hidden]'));
+        blocks.forEach(b => {
+            if (!io) return play(b, wait);
+            if (!wordsIn(b).length) return;
+            b.classList.remove('fx-text-in'); b.classList.add('fx-wait');
+            io.unobserve(b); io.observe(b);
+        });
+        // أمان: البطاقات الظاهرة على الشاشة ما بتضل كلماتها مخفية لو تأخّر المراقب
+        clearTimeout(page._fxSafety);
+        page._fxSafety = setTimeout(() => page.querySelectorAll('.fx-wait').forEach(b => {
+            const r = b.getBoundingClientRect();
+            if (r.bottom > 0 && r.top < innerHeight) { io && io.unobserve(b); play(b, 0); }
+        }), wait + 1500);
     }
     function pages() {
         const was = /(^|\s)active-page(\s|$)/;

@@ -35,46 +35,26 @@ const DailyStats = (() => {
     const nextBtn = document.getElementById('dhikr-next-btn');
     const soundToggle = document.getElementById('tasbih-sound-toggle');
     if (!countEl || !orb) return;
-    const COUNT_KEY = 'mudhakkir-home-tasbih-count';
+    // العدّ والصوت والاهتزاز صاروا في tasbih.js: نفس العدّاد بالرئيسية وصفحة التسبيح ووضع التسبيح
     const INDEX_KEY = 'mudhakkir-home-dhikr-index';
-    let count = Number(localStorage.getItem(COUNT_KEY) || 0);
     let index = Number(localStorage.getItem(INDEX_KEY) || 0);
-    const SOUND_KEY = 'mudhakkir-tasbih-sound';
-    let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
-    let audioContext = null;
     const format = n => Number(n).toLocaleString('ar-EG');
-    const updateSoundButton = () => { if (!soundToggle) return; soundToggle.textContent = `الصوت: ${soundOn ? 'تشغيل' : 'إيقاف'}`; soundToggle.setAttribute('aria-pressed', String(soundOn)); };
-    const playTap = () => {
-        if (!soundOn) return;
-        try {
-            audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain();
-            oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(560, audioContext.currentTime); oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + .08);
-            gain.gain.setValueAtTime(.0001, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(.045, audioContext.currentTime + .01); gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + .09);
-            oscillator.connect(gain).connect(audioContext.destination); oscillator.start(); oscillator.stop(audioContext.currentTime + .1);
-        } catch (e) {}
-    };
-    const CYCLE = 33; // حلقة التقدّم حول المسبحة تكتمل كل ٣٣
-    const renderCount = () => {
+    const render = s => {
         // العدّاد يتدحرج (fx.js)، وإن لم يتوفر نكتب الرقم مباشرة
-        if (typeof FX !== 'undefined') FX.ticker(countEl, count); else countEl.textContent = format(count);
-        const stat = document.getElementById('dash-stat-tasbeeh'); if (stat) stat.textContent = format(count);
-        const r = count % CYCLE;
-        orb.style.setProperty('--p', String(count && !r ? 1 : r / CYCLE));
+        if (typeof FX !== 'undefined') FX.ticker(countEl, s.count); else countEl.textContent = format(s.count);
+        orb.style.setProperty('--p', String(s.progress)); // الحلقة تكتمل مع العدد المختار (٣٣ افتراضيًا)
+        if (soundToggle) { soundToggle.textContent = `الصوت: ${s.soundOn ? 'تشغيل' : 'إيقاف'}`; soundToggle.setAttribute('aria-pressed', String(s.soundOn)); }
     };
     const showDhikr = () => { if (!Array.isArray(window.GENERAL_ADHKAR_LIST) && typeof GENERAL_ADHKAR_LIST === 'undefined') return; const list = typeof GENERAL_ADHKAR_LIST !== 'undefined' ? GENERAL_ADHKAR_LIST : []; if (!list.length) return; index = (index + 1) % list.length; if (typeof FX !== 'undefined') FX.textIn(dhikrText, list[index]); else dhikrText.textContent = list[index]; dhikrSource.textContent = `ذكر مقترح · ${format(index + 1)} من ${format(list.length)}`; localStorage.setItem(INDEX_KEY, index); };
-    renderCount(); showDhikr(); updateSoundButton(); DailyStats.render();
+    Tasbih.onChange(render); showDhikr(); DailyStats.render();
     orb.addEventListener('click', () => {
-        count += 1; localStorage.setItem(COUNT_KEY, count); DailyStats.add('tasbeeh', 1); playTap(); renderCount();
+        const s = Tasbih.add();
         orb.classList.remove('tasbih-ripple'); void orb.offsetWidth; orb.classList.add('tasbih-ripple');
         floatEl.classList.remove('show'); void floatEl.offsetWidth; floatEl.classList.add('show');
-        // الرقم ينبض، وعند إتمام ٣٣ وميض ذهبي واهتزاز خفيف
+        // الرقم ينبض، وعند إتمام الدورة وميض ذهبي (والاهتزاز من tasbih.js)
         countEl.classList.remove('is-pop'); void countEl.offsetWidth; countEl.classList.add('is-pop');
-        if (count % CYCLE === 0) {
-            orb.classList.remove('is-cycle'); void orb.offsetWidth; orb.classList.add('is-cycle');
-            try { if (navigator.vibrate) navigator.vibrate([18, 40, 28]); } catch (e) {}
-        }
+        if (s.completed) { orb.classList.remove('is-cycle'); void orb.offsetWidth; orb.classList.add('is-cycle'); }
     });
-    soundToggle?.addEventListener('click', () => { soundOn = !soundOn; localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off'); updateSoundButton(); });
+    soundToggle?.addEventListener('click', () => Tasbih.toggleSound());
     nextBtn?.addEventListener('click', showDhikr);
 })();

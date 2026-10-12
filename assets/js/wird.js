@@ -114,6 +114,15 @@ const Wird = (() => {
     const MAX_DAYS = 730;
     const DEFAULT_DAYS = 30;
     const DURATION_PRESETS = [7, 10, 15, 20, 30, 45, 60, 90, 120, 180, 365];
+    // تحزيب الصحابة (فمي بشوق): أول صفحة لكل حزب من الأحزاب السبعة، بحدود السور
+    // الفاتحة، المائدة، يونس، الإسراء (بني إسرائيل)، الشعراء، الصافات، ق
+    const HIZB_PAGES = [1, 106, 208, 282, 367, 446, 518];
+    const nextHizbStart = page => HIZB_PAGES.find(p => p > page) || TOTAL + 1;
+    const HIZB_NAMES = [['الفاتحة', 'النساء'], ['المائدة', 'التوبة'], ['يونس', 'النحل'], ['الإسراء', 'الفرقان'], ['الشعراء', 'يس'], ['الصافات', 'الحجرات'], ['ق', 'الناس']];
+    function hizbTitle(page) {
+        const i = HIZB_PAGES.reduce((found, p, k) => (p <= page ? k : found), 0), [a, b] = HIZB_NAMES[i];
+        return `الحزب ${fmt(i + 1)}: من سورة ${a} إلى سورة ${b}`;
+    }
     const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
     const $ = id => document.getElementById(id);
     const fmt = n => Number(n).toLocaleString('ar-EG');
@@ -128,12 +137,13 @@ const Wird = (() => {
 
     // ---------- الحالة ----------
     // readCount: عدد الصفحات المكتملة منذ بداية الختمة (٠–٦٠٤) · verseIdx: آيات مكتملة في الصفحة الحالية
-    const blankState = () => ({ v: 2, mode: 'duration', days: DEFAULT_DAYS, pagesPerDay: Math.ceil(TOTAL / DEFAULT_DAYS), planDate: dayKey(), startPage: 1, readCount: 0, verseIdx: 0, pageLen: 0, khatmas: 0, today: null, pos: null });
+    // goal: عدد الختمات المنويّة (من أسئلة الخطة)
+    const blankState = () => ({ v: 2, mode: 'duration', days: DEFAULT_DAYS, pagesPerDay: Math.ceil(TOTAL / DEFAULT_DAYS), planDate: dayKey(), startPage: 1, readCount: 0, verseIdx: 0, pageLen: 0, khatmas: 0, goal: 1, today: null, pos: null });
     function sanitize(raw) {
         const s = blankState();
         if (!raw || typeof raw !== 'object') return s;
         const int = (v, lo, hi, fallback) => (Number.isFinite(Number(v)) ? clamp(Math.trunc(Number(v)), lo, hi) : fallback);
-        s.mode = raw.mode === 'daily' ? 'daily' : 'duration';
+        s.mode = ['daily', 'sahaba'].includes(raw.mode) ? raw.mode : 'duration';
         s.days = int(raw.days, MIN_DAYS, MAX_DAYS, s.days);
         s.pagesPerDay = int(raw.pagesPerDay, 1, MAX_PAGES_PER_DAY, s.pagesPerDay);
         if (DATE_RE.test(raw.planDate)) s.planDate = raw.planDate;
@@ -142,6 +152,7 @@ const Wird = (() => {
         s.verseIdx = s.readCount >= TOTAL ? 0 : int(raw.verseIdx, 0, 400, 0);
         s.pageLen = int(raw.pageLen, 0, 400, 0);
         s.khatmas = int(raw.khatmas, 0, 9999, 0);
+        s.goal = int(raw.goal, 1, 100, 1);
         const t = raw.today;
         if (t && DATE_RE.test(t.date)) s.today = { date: t.date, fromCount: int(t.fromCount, 0, TOTAL, 0), pages: int(t.pages, 0, TOTAL, 0), done: !!t.done };
         const p = raw.pos;
@@ -164,6 +175,8 @@ const Wird = (() => {
         const remaining = TOTAL - baseline;
         if (remaining <= 0) return 0;
         if (S.mode === 'daily') return Math.min(S.pagesPerDay, remaining);
+        // تحزيب الصحابة: ورد اليوم = من مكانك لآخر الحزب يلي إنت فيه
+        if (S.mode === 'sahaba') { const page = pageNo(baseline); return Math.min(remaining, nextHizbStart(page) - page); }
         const elapsed = Math.max(0, daysBetween(S.planDate, dayKey()));
         const daysLeft = Math.max(1, S.days - elapsed);
         return Math.min(MAX_PAGES_PER_DAY, remaining, Math.ceil(remaining / daysLeft));
@@ -180,10 +193,17 @@ const Wird = (() => {
         return clamp((S.readCount - t.fromCount + partialOfPage()) / t.pages, 0, 1);
     }
     const khatmaFraction = () => (isComplete() ? 1 : clamp((S.readCount + partialOfPage()) / TOTAL, 0, 1));
+    // عدد الأحزاب الباقية من موضع معيّن لآخر الختمة (تحزيب الصحابة)
+    function hizbDaysFrom(count) {
+        let c = count, n = 0;
+        while (c < TOTAL && n < 20) { const page = pageNo(c); c += Math.min(TOTAL - c, nextHizbStart(page) - page); n++; }
+        return Math.max(1, n);
+    }
     function planDays() {
         const dayN = Math.max(1, daysBetween(S.planDate, dayKey()) + 1);
         const totalDays = S.mode === 'daily'
             ? dayN - 1 + Math.max(1, Math.ceil((TOTAL - S.today.fromCount) / S.pagesPerDay))
+            : S.mode === 'sahaba' ? dayN - 1 + hizbDaysFrom(S.today.fromCount)
             : Math.max(S.days, dayN);
         return { dayN, totalDays };
     }
@@ -222,6 +242,40 @@ const Wird = (() => {
             el.append(b);
         }
         el.append(document.createTextNode(QuranData.verseText(ayah)));
+        // رقم الآية بآخرها بدائرة ذهبية متل المصحف
+        const n = document.createElement('span');
+        n.className = 'ayah-no'; n.textContent = fmt(ayah.numberInSurah); n.setAttribute('aria-label', `الآية ${fmt(ayah.numberInSurah)}`);
+        el.append(' ', n);
+    }
+
+    // ---------- ورد اليوم بدون نت: صفحاته بتتنزّل لحالها بالخلفية ----------
+    let prefetchKey = '';
+    async function prefetchToday() {
+        if (isComplete() || !navigator.onLine) return;
+        const r = rangeInfo(), key = `${S.today.date}:${r.from}-${r.to}`;
+        if (prefetchKey === key) return;
+        prefetchKey = key;
+        const pages = [];
+        for (let c = S.today.fromCount; c < Math.min(TOTAL, S.today.fromCount + S.today.pages); c++) pages.push(pageNo(c));
+        const note = $('wird-offline');
+        let done = 0;
+        const paint = () => {
+            if (!note) return;
+            note.hidden = false;
+            note.classList.toggle('ready', done === pages.length);
+            note.textContent = done === pages.length ? '✓ ورد اليوم محفوظ، بتقدر تقرأه بدون نت' : `جارٍ حفظ ورد اليوم للقراءة بدون نت… ${fmt(done)} من ${fmt(pages.length)}`;
+        };
+        paint();
+        // صفحتين مع بعض، وبهدوء حتى ما يثقل على الجهاز
+        let i = 0;
+        const worker = async () => {
+            while (i < pages.length && prefetchKey === key) {
+                const p = pages[i++];
+                try { await QuranData.getPage(p); done++; paint(); } catch (e) { if (note) note.hidden = true; prefetchKey = ''; return; }
+                await new Promise(res => setTimeout(res, 120));
+            }
+        };
+        await Promise.all([worker(), worker()]);
     }
     const surahTitle = number => `سورة ${SURAH_NAMES[number - 1]}`;
     const titleFor = (a, b) => (a === b ? surahTitle(a) : `من ${surahTitle(a)} إلى ${surahTitle(b)}`);
@@ -254,9 +308,11 @@ const Wird = (() => {
         $('khatma-percent').textContent = `${fmt(pct)}٪`;
         $('khatma-progress').style.width = pct + '%';
         const meta = $('khatma-meta');
-        if (isComplete()) { meta.textContent = `ختمات مكتملة: ${fmt(S.khatmas)} · تقبّل الله منك`; return; }
+        // النيّة من أسئلة الخطة: «الختمة ٢ من ٣»
+        const goal = S.goal > 1 ? `الختمة ${fmt(Math.min(S.khatmas + (isComplete() ? 0 : 1), S.goal))} من ${fmt(S.goal)} · ` : '';
+        if (isComplete()) { meta.textContent = `${goal}ختمات مكتملة: ${fmt(S.khatmas)} · تقبّل الله منك`; return; }
         const end = longDate(addDays(S.planDate, planDays().totalDays - 1));
-        meta.textContent = `قرأت ${fmt(S.readCount)} من ${fmt(TOTAL)} صفحة · المتبقي ${fmt(TOTAL - S.readCount)} · تنتهي بإذن الله في ${end}`;
+        meta.textContent = `${goal}قرأت ${fmt(S.readCount)} من ${fmt(TOTAL)} صفحة · المتبقي ${fmt(TOTAL - S.readCount)} · تنتهي بإذن الله في ${end}`;
     }
     function renderStreak() {
         const st = streakData(), badge = $('wird-badge');
@@ -348,6 +404,8 @@ const Wird = (() => {
         const my = ++rangeToken;
         if (isComplete()) return;
         const r = rangeInfo();
+        // تحزيب الصحابة: العنوان اسم الحزب بحدود السور
+        if (S.mode === 'sahaba') { rangeTitle = hizbTitle(r.from); renderHeader(); return; }
         rangeTitle = titleFor(QuranData.surahAtPage(r.from), QuranData.surahAtPage(r.to));
         renderHeader();
         try {
@@ -443,6 +501,7 @@ const Wird = (() => {
         document.querySelectorAll('#wird-mode [data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
         $('wird-duration-field').hidden = mode !== 'duration';
         $('wird-daily-field').hidden = mode !== 'daily';
+        $('wird-sahaba-field').hidden = mode !== 'sahaba';
         syncFields();
     }
     function syncFields() {
@@ -475,6 +534,10 @@ const Wird = (() => {
         const f = readForm();
         const baseline = f.start === 'continue' ? S.today.fromCount : 0;
         const remaining = TOTAL - baseline;
+        if (f.mode === 'sahaba') {
+            $('wird-plan-preview').textContent = `كل يوم حزب (بين ٧٢ و١٠٥ صفحات، يعني تقريبًا ٤ إلى ٥ أجزاء) · ختمة كل أسبوع بإذن الله.`;
+            return;
+        }
         const pages = f.mode === 'daily' ? f.pagesPerDay : Math.ceil(remaining / f.days);
         const days = f.mode === 'daily' ? Math.ceil(remaining / f.pagesPerDay) : f.days;
         const juz = pages >= 5 ? ` (≈ ${(Math.round(pages / 20 * 10) / 10).toLocaleString('ar-EG')} جزء)` : '';
@@ -497,9 +560,10 @@ const Wird = (() => {
         updatePreview();
         setModalState($('edit-wird-modal'), true);
     }
-    function applyPlan(f) {
+    function applyPlan(f, { silent = false } = {}) {
         const key = dayKey();
         S.mode = f.mode; S.days = f.days; S.pagesPerDay = f.pagesPerDay; S.planDate = key;
+        if (f.goal) S.goal = clamp(Math.trunc(f.goal) || 1, 1, 100);
         if (f.start === 'continue' && !isComplete()) {
             // نُبقي بداية اليوم كما هي حتى لا يضيع ما قُرئ اليوم، ونعيد حساب الكمية فقط
             const baseline = S.today.fromCount;
@@ -510,16 +574,25 @@ const Wird = (() => {
             S.readCount = 0; S.verseIdx = 0; S.pageLen = 0; S.pos = null;
             S.today = { date: key, fromCount: 0, pages: amountFor(0), done: false };
         }
-        current = null;
-        resetView(); save(); renderAll(); refreshRangeTitle(); showView();
+        current = null; prefetchKey = '';
+        resetView(); save(); renderAll(); refreshRangeTitle(); showView(); prefetchToday();
         setModalState($('edit-wird-modal'), false);
-        Toast.show('تم حفظ خطة الورد');
+        if (!silent) Toast.show('تم حفظ خطة الورد');
     }
 
     // ---------- بدء التشغيل ----------
     function checkDay() {
         if (S.today && S.today.date === dayKey()) return;
-        ensureToday(); current = null; resetView(); save(); renderAll(); refreshRangeTitle(); showView();
+        ensureToday(); current = null; resetView(); save(); renderAll(); refreshRangeTitle(); showView(); prefetchToday();
+    }
+    // لأسئلة الخطة (wird-intro.js)
+    function info() {
+        const page = pageNo(S.readCount);
+        return {
+            hasProgress: !isComplete() && (S.readCount > 0 || S.verseIdx > 0), complete: isComplete(),
+            mode: S.mode, days: S.days, pagesPerDay: S.pagesPerDay, goal: S.goal, khatmas: S.khatmas,
+            surah: S.pos ? S.pos.surah : QuranData.surahAtPage(page)
+        };
     }
     function snapshot() {
         const r = rangeInfo(), { dayN, totalDays } = planDays();
@@ -556,10 +629,13 @@ const Wird = (() => {
         $('wird-form').addEventListener('submit', e => { e.preventDefault(); applyPlan(readForm()); });
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkDay(); });
         setInterval(checkDay, 60000);
+        addEventListener('online', () => { prefetchKey = ''; prefetchToday(); });
         renderAll();
         refreshRangeTitle();
         showView();
+        // بعد ما يهدأ التشغيل بشوي: نحفظ ورد اليوم للقراءة بدون نت
+        setTimeout(prefetchToday, 2500);
     }
 
-    return { init, snapshot, onReaderAdvance };
+    return { init, snapshot, onReaderAdvance, info, applyIntro: f => applyPlan(f, { silent: true }), openPlan: () => openPlanModal() };
 })();

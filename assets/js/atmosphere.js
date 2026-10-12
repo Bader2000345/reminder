@@ -22,6 +22,10 @@ const Atmosphere = (() => {
         night: svg('<path d="M19 14.5A7.5 7.5 0 1 1 9.5 5a6 6 0 0 0 9.5 9.5z"/><path d="M17.5 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/>')
     };
     let manual = null; // للتجربة: Atmosphere.preview('night')
+    // الإعدادات ← «ألوان الوقت»: تلقائي (حسب الشروق والغروب) أو فترة ثابتة يختارها المستخدم
+    const PREF_KEY = 'mudhakkir-daytime-pref';
+    const SHORT = { dawn: 'الفجر', day: 'النهار', afternoon: 'العصر', sunset: 'المغرب', night: 'الليل' };
+    let pref = (() => { try { const p = localStorage.getItem(PREF_KEY); return SHORT[p] ? p : 'auto'; } catch (e) { return 'auto'; } })();
 
     // فترة اليوم الآن
     function phaseAt(now = new Date()) {
@@ -42,11 +46,36 @@ const Atmosphere = (() => {
         return 'night';
     }
 
-    function apply(phase = manual || phaseAt()) {
+    function apply(phase = manual || (pref !== 'auto' ? pref : phaseAt())) {
         if (root.dataset.daytime !== phase) root.dataset.daytime = phase;
         try { localStorage.setItem(KEY, phase); } catch (e) {}
         const icon = document.querySelector('.home-date .sky-icon');
         if (icon && icon.dataset.phase !== phase) { icon.dataset.phase = phase; icon.innerHTML = SKY[phase]; icon.title = NAMES[phase]; }
+        paintSetting();
+    }
+
+    // بطاقة «ألوان الوقت» بالإعدادات: الضغط بيطبّق فورًا على التطبيق كله، فبتجرّب وبتختار
+    function paintSetting() {
+        const box = document.getElementById('dt-swatches'); if (!box) return;
+        box.querySelectorAll('[data-dt]').forEach(b => { const on = b.dataset.dt === pref; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
+        const status = document.getElementById('daytime-status');
+        if (status) status.textContent = pref === 'auto' ? `تلقائي حسب وقتك · الآن ${SHORT[phaseAt()]}` : `ثابتة على ألوان ${SHORT[pref]} طول اليوم`;
+    }
+    function setPref(p) {
+        pref = SHORT[p] ? p : 'auto';
+        try { localStorage.setItem(PREF_KEY, pref); } catch (e) {}
+        manual = null; apply();
+    }
+    function bindSetting() {
+        const box = document.getElementById('dt-swatches'); if (!box) return;
+        const order = ['auto', 'dawn', 'day', 'afternoon', 'sunset', 'night'];
+        box.addEventListener('click', e => { const b = e.target.closest('[data-dt]'); if (b) setPref(b.dataset.dt); });
+        box.addEventListener('keydown', e => {
+            if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+            e.preventDefault();
+            const next = order[(order.indexOf(pref) + (e.key === 'ArrowLeft' ? 1 : -1) + order.length) % order.length]; // RTL
+            setPref(next); box.querySelector(`[data-dt="${next}"]`)?.focus();
+        });
     }
 
     // أيقونة السماء بدل النقطة في شريط التاريخ
@@ -85,6 +114,7 @@ const Atmosphere = (() => {
 
     function init() {
         skyIcon();
+        bindSetting();
         apply();
         // الانتقال الناعم للألوان يبدأ بعد أول رسم (حتى لا تتحرك الألوان عند فتح التطبيق)
         const ready = () => { root.dataset.skyReady = '1'; };
@@ -101,5 +131,5 @@ const Atmosphere = (() => {
     }
     // للتجربة من الكونسول: Atmosphere.preview('sunset')، و Atmosphere.preview(null) للرجوع للوقت الحقيقي
     function preview(phase) { manual = phase || null; apply(); }
-    return { init, apply, phaseAt, preview };
+    return { init, apply, phaseAt, preview, setPref, pref: () => pref };
 })();

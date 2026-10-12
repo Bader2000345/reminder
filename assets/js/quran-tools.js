@@ -444,10 +444,12 @@ const FocusTools = (() => {
     const KEY = 'mudhakkir-focus-tajweed';
     let current = null, on = false;
     try { on = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    // رقم الآية بآخرها بدائرة ذهبية (متل بطاقة الورد)
+    const ayahNo = ayah => { const n = qEl('span', 'ayah-no', ayah.numberInSurah.toLocaleString('ar-EG')); n.setAttribute('aria-label', 'الآية ' + ayah.numberInSurah.toLocaleString('ar-EG')); return n; };
     function paintPlain(el, ayah) {
         el.replaceChildren();
         if (QuranData.hasBasmalaHeader(ayah)) el.append(qEl('span', 'verse-basmala', QuranData.BASMALA));
-        el.append(document.createTextNode(QuranData.verseText(ayah)));
+        el.append(document.createTextNode(QuranData.verseText(ayah)), ' ', ayahNo(ayah));
     }
     async function paint() {
         const el = $('focus-verse-text');
@@ -463,7 +465,7 @@ const FocusTools = (() => {
             if (!row || row.n !== ayah.numberInSurah) return paintPlain(el, ayah);
             el.replaceChildren();
             if (QuranData.hasBasmalaHeader(ayah)) el.append(qEl('span', 'verse-basmala', QuranData.BASMALA));
-            const span = qEl('span'); span.innerHTML = Tajweed.ayahHtml(row, ayah); el.append(span);
+            const span = qEl('span'); span.innerHTML = Tajweed.ayahHtml(row, ayah); el.append(span, ' ', ayahNo(ayah));
         } catch (e) { paintPlain(el, ayah); Toast.show('تعذّر تحميل ألوان التجويد الآن'); }
     }
     // تُستدعى من الورد كلما تغيّرت الآية

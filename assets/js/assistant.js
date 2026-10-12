@@ -87,12 +87,13 @@ const Assistant = (() => {
         general: () => { navigateTo('my-adhkar'); later(() => $('general-reminder-card')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300); },
         reminder: () => { navigateTo('my-adhkar'); later(() => Reminders.openForm()); },
         kahf: () => FridayReminder.openKahf(),
-        wird: () => navigateTo('quran'),
-        reader: () => { navigateTo('free-reading'); Reader.enter(); },
-        search: () => { navigateTo('free-reading'); Reader.enter(); later(() => $('rd-search-btn')?.click(), 500); },
+        wird: () => navigateTo('quran', 'wird'),
+        reader: () => { navigateTo('quran', 'mushaf'); Reader.enter(); },
+        search: () => { navigateTo('quran', 'mushaf'); Reader.enter(); later(() => $('rd-search-btn')?.click(), 500); },
         adhkar: () => navigateTo('adhkar'),
         situations: () => { navigateTo('adhkar'); later(() => AdhkarViewer.openSituations()); },
-        tasbih: () => { navigateTo('home'); later(() => $('tasbih-orb')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300); },
+        tasbih: () => navigateTo('tasbih'),
+        'tasbih-mode': () => later(() => Tasbih.openMode(), 350), // بعد ما تتسكّر المحادثة (حتى ما يتداخل زر الرجوع)
         home: () => navigateTo('home'),
         settings: () => navigateTo('settings'),
         name: () => { navigateTo('settings'); later(() => { $('name-setting')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); $('name-input')?.focus({ preventScroll: true }); }, 350); }

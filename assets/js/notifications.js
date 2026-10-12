@@ -177,8 +177,10 @@ const PushSync = (() => {
     return { sync, state: () => state, onChange: f => listeners.add(f) };
 })();
 
-// التذكيرات الشخصية + تذكير الجمعة (time-context.js)
-const allReminders = () => Reminders.list().concat(typeof FridayReminder !== 'undefined' ? FridayReminder.entries() : []);
+// التذكيرات الشخصية + تذكير الجمعة (time-context.js) + تذكير الورد (wird-intro.js)
+const allReminders = () => Reminders.list()
+    .concat(typeof FridayReminder !== 'undefined' ? FridayReminder.entries() : [])
+    .concat(typeof WirdReminder !== 'undefined' ? WirdReminder.entries() : []);
 
 // كل تغيير في الإعدادات: نحدّث نسخة الـ Service Worker ثم السيرفر
 function syncNotifications() {

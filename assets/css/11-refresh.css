@@ -62,8 +62,8 @@ html[data-daytime="night"] body.dark-mode .home-date .sky-icon { color:#e3dcc2; 
 html:not([data-daytime="night"]) .motes { display:none; }
 .fx-pattern { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
 .fx-pat { position:absolute; left:0; top:0; width:100vw; height:100vh; height:100lvh; background:var(--lamp-c, var(--lamp)); opacity:.55;
-  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='black' stroke-width='1'%3E%3Crect x='14' y='14' width='20' height='20'/%3E%3Crect x='14' y='14' width='20' height='20' transform='rotate(45 24 24)'/%3E%3Cpath d='M0 24h9.9M38.1 24H48M24 0v9.9M24 38.1V48'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='48' cy='0' r='6'/%3E%3Ccircle cx='0' cy='48' r='6'/%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3C/g%3E%3C/svg%3E") 0 0/54px 54px repeat;
-  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='black' stroke-width='1'%3E%3Crect x='14' y='14' width='20' height='20'/%3E%3Crect x='14' y='14' width='20' height='20' transform='rotate(45 24 24)'/%3E%3Cpath d='M0 24h9.9M38.1 24H48M24 0v9.9M24 38.1V48'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='48' cy='0' r='6'/%3E%3Ccircle cx='0' cy='48' r='6'/%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3C/g%3E%3C/svg%3E") 0 0/54px 54px repeat; }
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='black' stroke-width='1'%3E%3Cpath d='M0 20L20 0L40 20L20 40Z'/%3E%3Cpath d='M20 11L29 20L20 29L11 20Z'/%3E%3Cpath d='M20 0v11M20 29v11M0 20h11M29 20h11'/%3E%3Ccircle cx='20' cy='20' r='3'/%3E%3Ccircle cx='0' cy='0' r='4'/%3E%3Ccircle cx='40' cy='0' r='4'/%3E%3Ccircle cx='0' cy='40' r='4'/%3E%3Ccircle cx='40' cy='40' r='4'/%3E%3C/g%3E%3C/svg%3E") 0 0/44px 44px repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='black' stroke-width='1'%3E%3Cpath d='M0 20L20 0L40 20L20 40Z'/%3E%3Cpath d='M20 11L29 20L20 29L11 20Z'/%3E%3Cpath d='M20 0v11M20 29v11M0 20h11M29 20h11'/%3E%3Ccircle cx='20' cy='20' r='3'/%3E%3Ccircle cx='0' cy='0' r='4'/%3E%3Ccircle cx='40' cy='0' r='4'/%3E%3Ccircle cx='0' cy='40' r='4'/%3E%3Ccircle cx='40' cy='40' r='4'/%3E%3C/g%3E%3C/svg%3E") 0 0/44px 44px repeat; }
 body.dark-mode .fx-pat { opacity:.5; }
 /* الإصدار ٨: النقش ظاهر على كامل الشاشة بهدوء، ويتوضّح أثناء التمرير واللمس (fx.js ← .is-awake) ثم يهدأ */
 .fx-pat-all { position:absolute; inset:0; opacity:.24; will-change:opacity; transition:opacity 1.2s ease;
@@ -153,10 +153,14 @@ body.dark-mode .ghost-button:hover, body.dark-mode .focus-button:hover { backgro
 /* الذكر يظهر كلمة كلمة (كل كلمة كاملة، فالحروف تبقى موصولة) */
 .fx-words .fx-w { display:inline-block; animation:fxWord .5s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--fx-wait, 0ms) + var(--i) * 75ms); }
 @keyframes fxWord { from { opacity:0; filter:blur(8px); transform:translateY(6px); } }
-/* عناوين كل صفحة عند فتحها: نفس الفكرة وأسرع (fx.js ← pageIn) */
-.fx-page-in .fx-pw { animation:fxWordSoft .4s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--fx-wait, 0ms) + var(--i) * 32ms); }
+/* النص كلمة كلمة بكل الموقع: عنوان الصفحة عند فتحها، ونصوص كل بطاقة لما تبيّن (fx.js ← pageIn) */
+/* كلمة الحركة لازم تضل جزء عادي من السطر، مهما كانت قواعد الـ span العامة بالبطاقات (متل .category-card span) */
+.fx-pw { display:inline !important; width:auto !important; height:auto !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important;
+  background:none !important; box-shadow:none !important; color:inherit !important; font-size:inherit !important; position:static !important; transform:none !important; }
+.fx-wait .fx-pw { opacity:0; }
+.fx-text-in .fx-pw { animation:fxWordSoft .36s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--fx-wait, 0ms) + var(--i) * 26ms); }
 @keyframes fxWordSoft { from { opacity:0; filter:blur(6px); } }
-html.fx-lite .fx-page-in .fx-pw { animation-name:fxFade; animation-duration:.3s; }
+html.fx-lite .fx-text-in .fx-pw { animation-name:fxFade; animation-duration:.3s; }
 .fx-fade { animation:fxFade .6s ease both; animation-delay:var(--fx-wait, 0ms); }
 @keyframes fxFade { from { opacity:0; } }
 /* العدّاد يتدحرج */
@@ -172,5 +176,6 @@ html.fx-lite .reveal.in { animation-name:fxRise; }
 
 @media (prefers-reduced-motion: reduce) {
   .beam-ring::before, .fx-w, .fx-pw, .fx-fade { animation:none !important; }
+  .fx-wait .fx-pw { opacity:1; }
   .fx-ticker .tk-col { transition:none; }
 }
