@@ -32,5 +32,33 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "وضع التسبيح",
+      "short_name": "التسبيح",
+      "description": "مسبحة بملء الشاشة، أي ضغطة بتحسب",
+      "url": "./index.html?open=tasbih-mode",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "ورد اليوم",
+      "short_name": "الورد",
+      "description": "تابع وردك القرآني من حيث وقفت",
+      "url": "./index.html?open=wird",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "أذكار الصباح",
+      "short_name": "الصباح",
+      "url": "./index.html?open=morning",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "أذكار المساء",
+      "short_name": "المساء",
+      "url": "./index.html?open=evening",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
   ]
 }

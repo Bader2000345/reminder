@@ -16,11 +16,22 @@ const DailyStats = (() => {
     };
     const write = stats => { try { localStorage.setItem(KEY, JSON.stringify(stats)); } catch (e) {} };
     const get = () => read();
-    const add = (field, amount = 1) => { const stats = read(); stats[field] = Number(stats[field] || 0) + amount; write(stats); render(); return stats; };
+    const add = (field, amount = 1) => {
+        const stats = read(); stats[field] = Number(stats[field] || 0) + amount; write(stats); render();
+        // تقويم الأسبوع (extras.js): التسبيح، والقراءة من الورد
+        if (typeof WeekLog !== 'undefined') WeekLog.mark(field === 'wirdVerses' ? 'r' : 't');
+        return stats;
+    };
     const render = () => {
         const line = document.getElementById('daily-stats-line'); if (!line) return;
         const stats = read(); const format = n => Number(n).toLocaleString('ar-EG');
-        line.innerHTML = `إحصائية اليوم: <strong>${format(stats.tasbeeh)}</strong> تسبيحة · <strong>${format(stats.wirdVerses)}</strong> آية`;
+        // العدد مع المعدود بقاعدة العربية: ١ تسبيحة · ٢ تسبيحتان · ٣–١٠ تسبيحات · ١١+ تسبيحة
+        const count = (n, one, two, few, many) => n === 1 ? `${one} واحدة` : n === 2 ? two
+            : `<strong>${format(n)}</strong> ${n % 100 >= 3 && n % 100 <= 10 ? few : many}`;
+        const parts = [];
+        if (stats.tasbeeh) parts.push(count(stats.tasbeeh, 'تسبيحة', 'تسبيحتان', 'تسبيحات', 'تسبيحة'));
+        if (stats.wirdVerses) parts.push(count(stats.wirdVerses, 'آية', 'آيتان', 'آيات', 'آية'));
+        line.innerHTML = parts.length ? `إحصائية اليوم: ${parts.join(' · ')}` : 'إحصائية اليوم: لم تبدأ بعد، تسبيحة واحدة تكفي لتبدأ';
     };
     return { get, add, render };
 })();
@@ -49,6 +60,7 @@ const DailyStats = (() => {
     Tasbih.onChange(render); showDhikr(); DailyStats.render();
     orb.addEventListener('click', () => {
         const s = Tasbih.add();
+        Tasbih.wave(orb);
         orb.classList.remove('tasbih-ripple'); void orb.offsetWidth; orb.classList.add('tasbih-ripple');
         floatEl.classList.remove('show'); void floatEl.offsetWidth; floatEl.classList.add('show');
         // الرقم ينبض، وعند إتمام الدورة وميض ذهبي (والاهتزاز من tasbih.js)

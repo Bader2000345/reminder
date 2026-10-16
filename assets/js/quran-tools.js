@@ -24,7 +24,8 @@ const ICONS = {
     bookmark: '<path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/>',
     highlight: '<path d="M4 20h7"/><path d="M14.5 4.5l5 5L10 19l-5 1 1-5z"/>',
     note: '<path d="M5 4h14v12l-4 4H5z"/><path d="M15 20v-4h4M8 9h8M8 13h5"/>',
-    ask: '<path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.5l.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8z"/>'
+    ask: '<path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.5l.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8z"/>',
+    image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8 8.5"/>'
 };
 const svgIcon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 
@@ -320,6 +321,8 @@ const AyahSheet = (() => {
             try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { return; }
             try { await navigator.clipboard.writeText(text); Toast.show('تم نسخ الآية للمشاركة'); } catch (e) {}
         });
+        // صورة الآية بإطار المصحف للمشاركة (share.js)
+        if (typeof Share !== 'undefined') add('image', 'صورة', () => { QSheet.close(); setTimeout(() => Share.openAyah(ayah), 200); });
         const bm = add('bookmark', AyahStore.isBookmarked(k) ? 'إزالة العلامة' : 'علامة مرجعية', () => {
             const on = AyahStore.toggleBookmark(k, ayah.page);
             bm.querySelector('span').textContent = on ? 'إزالة العلامة' : 'علامة مرجعية';
@@ -444,12 +447,12 @@ const FocusTools = (() => {
     const KEY = 'mudhakkir-focus-tajweed';
     let current = null, on = false;
     try { on = localStorage.getItem(KEY) === '1'; } catch (e) {}
-    // رقم الآية بآخرها بدائرة ذهبية (متل بطاقة الورد)
-    const ayahNo = ayah => { const n = qEl('span', 'ayah-no', ayah.numberInSurah.toLocaleString('ar-EG')); n.setAttribute('aria-label', 'الآية ' + ayah.numberInSurah.toLocaleString('ar-EG')); return n; };
+    // رقم الآية بآخرها بعلامة المصحف «۝» (متل بطاقة الورد)
+    const ayahNo = ayah => { const n = qEl('span', 'ayah-no', QuranData.endMark(ayah.numberInSurah)); n.setAttribute('aria-label', 'الآية ' + ayah.numberInSurah.toLocaleString('ar-EG')); return n; };
     function paintPlain(el, ayah) {
         el.replaceChildren();
         if (QuranData.hasBasmalaHeader(ayah)) el.append(qEl('span', 'verse-basmala', QuranData.BASMALA));
-        el.append(document.createTextNode(QuranData.verseText(ayah)), ' ', ayahNo(ayah));
+        el.append(document.createTextNode(QuranData.verseText(ayah)), ' ', ayahNo(ayah));
     }
     async function paint() {
         const el = $('focus-verse-text');
@@ -465,7 +468,7 @@ const FocusTools = (() => {
             if (!row || row.n !== ayah.numberInSurah) return paintPlain(el, ayah);
             el.replaceChildren();
             if (QuranData.hasBasmalaHeader(ayah)) el.append(qEl('span', 'verse-basmala', QuranData.BASMALA));
-            const span = qEl('span'); span.innerHTML = Tajweed.ayahHtml(row, ayah); el.append(span, ' ', ayahNo(ayah));
+            const span = qEl('span'); span.innerHTML = Tajweed.ayahHtml(row, ayah); el.append(span, ' ', ayahNo(ayah));
         } catch (e) { paintPlain(el, ayah); Toast.show('تعذّر تحميل ألوان التجويد الآن'); }
     }
     // تُستدعى من الورد كلما تغيّرت الآية

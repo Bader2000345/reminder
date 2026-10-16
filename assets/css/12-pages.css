@@ -349,6 +349,52 @@ body.dark-mode .wi-stepper output { color:var(--olive-dark); }
 html.fx-lite :is(.ghost-button, .focus-button, .home-date, .theme-quick, .dhikr-next, .sound-toggle, .sidebar, .tasbih-fab, .ask-fab) { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
 html.fx-lite .sidebar { background:var(--paper) !important; }
 
+/* ----- «فحص الإشعارات» بأذكاري ----- */
+.notify-check { margin-top:18px; padding:18px; border-radius:var(--r-lg, 22px); display:flex; flex-direction:column; gap:14px;
+  background:var(--paper); border:1px solid color-mix(in srgb, var(--gold) 40%, #fff); box-shadow:var(--shadow); }
+body.dark-mode .notify-check { border-color:color-mix(in srgb, var(--gold) 18%, transparent); }
+.nc-head { display:flex; gap:12px; align-items:flex-start; }
+.nc-head h2 { margin:0 0 2px; font-size:16px; }
+.nc-head p { margin:0; color:var(--muted); font-size:13px; }
+.nc-badge { width:42px; height:42px; flex:none; display:grid; place-items:center; border-radius:14px; background:color-mix(in srgb, var(--olive) 12%, transparent); color:var(--olive); }
+body.dark-mode .nc-badge { color:var(--olive-dark); }
+.nc-badge svg { width:22px; height:22px; }
+.notify-check > .primary-button { align-self:flex-start; }
+.nc-steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.nc-step { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:14px; background:color-mix(in srgb, var(--surface-2) 70%, transparent); animation:wiOpt .35s ease both; }
+.nc-ic { width:24px; height:24px; flex:none; display:grid; place-items:center; border-radius:50%; font-weight:800; font-size:13px; color:#fff; }
+.nc-step.is-ok .nc-ic { background:var(--olive); }
+.nc-step.is-warn .nc-ic { background:#c08a2e; }
+.nc-step.is-fail .nc-ic { background:#b0473a; }
+.nc-step.is-wait .nc-ic { background:var(--muted); }
+.nc-tx { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.nc-tx b { font-size:14px; }
+.nc-tx small { color:var(--muted); font-size:12.5px; line-height:1.6; }
+.nc-tx em { font-style:normal; font-size:12.5px; line-height:1.6; color:var(--ink); padding:6px 10px; margin-top:4px; border-radius:10px; background:color-mix(in srgb, var(--gold) 12%, transparent); }
+.nc-actions { display:flex; gap:8px; }
+
+/* ===== الإصدار ١٣: وضوح النصوص وسهولة الضغط (من مراجعة التطبيق بالقياس) =====
+ * فاتح: النص الرمادي كان ٤٫٤:١ والعنوان الصغير الذهبي ٣٫٦:١ على الكريمي ← صاروا فوق ٥:١ (المطلوب ٤٫٥).
+ * الأزرار الصغيرة (٢٨–٣٤ بكسل) صارت ٣٦–٤٢ بكسل لتنضغط بسهولة بالإصبع. */
+:root { --muted:#55615b; --gold-ink:#7a5c22; }
+body { --frame-ink:#7a5c22; }
+body.dark-mode { --frame-ink:#e0c27a; }
+/* الذهبي الفاتح للزخارف فقط؛ النصوص الصغيرة بالدرجة الأعمق */
+.count-label, .lock-badge, .proof summary { color:var(--gold-ink); }
+.lock-badge { border-color:color-mix(in srgb, var(--gold) 55%, transparent); }
+/* داكن: الأبيض على الزمرّدي كان ٣٫٧:١ بالأزرار المختارة ← زمرّدي أعمق (٥٫٨:١) */
+body.dark-mode :is(.tb-chips button[aria-checked="true"], .tab.active) { background:#1f7259; }
+body.dark-mode .time-context { color:var(--olive-dark); }
+/* أهداف اللمس */
+.proof summary { min-height:36px; padding-inline:4px; }
+.segmented button { min-height:36px; }
+.tb-goal button, #gr-test, .share-trigger { min-height:40px; }
+.share-trigger { padding-inline:16px; font-size:12px; }
+.resume-reading .primary-button { min-height:42px; padding:10px 18px; font-size:13px; }
+@media (max-width:700px) {
+  .side-link small { font-size:10.5px !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .quran-pane:not([hidden]), .tb-orb.is-tap .tb-count, .tm-count.is-pop, .tm-ripple { animation:none !important; }
   .tasbih-mode, .tasbih-fab, .tb-orb { transition:none; }

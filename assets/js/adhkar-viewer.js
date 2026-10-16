@@ -58,7 +58,7 @@ const AdhkarViewer = (() => {
         }
         if (foot.length) {
             const ol = el('ol', 'dk-foot');
-            foot.forEach((f, k) => { const li = el('li'); li.append(el('b', '', `(${ar(k + 1)}) `), document.createTextNode(f)); ol.append(li); });
+            foot.forEach((f, k) => { const li = el('li'); li.append(el('b', '', `(${ar(k + 1)}) `), document.createTextNode(f.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]))); ol.append(li); });
             inner.append(ol);
         }
         page.append(inner);
@@ -156,6 +156,7 @@ const AdhkarViewer = (() => {
         if (!total || counts[idx] >= total) return;
         counts[idx]++;
         DailyStats.add('tasbeeh', 1);
+        if (typeof WeekLog !== 'undefined') WeekLog.mark('a');
         try { if (navigator.vibrate) navigator.vibrate(counts[idx] >= total ? [20, 40, 30] : 12); } catch (e) {}
         const btn = $('dk-counter');
         btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');

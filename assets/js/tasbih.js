@@ -65,6 +65,13 @@ const Tasbih = (() => {
         } catch (e) {}
     }
     const buzz = p => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
+    // ك٢ (الإصدار ١٤): مع كل تسبيحة موجة ذهبية بتطلع من حوالين المسبحة (الرئيسية، الصفحة، الوضع)
+    function wave(el) {
+        if (!el || reduce.matches) return;
+        const w = document.createElement('i');
+        w.className = 'tb-wave'; w.setAttribute('aria-hidden', 'true');
+        el.append(w); setTimeout(() => w.remove(), 760);
+    }
 
     // ---------- العمليات ----------
     function add({ light = false } = {}) {
@@ -106,6 +113,7 @@ const Tasbih = (() => {
         orb.addEventListener('click', () => {
             const s = add();
             if (reduce.matches) return;
+            wave(orb);
             orb.classList.remove('is-tap'); void orb.offsetWidth; orb.classList.add('is-tap');
             if (s.completed) { orb.classList.remove('is-cycle'); void orb.offsetWidth; orb.classList.add('is-cycle'); }
         });
@@ -156,6 +164,7 @@ const Tasbih = (() => {
             const s = add({ light: true });
             if (e) ripple(e);
             if (reduce.matches) return;
+            wave(root.querySelector('.tm-ring-wrap'));
             const c = $('tm-count'); c.classList.remove('is-pop'); void c.offsetWidth; c.classList.add('is-pop');
             if (s.completed) { root.classList.remove('is-cycle'); void root.offsetWidth; root.classList.add('is-cycle'); }
         }
@@ -232,5 +241,5 @@ const Tasbih = (() => {
     }
 
     function init() { page(); Mode.init(); tuckFabs(); }
-    return { init, add, reset, setGoal, setDhikr, toggleSound, onChange, state, openMode: () => Mode.open(), DHIKR };
+    return { init, add, reset, setGoal, setDhikr, toggleSound, onChange, state, wave, openMode: () => Mode.open(), DHIKR };
 })();

@@ -174,7 +174,18 @@ const PushSync = (() => {
         running = (async () => { do { again = false; await run(); } while (again); })().finally(() => { running = null; });
         return running;
     }
-    return { sync, state: () => state, onChange: f => listeners.add(f) };
+    // إصلاح: نلغي الاشتراك القديم ونعمل واحد جديد ونبعته للسيرفر من جديد (بيحل الاشتراك المنتهي أو الملغى)
+    async function reset() {
+        try {
+            const reg = await navigator.serviceWorker.ready;
+            const sub = await reg.pushManager.getSubscription();
+            if (sub) { await post('/unsubscribe', { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe().catch(() => {}); }
+        } catch (e) {}
+        try { localStorage.removeItem(SENT_KEY); } catch (e) {}
+        await sync();
+        return state;
+    }
+    return { sync, reset, post, state: () => state, onChange: f => listeners.add(f) };
 })();
 
 // التذكيرات الشخصية + تذكير الجمعة (time-context.js) + تذكير الورد (wird-intro.js)
@@ -229,8 +240,8 @@ const GeneralReminder = (() => {
 
     function fireIfDue() {
         if (!isActive()) return;
-        // والتطبيق في الخلفية يتولى السيرفر الإشعار، فلا نكرره
-        if (document.visibilityState !== 'visible' && PushSync.state() === 'on') return;
+        // إذا الإشعار من السيرفر شغّال، هو بيتولّى الأذكار العامة دايمًا (حتى والتطبيق مفتوح)، فما منكررها
+        if (PushSync.state() === 'on') return;
         const current = slotOf(Date.now());
         const last = parseInt(store.get(KEY_SLOT) || '0', 10);
         if (current > last) {
@@ -307,6 +318,147 @@ const GeneralReminder = (() => {
 
     const nextSlotText = () => new Date((slotOf(Date.now()) + 1) * INTERVAL_MS).toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' });
     return { init, isActive, nextSlotText, refresh: schedule };
+})();
+
+// ===== «فحص الإشعارات»: يفحص كل حلقة بالسلسلة ويجرّب إشعار حقيقي من السيرفر (الإصدار ١٣) =====
+const NotifyCheck = (() => {
+    const $ = id => document.getElementById(id);
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/.test(ua);
+    const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const AR = n => Number(n).toLocaleString('ar-EG');
+    const remindersLabel = n => n === 0 ? 'لا تذكيرات شخصية' : n === 1 ? 'تذكير واحد' : n === 2 ? 'تذكيران'
+        : n % 100 >= 3 && n % 100 <= 10 ? `${AR(n)} تذكيرات` : n % 100 >= 11 ? `${AR(n)} تذكيرًا` : `${AR(n)} تذكير`;
+    let running = false, testWaiter = null;
+
+    const ICONS = { ok: '✓', warn: '!', fail: '✕', wait: '…' };
+    function paint(steps) {
+        const list = $('nc-steps'); if (!list) return;
+        list.hidden = false;
+        list.replaceChildren(...steps.map(s => {
+            const li = document.createElement('li');
+            li.className = 'nc-step is-' + s.status;
+            li.innerHTML = `<span class="nc-ic" aria-hidden="true">${ICONS[s.status]}</span><span class="nc-tx"><b></b><small></small>${s.fix ? '<em></em>' : ''}</span>`;
+            li.querySelector('b').textContent = s.title;
+            li.querySelector('small').textContent = s.detail || '';
+            if (s.fix) li.querySelector('em').textContent = s.fix;
+            return li;
+        }));
+    }
+    const fixDenied = () => isIOS ? 'من إعدادات الآيفون ← الإشعارات ← مُذكّر ← السماح بالإشعارات.'
+        : isAndroid ? 'اضغط القفل بجانب رابط الموقع (أو معلومات التطبيق) ← الأذونات ← الإشعارات ← سماح، ثم أعد الفحص.'
+        : 'اضغط القفل بجانب رابط الموقع ← الإشعارات ← سماح، ثم أعد الفحص.';
+    const fixBackground = () => isAndroid ? 'من إعدادات الهاتف ← التطبيقات ← مُذكّر (أو Chrome) ← البطارية ← «بلا قيود»، وتأكد أن إشعاراته غير مكتومة.'
+        : isIOS ? 'تأكد أن وضع «التركيز/عدم الإزعاج» متوقف، وأن إشعارات مُذكّر مسموحة من إعدادات الآيفون.'
+        : 'اترك المتصفح يعمل في الخلفية، وتأكد أن إشعاراته مسموحة من إعدادات النظام.';
+
+    // انتظار إشارة sw.js إن إشعار التجربة وصل
+    function waitForTest(ms) {
+        return new Promise(resolve => {
+            const timer = setTimeout(() => { testWaiter = null; resolve(false); }, ms);
+            testWaiter = () => { clearTimeout(timer); testWaiter = null; resolve(true); };
+        });
+    }
+    const timeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+
+    async function run() {
+        if (running) return;
+        running = true;
+        const btn = $('nc-run'); if (btn) { btn.disabled = true; btn.textContent = 'جارٍ الفحص…'; }
+        $('nc-actions') && ($('nc-actions').hidden = true);
+        const steps = [];
+        const add = s => { steps.push(s); paint(steps); return s; };
+        let canTest = true, needRepair = false;
+        try {
+            // ١) دعم المتصفح
+            const supported = Notifier.supported && SW_OK && 'PushManager' in window;
+            if (isIOS && !standalone()) { add({ status: 'fail', title: 'التطبيق غير مثبّت على الآيفون', detail: 'على الآيفون تعمل الإشعارات من التطبيق المثبّت فقط.', fix: 'افتح الموقع في Safari ← زر المشاركة ⬆️ ← «إضافة إلى الشاشة الرئيسية»، ثم افتح مُذكّر من أيقونته.' }); canTest = false; }
+            else if (!supported) { add({ status: 'fail', title: 'المتصفح لا يدعم الإشعارات في الخلفية', detail: 'جرّب Chrome على أندرويد، أو Safari بعد تثبيت التطبيق على الآيفون.' }); canTest = false; }
+            else add({ status: 'ok', title: 'المتصفح يدعم الإشعارات' });
+            // ٢) الإذن
+            if (canTest) {
+                let perm = Notifier.permission();
+                if (perm === 'default') perm = await Notifier.ensurePermission();
+                if (perm === 'granted') add({ status: 'ok', title: 'إذن الإشعارات مسموح' });
+                else { add({ status: 'fail', title: perm === 'denied' ? 'الإشعارات ممنوعة لهذا الموقع' : 'لم تسمح بالإشعارات بعد', fix: fixDenied() }); canTest = false; }
+            }
+            // ٣) خدمة الخلفية
+            let reg = null;
+            if (canTest) {
+                reg = await timeout(navigator.serviceWorker.ready, 8000).catch(() => null);
+                if (reg && reg.active) add({ status: 'ok', title: 'خدمة الخلفية تعمل' });
+                else { add({ status: 'fail', title: 'خدمة الخلفية لم تبدأ', fix: 'أغلق التطبيق وافتحه من جديد، وإن استمرت المشكلة اضغط «إصلاح الاشتراك».' }); canTest = false; needRepair = true; }
+            }
+            // ٤) الاشتراك بالسيرفر (نعيد المزامنة أول شي)
+            let sub = null;
+            if (canTest) {
+                await PushSync.sync();
+                sub = await reg.pushManager.getSubscription().catch(() => null);
+                const st = PushSync.state();
+                if (sub && (st === 'on' || st === 'outdated')) add({ status: 'ok', title: 'الجهاز مسجّل في الخادم' });
+                else if (!sub && st === 'off') { add({ status: 'warn', title: 'لا يوجد ما يُرسَل', detail: 'فعّل «أذكار عامة» أو أضف تذكيرًا، ثم أعد الفحص.' }); canTest = false; }
+                else { add({ status: 'fail', title: 'تعذّر التسجيل في الخادم', detail: 'قد يكون الاتصال ضعيفًا أو الاشتراك قديمًا.', fix: 'اضغط «إصلاح الاشتراك» في الأسفل.' }); canTest = false; needRepair = true; }
+            }
+            // ٥) الخادم نفسه
+            let server = null;
+            try { server = await timeout(fetch(PUSH_SERVER + '/status', { cache: 'no-store' }).then(r => r.json()), 8000); } catch (e) {}
+            if (!server) add({ status: 'warn', title: 'تعذّر الوصول إلى الخادم الآن', detail: 'تأكد من الاتصال بالإنترنت وأعد الفحص.' });
+            else {
+                const last = server.lastRun && Date.parse(server.lastRun.time);
+                const mins = last ? Math.round((Date.now() - last) / 60000) : null;
+                const step = server.lastRun && server.lastRun.step;
+                if (mins === null || mins > 40) add({ status: 'fail', title: 'الخادم لم يرسل إشعارات منذ مدة', detail: mins === null ? 'لا يوجد سجل إرسال.' : `آخر إرسال قبل ${AR(mins)} دقيقة.`, fix: 'المشكلة من جهة الخادم (Cloudflare)، لا من هاتفك.' });
+                else if (step > 1) add({ status: 'warn', title: 'الخادم يعمل', detail: `لكن جدوله كل ${AR(step)} دقيقة، فقد يتأخر التذكير حتى ${AR(step)} دقيقة.` });
+                else add({ status: 'ok', title: 'الخادم يعمل ويرسل كل دقيقة' });
+            }
+            // ٦) تجربة حقيقية
+            if (canTest && sub) {
+                const s = add({ status: 'wait', title: 'جارٍ إرسال إشعار تجربة من الخادم…', detail: 'لا تغلق التطبيق، ثوانٍ فقط.' });
+                await NotifyStore.put('test', { at: Date.now() });
+                const arrived = waitForTest(25000);
+                let res = null;
+                try { res = await PushSync.post('/test', { endpoint: sub.endpoint }); } catch (e) {}
+                const body = res ? await res.json().catch(() => ({})) : {};
+                if (!res || (!res.ok && body.error !== 'limit')) {
+                    await NotifyStore.put('test', null);
+                    Object.assign(s, body.error === 'not-subscribed' || body.error === 'expired'
+                        ? { status: 'fail', title: 'الخادم لم يجد اشتراك هذا الجهاز', detail: 'انتهى الاشتراك أو أُلغي.', fix: 'اضغط «إصلاح الاشتراك» ثم أعد الفحص.' }
+                        : { status: 'fail', title: 'تعذّر على الخادم إرسال التجربة', detail: 'حاول بعد قليل.' });
+                    needRepair = needRepair || body.error === 'not-subscribed' || body.error === 'expired';
+                } else if (body.error === 'limit') {
+                    Object.assign(s, { status: 'warn', title: 'بلغت حدّ التجارب لهذا اليوم', detail: 'حاول غدًا.' });
+                } else if (await arrived) {
+                    Object.assign(s, { status: 'ok', title: 'وصل إشعار التجربة ✓', detail: `كل شيء يعمل. المسجّل في الخادم: ${remindersLabel(body.reminders || 0)}${body.general ? ' + الأذكار العامة' : ''}.` });
+                } else {
+                    Object.assign(s, { status: 'fail', title: 'أرسل الخادم الإشعار لكنه لم يصل إلى الهاتف', fix: fixBackground() });
+                    needRepair = true;
+                }
+                paint(steps);
+            }
+        } catch (e) {
+            add({ status: 'fail', title: 'حدث خطأ أثناء الفحص', detail: 'أعد المحاولة.' });
+        } finally {
+            running = false;
+            if (btn) { btn.disabled = false; btn.textContent = 'أعد الفحص'; }
+            if ($('nc-actions')) $('nc-actions').hidden = !needRepair;
+        }
+    }
+
+    async function repair() {
+        const b = $('nc-repair'); if (b) { b.disabled = true; b.textContent = 'جارٍ الإصلاح…'; }
+        const st = await PushSync.reset();
+        if (b) { b.disabled = false; b.textContent = 'إصلاح الاشتراك'; }
+        Toast.show(st === 'on' || st === 'outdated' ? 'تم تجديد الاشتراك ✓ أعد الفحص للتأكد' : 'تعذّر التجديد، تأكد من الاتصال وإذن الإشعارات');
+        GeneralReminder.refresh();
+    }
+
+    function init() {
+        $('nc-run')?.addEventListener('click', run);
+        $('nc-repair')?.addEventListener('click', repair);
+        if (SW_OK) navigator.serviceWorker.addEventListener('message', e => { if (e.data?.type === 'mdk-test-ok' && testWaiter) testWaiter(); });
+    }
+    return { init, run };
 })();
 
 // تسجيل Service Worker (مطلوب لعمل الإشعارات على الهاتف) + استقبال تذكيراته داخل التطبيق

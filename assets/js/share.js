@@ -10,7 +10,7 @@ const Share = (() => {
     const fmt = n => Number(n).toLocaleString('ar-EG');
     const W = 1080, H = 1350;
     const SAMPLE = 'مذكر القرآن الكريم الورد ٠١٢٣٤٥٦٧٨٩';
-    let kind = 'wird', blob = null, previewUrl = '', renderId = 0, logoImage = null;
+    let kind = 'wird', blob = null, previewUrl = '', renderId = 0, logoImage = null, ayahData = null;
 
     const appUrl = () => (/^https?:$/.test(location.protocol) ? location.href.split('#')[0] : '');
     const pagesPhrase = d => (d.from === d.to ? `الصفحة ${fmt(d.from)}` : `الصفحات ${fmt(d.from)} – ${fmt(d.to)}`);
@@ -18,6 +18,12 @@ const Share = (() => {
 
     function buildText(k, d) {
         const lines = [];
+        if (k === 'ayah') {
+            lines.push(`﴿${d.text}﴾`, `[${surahName(d.s)}: ${fmt(d.a)}]`, '', 'تطبيق مُذكّر — القرآن والأذكار');
+            const url = appUrl();
+            if (url) lines.push(url);
+            return lines.join('\n');
+        }
         if (k === 'wird') {
             lines.push(d.complete ? '🎉 ختمتُ القرآن الكريم كاملاً بفضل الله، تقبّل الله منا ومنكم'
                 : d.done ? '✅ أتممتُ وردي اليوم من القرآن الكريم' : '📖 وردي اليوم من القرآن الكريم');
@@ -71,7 +77,7 @@ const Share = (() => {
     }
     function wrapLines(g, text, maxWidth) {
         const lines = []; let line = '';
-        for (const word of text.split(/\s+/).filter(Boolean)) {
+        for (const word of text.split(/[ \t\n]+/).filter(Boolean)) { // المسافة اللي ما بتنكسر (قبل «۝») بتضل لازقة
             const test = line ? `${line} ${word}` : word;
             if (g.measureText(test).width > maxWidth && line) { lines.push(line); line = word; } else line = test;
         }
@@ -147,6 +153,57 @@ const Share = (() => {
         g.fillText('وقليل دائم خير من كثير منقطع', W / 2, 1245);
         return c;
     }
+    // صورة الآية: ورقة مصحف بحاشية مزخرفة وإطار مزدوج (نفس شكل القراءة الحرة)، والآية بخط المصحف وعلامة «۝» برقمها
+    async function drawAyah(d) {
+        await loadFonts();
+        try { await document.fonts?.load?.('400 60px "Amiri Quran"', d.text + QuranData.endMark(d.a)); } catch (e) {}
+        const logo = await getLogo();
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const g = c.getContext('2d');
+        g.direction = 'rtl'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+        const GOLD = '#a8843f', GOLD2 = '#c9a45c', PAPER = '#fffaf0', INK = '#1d2a24';
+        // الحاشية: ورق بخطوط ذهبية مائلة
+        g.fillStyle = '#f4ead2'; g.fillRect(0, 0, W, H);
+        g.save(); g.beginPath(); g.rect(0, 0, W, H); g.clip();
+        g.strokeStyle = 'rgba(201,164,92,.28)'; g.lineWidth = 6;
+        for (let x = -H; x < W + H; x += 22) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + H, H); g.stroke(); }
+        g.restore();
+        // الورقة والإطار المزدوج
+        const m = 46, fx = m, fy = m, fw = W - 2 * m, fh = H - 2 * m;
+        roundRect(g, fx, fy, fw, fh, 14); g.fillStyle = PAPER; g.fill();
+        g.lineWidth = 4; g.strokeStyle = GOLD; roundRect(g, fx + 18, fy + 18, fw - 36, fh - 36, 8); g.stroke();
+        g.lineWidth = 1.5; roundRect(g, fx + 28, fy + 28, fw - 56, fh - 56, 6); g.stroke();
+        // نجوم الزوايا
+        g.fillStyle = GOLD; g.font = '400 34px "Amiri Quran", Amiri, serif';
+        [[fx + 18, fy + 22], [fx + fw - 18, fy + 22], [fx + 18, fy + fh - 6], [fx + fw - 18, fy + fh - 6]].forEach(([x, y]) => { g.fillStyle = PAPER; g.fillRect(x - 20, y - 30, 40, 40); g.fillStyle = GOLD; g.fillText('✦', x, y); });
+        // رأس الصفحة: اسم السورة بشريط مزخرف
+        const bw = 520, bh = 96, bx = (W - bw) / 2, by = fy + 76;
+        roundRect(g, bx, by, bw, bh, 18); g.fillStyle = 'rgba(201,164,92,.12)'; g.fill();
+        g.lineWidth = 3; g.strokeStyle = GOLD2; g.stroke();
+        g.fillStyle = INK; g.font = '700 50px Amiri, serif'; g.fillText('سورة ' + surahName(d.s), W / 2, by + 64);
+        g.fillStyle = GOLD; g.font = '400 40px "Amiri Quran", Amiri, serif';
+        g.fillText('۞', bx + 44, by + 62); g.fillText('۞', bx + bw - 44, by + 62);
+        // نص الآية: أكبر خط بيساع بالمساحة
+        const text = `${d.text} ${QuranData.endMark(d.a)}`;
+        const top = by + bh + 60, bottom = fy + fh - 250, maxW = fw - 170;
+        let size = 70, lines = [];
+        for (; size >= 30; size -= 2) {
+            g.font = `400 ${size}px "Amiri Quran", Amiri, serif`;
+            lines = wrapLines(g, text, maxW);
+            if (lines.length * size * 2.05 <= bottom - top) break;
+        }
+        const lh = size * 2.05, startY = top + ((bottom - top) - lines.length * lh) / 2 + size * 1.25;
+        g.fillStyle = INK;
+        lines.forEach((ln, i) => g.fillText(ln, W / 2, startY + i * lh));
+        // التذييل: المرجع والشعار
+        g.fillStyle = '#6b6455'; g.font = '500 32px "Readex Pro", sans-serif';
+        g.fillText(`${surahName(d.s)} · الآية ${fmt(d.a)}`, W / 2, fy + fh - 178);
+        g.strokeStyle = 'rgba(169,132,63,.35)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(W / 2 - 160, fy + fh - 148); g.lineTo(W / 2 + 160, fy + fh - 148); g.stroke();
+        if (logo) { const lh2 = 74, lw = lh2 * logo.width / logo.height; g.drawImage(logo, (W - lw) / 2, fy + fh - 136, lw, lh2); }
+        else { g.fillStyle = '#1f5444'; g.font = '700 40px "Readex Pro", sans-serif'; g.fillText('مُذكّر', W / 2, fy + fh - 84); }
+        return c;
+    }
     const toBlob = canvas => new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob'))), 'image/png'));
 
     // ---------- النافذة ----------
@@ -160,11 +217,11 @@ const Share = (() => {
         $('share-download').disabled = busy || !blob;
     }
     async function render() {
-        const id = ++renderId, d = collect();
+        const id = ++renderId, d = kind === 'ayah' ? ayahData : collect();
         $('share-text').value = buildText(kind, d);
         blob = null; setBusy(true);
         try {
-            const b = await toBlob(await drawCard(kind, d));
+            const b = await toBlob(await (kind === 'ayah' ? drawAyah(d) : drawCard(kind, d)));
             if (id !== renderId) return;
             blob = b;
             if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -174,7 +231,9 @@ const Share = (() => {
         if (id === renderId) setBusy(false);
     }
     function open(k) {
-        kind = k === 'achievements' ? 'achievements' : 'wird';
+        kind = k === 'achievements' ? 'achievements' : k === 'ayah' && ayahData ? 'ayah' : 'wird';
+        $('share-tabs').hidden = kind === 'ayah';
+        $('share-title').textContent = kind === 'ayah' ? 'مشاركة الآية' : 'مشاركة';
         syncTabs();
         $('share-native').hidden = !navigator.share;
         $('share-net-facebook').disabled = !appUrl();
@@ -241,5 +300,7 @@ const Share = (() => {
         $('share-copy').addEventListener('click', copyText);
         $('share-download').addEventListener('click', download);
     }
-    return { init, open };
+    // من أدوات الآية: { s, a, text }
+    function openAyah(ayah) { ayahData = { s: ayah.s, a: ayah.a, text: ayah.text }; open('ayah'); }
+    return { init, open, openAyah };
 })();

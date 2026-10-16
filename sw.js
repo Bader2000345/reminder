@@ -15,11 +15,11 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v26';
+const CACHE = 'mudhakkir-v27';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
-const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
+const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion'].map(n => `./assets/css/${n}.css`);
+const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
     './assets/img/logo-light.webp', './assets/img/logo-dark.webp', './assets/img/icon-192.webp', './assets/img/icon-192.png', './assets/img/favicon-64.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
@@ -269,9 +269,12 @@ async function checkUpdateNotice() {
         if (!res.ok) return;
         const v = await res.json();
         const seen = await getJSON('seen', { build: 0 });
-        const build = Number(v.build) || 0;
-        if (!seen.build || build <= seen.build || meta.notified === build) return;
-        meta.notified = build;
+        const build = Number(v.build) || 0, rel = v.release || '';
+        // أحدث = رقم أكبر، أو نفس الرقم بتاريخ نشر جديد (الإصدار ١٤ انتشر مرتين)
+        const newer = build > seen.build || (build === seen.build && !!rel && seen.release !== rel);
+        const tag = rel ? `${build}|${rel}` : build;
+        if (!seen.build || !newer || meta.notified === tag) return;
+        meta.notified = tag;
         await putJSON('update-meta', meta);
         await self.registration.showNotification(v.title || 'تحديث جديد لمُذكّر', {
             body: 'صار في تحديث جديد، افتح التطبيق واضغط «تحديث».' + (v.notes && v.notes[0] ? ' ' + v.notes[0] : ''),
@@ -283,19 +286,32 @@ async function checkUpdateNotice() {
 
 // نبضة من السيرفر (Web Push) — تعمل والتطبيق مغلق
 // السيرفر يرسل نبضة عند كل ربع ساعة (الأذكار العامة) وعند وقت كل تذكير شخصي، ونحن نقرر هنا ماذا نعرض
+// ← الإصدار ١٣: كل نبضة لازم يطلع منها إشعار، حتى والتطبيق مفتوح. على الآيفون النبضة «الصامتة» بتخلّي Safari
+//   يلغي اشتراك الموقع بعد كم مرة، فبتوقف كل الإشعارات والسيرفر لسا مفكّر حاله عم يبعت.
 self.addEventListener('push', event => {
     event.waitUntil(serial(async () => {
         const now = Date.now();
+        // إشعار تجربة من «فحص الإشعارات»
+        const test = await getJSON('test', null);
+        if (test && now - (test.at || 0) < 3 * 60000) {
+            await putJSON('test', null);
+            await self.registration.showNotification('✓ الإشعارات شغّالة', {
+                body: 'وصل إشعار التجربة من الخادم. ستصلك التذكيرات والأذكار حتى والتطبيق مغلق بإذن الله.',
+                tag: 'notify-test', lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE, data: { kind: 'test' }
+            });
+            const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+            wins.forEach(w => w.postMessage({ type: 'mdk-test-ok' }));
+            return;
+        }
         const fired = await checkReminders(now);
         await checkUpdateNotice();
         const state = await getJSON('state', null);
         const generalOn = !state || state.general !== false;
-        const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-        if (wins.some(w => w.visibilityState === 'visible')) return; // الصفحة مفتوحة وتتولى الأذكار العامة بنفسها
         const minute = new Date(now).getMinutes() % 15;
         const generalSlot = minute <= 3 || minute >= 13;
-        // نعرض الذكر العام في موعده، أو إن وصلت نبضة دون تذكير مستحق (حتى لا تكون النبضة صامتة)
-        if (!generalOn || (fired.length && !generalSlot)) return;
-        await showGeneral();
+        // التذكير طلع، ومو وقت ذكر عام: بيكفي
+        if (fired.length && !generalSlot) return;
+        // الذكر العام بموعده، أو إذا وصلت نبضة بلا تذكير مستحق (حتى ما تكون النبضة صامتة)
+        if (generalOn) await showGeneral();
     }));
 });

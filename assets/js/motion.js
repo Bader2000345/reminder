@@ -1,6 +1,6 @@
 /* =====================================================================
  * مُذكّر — motion.js
- * الحركة: ميل البطاقات بالفأرة، ظهور العناصر، التموّج، الإضاءة، حركات اللمس، الخلفية ونقاط النور.
+ * الحركة: ظهور عناصر القوائم، عمق الخلفية ونقاط النور، وميل الشعار بالفأرة.
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
@@ -20,22 +20,14 @@
 // ===== حركات الظهور والتموّج =====
 const Motion = (() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-    const REVEAL = '.category-card, .adhkar-list article, .personal-reminder, .setting-card, .khatma-card, .smart-card, .quick-card, .reader-hero, .wird-streak-bar';
+    // البطاقات الرئيسية بيحرّكها fx.js (ب٢: البطاقة بتطلع وكلماتها بعدها)؛ هون بس العناصر يلي ما بيلمسها
+    const REVEAL = '.adhkar-list article, .smart-card';
     let io = null;
     function observe(root = document) {
         if (!io) return;
         root.querySelectorAll(REVEAL).forEach(n => { if (!n.dataset.revealed) { n.classList.add('reveal'); io.observe(n); } });
     }
-    function ripple(e) {
-        const b = e.target.closest('.primary-button, .ghost-button, .segmented button, .dk-counter, .day-chips button');
-        if (!b || reduce.matches) return;
-        const r = b.getBoundingClientRect(), s = Math.max(r.width, r.height) * 1.6;
-        const dot = document.createElement('span');
-        dot.className = 'ripple';
-        dot.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
-        b.append(dot);
-        dot.addEventListener('animationend', () => dot.remove());
-    }
+    // (التموّج عند الضغط انشال بالإصدار ١٤: الضغط صار توهّج ذهبي بالـ CSS — ز٣)
     // الخلفية تتحرك بعمق مع التمرير، ومع إمالة الهاتف على أندرويد
     function ambientMotion() {
         const amb = document.querySelector('.ambient'); if (!amb) return;
@@ -68,7 +60,6 @@ const Motion = (() => {
     }
     function init() {
         buildMotes();
-        document.addEventListener('pointerdown', ripple, { passive: true });
         if (!reduce.matches) ambientMotion();
         if (reduce.matches || !('IntersectionObserver' in window)) return;
         io = new IntersectionObserver(entries => entries.forEach(en => {

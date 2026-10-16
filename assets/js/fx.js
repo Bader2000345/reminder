@@ -150,15 +150,30 @@ const FX = (() => {
         return [...words];
     }
     const splashLeft = () => Math.max(0, 1150 - (performance.now() - born)); // أول فتح: بعد شاشة البداية
+    // ب٢ (الإصدار ١٤): البطاقة نفسها بتطلع لفوق شوي مع ظهور، ورا بعض بفرق ١١٠ جزء من الثانية،
+    // وكلماتها بتبلّش بعدها بلحظة. العناوين (section-title/heading) بتطلع كلماتها بس.
+    const RISE = ':not(.section-title):not(.section-heading)';
+    let batch = 0, batchTimer = 0;
+    function rise(block, wait) {
+        if (!block.matches(RISE)) return -1;
+        const d = wait + Math.min(batch++, 5) * 110;
+        clearTimeout(batchTimer); batchTimer = setTimeout(() => { batch = 0; }, 80);
+        block.style.setProperty('--fx-card-d', d + 'ms');
+        block.classList.remove('fx-card-wait', 'fx-card-in'); void block.offsetWidth; block.classList.add('fx-card-in');
+        const end = e => { if (e.target !== block) return; block.classList.remove('fx-card-in'); block.removeEventListener('animationend', end); };
+        block.addEventListener('animationend', end);
+        return d;
+    }
     function play(block, wait = splashLeft()) {
         block.classList.remove('fx-wait');
+        const d = rise(block, wait);
         const words = wordsIn(block);
         if (!words.length) return;
         words.forEach((w, i) => w.style.setProperty('--i', Math.min(i, 12))); // أطول انتظار ≈ ثلث ثانية
-        block.style.setProperty('--fx-wait', wait + 'ms');
+        block.style.setProperty('--fx-wait', (d >= 0 ? d + 140 : wait) + 'ms');
         block.classList.remove('fx-text-in'); void block.offsetWidth; block.classList.add('fx-text-in');
     }
-    // البطاقة بتبلّش حركة كلماتها أول ما تبيّن على الشاشة
+    // البطاقة بتبلّش حركتها أول ما تبيّن على الشاشة
     const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries => entries.forEach(e => {
         if (!e.isIntersecting) return;
         io.unobserve(e.target); play(e.target);
@@ -170,13 +185,16 @@ const FX = (() => {
         const blocks = [...page.querySelectorAll(CARD)].filter(b => !b.parentElement.closest(CARD) && !b.closest('[hidden]'));
         blocks.forEach(b => {
             if (!io) return play(b, wait);
-            if (!wordsIn(b).length) return;
-            b.classList.remove('fx-text-in'); b.classList.add('fx-wait');
+            const card = b.matches(RISE);
+            if (!card && !wordsIn(b).length) return;
+            b.classList.remove('fx-text-in', 'fx-card-in');
+            if (card) b.classList.add('fx-card-wait');
+            if (wordsIn(b).length) b.classList.add('fx-wait');
             io.unobserve(b); io.observe(b);
         });
-        // أمان: البطاقات الظاهرة على الشاشة ما بتضل كلماتها مخفية لو تأخّر المراقب
+        // أمان: البطاقات الظاهرة على الشاشة ما بتضل مخفية لو تأخّر المراقب
         clearTimeout(page._fxSafety);
-        page._fxSafety = setTimeout(() => page.querySelectorAll('.fx-wait').forEach(b => {
+        page._fxSafety = setTimeout(() => page.querySelectorAll('.fx-wait, .fx-card-wait').forEach(b => {
             const r = b.getBoundingClientRect();
             if (r.bottom > 0 && r.top < innerHeight) { io && io.unobserve(b); play(b, 0); }
         }), wait + 1500);

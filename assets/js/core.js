@@ -51,7 +51,7 @@ function renderGeneralAdhkar(filterText = '') {
             sum.textContent = 'الدليل';
             const body = document.createElement('div');
             const src = document.createElement('small');
-            src.textContent = proof[1];
+            src.textContent = proof[1].replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); // أرقام الأحاديث عربية متل باقي التطبيق
             body.append(document.createTextNode(proof[0]), src);
             det.append(sum, body);
             p.append(det);
@@ -92,6 +92,33 @@ function updateNavPill(instant = false) {
 addEventListener('resize', () => updateNavPill(true));
 
 // صفحة «القرآن» (الإصدار ١٢): تبويبا «الورد اليومي» و«المصحف»، والتبويب الأخير محفوظ
+// إ٣: الشاشة ما بتطفي وقت القراءة (المصحف، وضع التركيز، الورد). كل جزء بيطلب بسبب خاص فيه،
+// والقفل بيتحرّر إذا ما في ولا سبب، أو الصفحة مخفية، أو ما في ولا لمسة من ١٠ دقايق (حتى ما تخلص البطارية).
+const KeepAwake = (() => {
+    const reasons = new Set(), IDLE_MS = 10 * 60 * 1000;
+    let lock = null, busy = false, last = Date.now();
+    async function sync() {
+        if (!('wakeLock' in navigator) || busy) return;
+        const want = reasons.size > 0 && document.visibilityState === 'visible' && Date.now() - last < IDLE_MS;
+        busy = true;
+        try {
+            if (want && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => { lock = null; }); }
+            else if (!want && lock) { const l = lock; lock = null; await l.release(); }
+        } catch (e) { lock = null; }
+        busy = false;
+    }
+    const touch = () => { const idle = Date.now() - last >= IDLE_MS; last = Date.now(); if (idle || (!lock && reasons.size)) sync(); };
+    ['pointerdown', 'keydown', 'wheel'].forEach(t => addEventListener(t, touch, { passive: true, capture: true }));
+    document.addEventListener('visibilitychange', sync);
+    setInterval(() => { if (lock && Date.now() - last >= IDLE_MS) sync(); }, 30000);
+    return { on: r => { reasons.add(r); last = Date.now(); sync(); }, off: r => { reasons.delete(r); sync(); }, set: (r, v) => (v ? reasons.add(r) : reasons.delete(r), sync()) };
+})();
+// الورد: الشاشة شغّالة طول ما صفحة القرآن مفتوحة على تبويب الورد
+function syncWirdAwake() {
+    const on = document.getElementById('page-quran')?.classList.contains('active-page') && QuranTabs.get() === 'wird';
+    KeepAwake.set('wird', !!on);
+}
+
 const QuranTabs = (() => {
     const KEY = 'mudhakkir-quran-tab';
     let current = (() => { try { return localStorage.getItem(KEY) === 'mushaf' ? 'mushaf' : 'wird'; } catch (e) { return 'wird'; } })();
@@ -106,6 +133,7 @@ const QuranTabs = (() => {
         if (wird) wird.hidden = current !== 'wird';
         if (mushaf) mushaf.hidden = current !== 'mushaf';
         document.getElementById('page-quran')?.setAttribute('data-tab', current);
+        syncWirdAwake();
     }
     function init() {
         document.querySelectorAll('[data-qtab]').forEach(b => b.addEventListener('click', () => show(b.dataset.qtab)));
@@ -141,6 +169,7 @@ function navigateTo(pageId, tab) {
             else link.classList.remove('active');
         });
         updateNavPill();
+        syncWirdAwake();
         window.scrollTo({ top: 0, behavior: 'auto' });
     };
     // انتقال ناعم بين الصفحات (المحتوى ينزلق باتجاه التنقل: لليسار للأمام في العربية)

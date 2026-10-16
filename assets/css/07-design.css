@@ -209,10 +209,11 @@ body.dark-mode .category-card[data-adhkar-group="morning"] > span { color:#e8b85
   .ambient-inner { transform:none !important; }
 }
 
-/* ===== القراءة الحرة: الصفحة تتمدد مع الخط، ومحاذاة مريحة للخط الكبير ===== */
+/* ===== القراءة الحرة: الصفحة تتمدد مع الخط =====
+ * السطور مضبوطة من الطرفين، و reader.js بيرجّع أي سطر فيه فراغ كبير لليمين (br.jbr)، فما في فراغات بأي حجم.
+ * بلا حركة لحجم الخط: الضبط بينقاس بعد التغيير مباشرة. */
 .reader-stage { align-items:flex-start; }
-.rd-text { align-self:flex-start; height:auto; flex:none; overflow-wrap:break-word; transition:font-size .15s ease; }
-.rd-text.is-large { text-align:right; text-align-last:right; line-height:2.05; word-spacing:.05em; }
+.rd-text { align-self:flex-start; height:auto; flex:none; overflow-wrap:break-word; text-align:justify; text-align-last:right; }
 .rd-text p { margin:0; }
 .rd-surah { font-family:var(--font-main); font-size:max(15px, .55em); font-weight:600; }
 .rd-basmala { font-size:.9em; }

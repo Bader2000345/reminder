@@ -49,10 +49,22 @@ const QuranData = (() => {
     const inflight = new Map();
     const stripMarks = word => word.replace(/[\u064B-\u065F\u0670\u0640]/g, '');
 
+    // بدايات أرباع الأحزاب (٢٤٠ ربع = ٦٠ حزب = ٣٠ جزء): [السورة، الآية، الصفحة] — من api.alquran.cloud/v1/meta
+    // كل ٤ أرباع حزب، وكل ٨ أرباع جزء
+    const QUARTERS = [[1,1,1],[2,26,5],[2,44,7],[2,60,9],[2,75,11],[2,92,14],[2,106,17],[2,124,19],[2,142,22],[2,158,24],[2,177,27],[2,189,29],[2,203,32],[2,219,34],[2,233,37],[2,243,39],[2,253,42],[2,263,44],[2,272,46],[2,283,49],[3,15,51],[3,33,54],[3,52,56],[3,75,59],[3,93,62],[3,113,64],[3,133,67],[3,153,69],[3,171,72],[3,186,74],[4,1,77],[4,12,79],[4,24,82],[4,36,84],[4,58,87],[4,74,89],[4,88,92],[4,100,94],[4,114,97],[4,135,100],[4,148,102],[4,163,104],[5,1,106],[5,12,109],[5,27,112],[5,41,114],[5,51,117],[5,67,119],[5,82,121],[5,97,124],[5,109,126],[6,13,129],[6,36,132],[6,59,134],[6,74,137],[6,95,140],[6,111,142],[6,127,144],[6,141,146],[6,151,148],[7,1,151],[7,31,154],[7,47,156],[7,65,158],[7,88,162],[7,117,164],[7,142,167],[7,156,170],[7,171,173],[7,189,175],[8,1,177],[8,22,179],[8,41,182],[8,61,184],[9,1,187],[9,19,189],[9,34,192],[9,46,194],[9,60,196],[9,75,199],[9,93,201],[9,111,204],[9,122,206],[10,11,209],[10,26,212],[10,53,214],[10,71,217],[10,90,219],[11,6,222],[11,24,224],[11,41,226],[11,61,228],[11,84,231],[11,108,233],[12,7,236],[12,30,238],[12,53,242],[12,77,244],[12,101,247],[13,5,249],[13,19,252],[13,35,254],[14,10,256],[14,28,259],[15,1,262],[15,50,264],[16,1,267],[16,30,270],[16,51,272],[16,75,275],[16,90,277],[16,111,280],[17,1,282],[17,23,284],[17,50,287],[17,70,289],[17,99,292],[18,17,295],[18,32,297],[18,51,299],[18,75,302],[18,99,304],[19,22,306],[19,59,309],[20,1,312],[20,55,315],[20,83,317],[20,111,319],[21,1,322],[21,29,324],[21,51,326],[21,83,329],[22,1,332],[22,19,334],[22,38,336],[22,60,339],[23,1,342],[23,36,344],[23,75,347],[24,1,350],[24,21,352],[24,35,354],[24,53,356],[25,1,359],[25,21,362],[25,53,364],[26,1,367],[26,52,369],[26,111,371],[26,181,374],[27,1,377],[27,27,379],[27,56,382],[27,82,384],[28,12,386],[28,29,389],[28,51,392],[28,76,394],[29,1,396],[29,26,399],[29,46,402],[30,1,404],[30,31,407],[30,54,410],[31,22,413],[32,11,415],[33,1,418],[33,18,420],[33,31,422],[33,51,425],[33,60,426],[34,10,429],[34,24,431],[34,46,433],[35,15,436],[35,41,439],[36,28,442],[36,60,444],[37,22,446],[37,83,449],[37,145,451],[38,21,454],[38,52,456],[39,8,459],[39,32,462],[39,53,464],[40,1,467],[40,21,469],[40,41,472],[40,66,474],[41,9,477],[41,25,479],[41,47,482],[42,13,484],[42,27,486],[42,51,488],[43,24,491],[43,57,493],[44,17,496],[45,12,499],[46,1,502],[46,21,505],[47,10,507],[47,33,510],[48,18,513],[49,1,515],[49,14,517],[50,27,519],[51,31,522],[52,24,524],[53,26,526],[54,9,529],[55,1,531],[56,1,534],[56,75,536],[57,16,539],[58,1,542],[58,14,544],[59,11,547],[60,7,550],[62,1,553],[63,4,554],[65,1,558],[66,1,560],[67,1,562],[68,1,564],[69,1,566],[70,19,569],[72,1,572],[73,20,575],[75,1,577],[76,19,579],[78,1,582],[80,1,585],[82,1,587],[84,1,589],[87,1,591],[90,1,594],[94,1,596],[100,9,599]];
+    const QUARTER_AT = new Map(QUARTERS.map((q, i) => [q[0] * 1000 + q[1], i]));
+
     const clampPage = n => Math.max(1, Math.min(TOTAL_PAGES, Math.trunc(Number(n)) || 1));
     // رقم الصفحة بعد قراءة `count` صفحة منذ صفحة البداية (مع الالتفاف بعد صفحة ٦٠٤)
     const pageAt = (startPage, count) => ((startPage - 1 + count) % TOTAL_PAGES + TOTAL_PAGES) % TOTAL_PAGES + 1;
-    const juzOfPage = page => Math.min(30, page <= 21 ? 1 : Math.floor((page - 2) / 20) + 1);
+    // آخر ربع بيبلش بهالصفحة أو قبلها (الجزء ٧ والجزء ١١ بيبلشوا بنص الصفحة ١٢١ و٢٠١)
+    const quarterOfPage = page => { let i = 0; while (i + 1 < QUARTERS.length && QUARTERS[i + 1][2] <= page) i++; return i; };
+    const juzOfPage = page => Math.floor(quarterOfPage(clampPage(page)) / 8) + 1;
+    const hizbOfPage = page => Math.floor(quarterOfPage(clampPage(page)) / 4) + 1;
+    // رقم الربع (من ٠) إذا الآية أول ربع، وإلا -1
+    const quarterAt = (s, a) => { const i = QUARTER_AT.get(s * 1000 + a); return i === undefined ? -1 : i; };
+    // علامة نهاية الآية متل المصحف: «۝» والرقم جوّاها (خط Amiri Quran بيرسمهن شكل واحد)
+    const endMark = n => '۝' + Number(n).toLocaleString('ar-EG');
     const surahStartPage = number => SURAH_START_PAGES[Math.max(1, Math.min(114, number)) - 1];
     // تقريب احتياطي إلى أن تصل بيانات الصفحة
     const surahAtPage = page => SURAH_START_PAGES.reduce((found, start, i) => (start <= page ? i + 1 : found), 1);
@@ -103,7 +115,7 @@ const QuranData = (() => {
         return stripMarks(words[0]) === 'بسم' ? words.slice(4).join(' ') : a.text;
     }
 
-    return { TOTAL_PAGES, BASMALA, SURAH_START_PAGES, getPage, hasBasmalaHeader, verseText, pageAt, juzOfPage, surahStartPage, surahAtPage };
+    return { TOTAL_PAGES, BASMALA, SURAH_START_PAGES, QUARTERS, getPage, hasBasmalaHeader, verseText, pageAt, juzOfPage, hizbOfPage, quarterAt, endMark, surahStartPage, surahAtPage };
 })();
 
 const Wird = (() => {
@@ -242,10 +254,10 @@ const Wird = (() => {
             el.append(b);
         }
         el.append(document.createTextNode(QuranData.verseText(ayah)));
-        // رقم الآية بآخرها بدائرة ذهبية متل المصحف
+        // رقم الآية بآخرها بعلامة المصحف «۝»
         const n = document.createElement('span');
-        n.className = 'ayah-no'; n.textContent = fmt(ayah.numberInSurah); n.setAttribute('aria-label', `الآية ${fmt(ayah.numberInSurah)}`);
-        el.append(' ', n);
+        n.className = 'ayah-no'; n.textContent = QuranData.endMark(ayah.numberInSurah); n.setAttribute('aria-label', `الآية ${fmt(ayah.numberInSurah)}`);
+        el.append(' ', n); // مسافة ما بتنكسر: الرقم ما بينفصل عن آخر كلمة
     }
 
     // ---------- ورد اليوم بدون نت: صفحاته بتتنزّل لحالها بالخلفية ----------
@@ -420,6 +432,7 @@ const Wird = (() => {
     function finishDay(khatmaDone) {
         S.today.done = true;
         markWirdDay();
+        if (typeof WeekLog !== 'undefined') WeekLog.mark('w');
         if (khatmaDone) S.khatmas += 1;
         Toast.show(khatmaDone ? 'ما شاء الله! أتممت الختمة، تقبّل الله منك' : 'تقبّل الله طاعتك، أتممت وردك اليوم');
     }
@@ -617,8 +630,9 @@ const Wird = (() => {
         $('wird-new-khatma').addEventListener('click', () => openPlanModal(true));
         // وضع التركيز: ملء الشاشة، وزر الإغلاق يظهر بضغطة على الشاشة
         const focusRoot = $('wird-focus');
-        const closeFocus = (fromPop = false) => { if (!focusRoot.classList.contains('open')) return; focusRoot.classList.remove('open'); Immersive.exit(focusRoot, fromPop === true); };
-        $('wird-focus-btn').addEventListener('click', () => { focusRoot.classList.add('open'); Immersive.enter(focusRoot, { onClose: closeFocus, hideAfter: 2500 }); });
+        // الشاشة ما بتطفي طول ما وضع التركيز مفتوح (KeepAwake بـ core.js)
+        const closeFocus = (fromPop = false) => { if (!focusRoot.classList.contains('open')) return; focusRoot.classList.remove('open'); KeepAwake.off('focus'); Immersive.exit(focusRoot, fromPop === true); };
+        $('wird-focus-btn').addEventListener('click', () => { focusRoot.classList.add('open'); KeepAwake.on('focus'); Immersive.enter(focusRoot, { onClose: closeFocus, hideAfter: 2500 }); });
         $('wird-focus-close').addEventListener('click', () => closeFocus());
         Immersive.bindTap(focusRoot, focusRoot);
         document.querySelectorAll('#wird-mode [data-mode]').forEach(b => b.addEventListener('click', () => { setMode(b.dataset.mode); updatePreview(); }));

@@ -10,10 +10,14 @@
  * ===================================================================== */
 
 const APP_BUILD = 14;
+// تاريخ النشر: نفس الرقم انتشر قبل (١٤)، فـ«ما الجديد» وإشعار التحديث بيعتمدوا كمان على هالتاريخ
+// ← عند كل نشر: غيّره (ومعه release في version.json)
+const APP_RELEASE = '2026-10-17';
 const SITE_URL = 'https://bader2000345.github.io/reminder/';
 const UpdateNotice = (() => {
     const $ = id => document.getElementById(id);
     const SEEN_KEY = 'mudhakkir-build-seen';
+    const RELEASE_KEY = 'mudhakkir-release-seen';
     const DISMISS_KEY = 'mudhakkir-update-dismissed'; // إخفاء الشريط لهذه الجلسة فقط
     const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
     const session = { get: k => { try { return sessionStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) {} } };
@@ -88,7 +92,7 @@ const UpdateNotice = (() => {
             try { remote = await fetchVersion(); } catch (e) { remote = null; }
             const s = await swStatus();
             if (s && s.update && s.ready) pending = 'sw';                                   // الملفات الجديدة نزلت وجاهزة
-            else if (!s && remote && Number(remote.build) > APP_BUILD) pending = 'reload';   // متصفح بلا Service Worker
+            else if (!s && remote && (Number(remote.build) > APP_BUILD || (Number(remote.build) === APP_BUILD && remote.release && remote.release !== APP_RELEASE))) pending = 'reload'; // متصفح بلا Service Worker
             else pending = null;
             if (pending && (manual || session.get(DISMISS_KEY) !== 'x')) showBanner(remote);
             else if (manual) Toast.show(s && s.update ? 'جارٍ تنزيل التحديث… سيظهر زر «تحديث» عند اكتماله' : 'أنت على أحدث إصدار ✓');
@@ -97,10 +101,11 @@ const UpdateNotice = (() => {
 
     // بعد التحديث مباشرة: «ما الجديد» مرة واحدة مع رابط المشاركة
     async function whatsNew() {
-        const seen = Number(store.get(SEEN_KEY) || 0);
-        store.set(SEEN_KEY, String(APP_BUILD));
-        NotifyStore.put('seen', { build: APP_BUILD }); // يعرف منه الـ Service Worker أن المستخدم رأى هذا الإصدار
-        if (!seen || seen >= APP_BUILD) return; // أول استخدام أو لا جديد
+        const seen = Number(store.get(SEEN_KEY) || 0), rel = store.get(RELEASE_KEY);
+        store.set(SEEN_KEY, String(APP_BUILD)); store.set(RELEASE_KEY, APP_RELEASE);
+        NotifyStore.put('seen', { build: APP_BUILD, release: APP_RELEASE }); // يعرف منه الـ Service Worker أن المستخدم رأى هذا الإصدار
+        const isNew = seen < APP_BUILD || (seen === APP_BUILD && rel !== APP_RELEASE);
+        if (!seen || !isNew) return; // أول استخدام أو لا جديد
         try {
             const v = remote || await fetchVersion();
             fillNotes($('whatsnew-notes'), v.notes);
@@ -122,7 +127,10 @@ const UpdateNotice = (() => {
         $('check-update-btn')?.addEventListener('click', () => (pending ? applyUpdate() : check(true)));
         paintSettings(false);
         // المستخدم الجديد لا يرى «ما الجديد»، لكن نسجّل الإصدار
-        if (!store.get(SEEN_KEY)) store.set(SEEN_KEY, String(returning ? APP_BUILD - 1 : APP_BUILD));
+        if (!store.get(SEEN_KEY)) {
+            store.set(SEEN_KEY, String(returning ? APP_BUILD - 1 : APP_BUILD));
+            if (!returning) store.set(RELEASE_KEY, APP_RELEASE);
+        }
         setTimeout(() => { whatsNew(); check(); }, 2500);
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
         setInterval(check, 30 * 60 * 1000);

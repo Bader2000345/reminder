@@ -83,7 +83,7 @@ const Assistant = (() => {
     const ACTIONS = {
         install: () => Install.start(),
         update: () => { navigateTo('settings'); later(() => UpdateNotice.check(true)); },
-        notifications: () => navigateTo('my-adhkar'),
+        notifications: () => { navigateTo('my-adhkar'); later(() => { $('notify-check')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); NotifyCheck.run(); }, 350); },
         general: () => { navigateTo('my-adhkar'); later(() => $('general-reminder-card')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300); },
         reminder: () => { navigateTo('my-adhkar'); later(() => Reminders.openForm()); },
         kahf: () => FridayReminder.openKahf(),
@@ -153,7 +153,7 @@ const Assistant = (() => {
         if (it.hadith) {
             // الدليل مطوي افتراضيًا حتى تبقى المحادثة خفيفة
             const q = el('blockquote', 'ask-card-hadith', it.hadith); q.hidden = true;
-            if (it.source) q.append(el('cite', '', it.source));
+            if (it.source) q.append(el('cite', '', it.source.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])));
             const t = btn('الدليل ▾', () => { q.hidden = !q.hidden; t.textContent = q.hidden ? 'الدليل ▾' : 'إخفاء الدليل ▴'; t.setAttribute('aria-expanded', String(!q.hidden)); }, 'is-proof');
             t.setAttribute('aria-expanded', 'false');
             c.append(q);

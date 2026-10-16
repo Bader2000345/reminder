@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0b4234">
     <title>مُذكّر | التطبيق الشامل للقرآن الكريم والأذكار</title>
+    <meta name="description" content="مُذكّر: وردك اليومي من القرآن الكريم، والمصحف بالتجويد والتفسير، وأذكار الصباح والمساء بأدلّتها، ومسبحة، وتذكيرات تصلك حتى والتطبيق مغلق. مجاني وبلا إعلانات.">
+    <meta property="og:title" content="مُذكّر · القرآن والأذكار">
+    <meta property="og:description" content="وردك اليومي، والمصحف، والأذكار، والمسبحة، وتذكيرات تصلك في وقتها.">
+    <meta property="og:locale" content="ar_AR">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,6 +33,7 @@
     <link rel="stylesheet" href="assets/css/10-atmosphere.css">
     <link rel="stylesheet" href="assets/css/11-refresh.css">
     <link rel="stylesheet" href="assets/css/12-pages.css">
+    <link rel="stylesheet" href="assets/css/13-mushaf-and-motion.css">
 </head>
 <body>
 
@@ -70,7 +75,7 @@
             <header class="home-intro">
                 <div><p class="eyebrow">لوحتك اليومية في مُذكّر</p><h1 id="home-greeting"><b id="greeting-word">مرحباً</b><span id="greeting-name-wrap" hidden>، <button class="greeting-name" id="greeting-name" type="button" title="تعديل الاسم"></button></span></h1></div>
                 <div class="home-tools">
-                    <div class="home-date"><i></i><span id="home-date-label">اليوم · —</span></div>
+                    <div class="home-date"><i></i><span class="hd-lines"><span id="home-date-label">اليوم · —</span><small class="home-hijri" id="home-hijri" hidden></small></span></div>
                     <button class="theme-quick" id="theme-quick" type="button" aria-label="تبديل الوضع الفاتح والداكن" title="فاتح / داكن">
                         <span class="tq-cube"><svg class="tq-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="tq-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span>
                     </button>
@@ -83,7 +88,7 @@
                     <h2 id="dhikr-card-title">خذ لحظة للذكر</h2>
                     <p class="dhikr-copy" id="dhikr-card-text">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</p>
                     <div class="dhikr-meta"><span class="dhikr-source" id="dhikr-card-source">ذكر مقترح لك الآن</span><div class="dhikr-meta-actions"><button class="sound-toggle" id="tasbih-sound-toggle" type="button" aria-pressed="true">الصوت: تشغيل</button><button class="dhikr-next" id="dhikr-next-btn" type="button">ذكر آخر ↻</button></div></div>
-                    <button class="tasbih-orb" id="tasbih-orb" type="button" aria-label="تسبيح سريع، اضغط للعد"><span id="tasbih-count">0</span><small>اضغط للتسبيح · +1</small></button>
+                    <button class="tasbih-orb" id="tasbih-orb" type="button" aria-label="تسبيح سريع، اضغط للعد"><span id="tasbih-count">٠</span><small>اضغط للتسبيح · +١</small></button>
                     <span class="tasbih-float" id="tasbih-float">+١</span>
                 </article>
                 <article class="home-card progress-card">
@@ -91,9 +96,20 @@
                     <div class="progress-track"><span id="dashboard-progress-bar"></span></div>
                     <div class="quran-progress-label"><span>الصفحة الحالية</span><strong id="dashboard-quran-page">—</strong></div>
                     <div class="resume-reading"><p><strong id="dashboard-resume-surah">—</strong><span id="dashboard-resume-meta"></span></p><button class="primary-button nav-btn" data-target="quran" data-tab="wird" type="button">متابعة القراءة</button></div>
-                    <p class="daily-stats-line" id="daily-stats-line" aria-live="polite">إحصائية اليوم: <strong>٠</strong> تسبيحة · <strong>٠</strong> آية</p>
+                    <p class="daily-stats-line" id="daily-stats-line" aria-live="polite">إحصائية اليوم: لم تبدأ بعد</p>
+                    <!-- إ٨ آخر ٧ أيام: الورد، الأذكار، التسبيح (extras.js) -->
+                    <div class="week-wrap">
+                        <ol class="week-log" id="week-log" aria-label="إنجازك في آخر ٧ أيام"></ol>
+                        <p class="week-legend" aria-hidden="true"><span class="wl-w full"></span>الورد <span class="wl-a full"></span>الأذكار <span class="wl-t full"></span>التسبيح</p>
+                    </div>
                     <button class="ghost-button share-trigger" type="button" data-share="achievements">مشاركة إنجازي</button>
                 </article>
+            </section>
+
+            <!-- إ٤ يوم مميز بالتقويم الهجري (الأيام البيض، عاشوراء، عرفة، العشر، العيدين…) -->
+            <section class="hijri-card" id="hijri-card" hidden aria-live="polite">
+                <span class="hc-icon" aria-hidden="true">۞</span>
+                <div><b id="hijri-card-title"></b><small id="hijri-card-text"></small></div>
             </section>
 
             <!-- تثبيت التطبيق: زر بضغطة واحدة + الطريقة تحته (يختفي داخل التطبيق المثبّت) -->
@@ -337,6 +353,17 @@
                 </article>
                 <p class="empty-note" id="rem-empty">لا توجد تذكيرات شخصية بعد. اضغط «تذكير جديد» لإضافة أول تذكير.</p>
             </div>
+
+            <!-- فحص الإشعارات: كل حلقة بالسلسلة + إشعار تجربة حقيقي من السيرفر (notifications.js ← NotifyCheck) -->
+            <section class="notify-check" id="notify-check" aria-labelledby="nc-title">
+                <div class="nc-head">
+                    <span class="nc-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span>
+                    <div><h2 id="nc-title">لا تصلك الإشعارات؟</h2><p>نفحص كل خطوة، ونرسل إشعار تجربة حقيقيًا من الخادم.</p></div>
+                </div>
+                <button class="primary-button" id="nc-run" type="button">افحص الإشعارات</button>
+                <ol class="nc-steps" id="nc-steps" aria-live="polite" hidden></ol>
+                <div class="nc-actions" id="nc-actions" hidden><button class="ghost-button" id="nc-repair" type="button">إصلاح الاشتراك</button></div>
+            </section>
             <footer><span>مُذكّر</span><span>تذكيرك، بطريقتك</span></footer>
         </section>
 
@@ -398,6 +425,28 @@
                         <p id="textsize-status">لكل التطبيق، وبيتطبّق فورًا</p>
                     </div>
                     <div class="segmented textsize-seg" id="textsize-seg" role="radiogroup" aria-label="حجم الخط"><button type="button" role="radio" data-size="sm">صغير</button><button type="button" role="radio" data-size="md">عادي</button><button type="button" role="radio" data-size="lg">كبير</button><button type="button" role="radio" data-size="xl">أكبر</button></div>
+                </article>
+                <!-- إ٤ التاريخ الهجري: تقويم أم القرى، مع تصحيح يوم حسب رؤية الهلال في بلدك (extras.js) -->
+                <article class="setting-card hijri-setting" id="hijri-setting">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z"/><path d="M17.5 8.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>التاريخ الهجري</h2>
+                        <p id="hijri-preview">اليوم: —</p>
+                    </div>
+                    <div class="segmented" id="hijri-adjust" role="group" aria-label="تصحيح التاريخ الهجري"><button type="button" data-adj="-1">يوم قبل</button><button type="button" data-adj="0">أم القرى</button><button type="button" data-adj="1">يوم بعد</button></div>
+                </article>
+                <!-- إ٦ النسخ الاحتياطي (extras.js) -->
+                <article class="setting-card backup-setting" id="backup-setting">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9a4 4 0 0 1 0 8"/><path d="M12 12v8M9 17l3 3 3-3"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>نسخ احتياطي ونقل لجهاز جديد</h2>
+                        <p>احفظ ورودك وتذكيراتك وعلاماتك وتسبيحك وإعداداتك في ملف، واسترجعها على أي جهاز.</p>
+                    </div>
+                    <div class="backup-actions">
+                        <button class="primary-button" type="button" id="backup-save">حفظ نسخة</button>
+                        <button class="ghost-button" type="button" id="backup-restore">استرجاع نسخة</button>
+                        <input type="file" id="backup-file" accept="application/json,.json" hidden>
+                    </div>
                 </article>
                 <article class="setting-card">
                     <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></div>
@@ -482,7 +531,7 @@
 <div class="modal" id="share-modal">
     <div class="modal-card">
         <button class="modal-close" type="button" data-close-modal aria-label="إغلاق">×</button>
-        <h2>مشاركة</h2>
+        <h2 id="share-title">مشاركة</h2>
         <div class="segmented" id="share-tabs" role="group" aria-label="ما تريد مشاركته" style="margin-bottom:14px;">
             <button type="button" data-share-kind="wird">وردي اليوم</button>
             <button type="button" data-share-kind="achievements">إنجازاتي</button>
@@ -577,20 +626,20 @@
 
 <!-- وضع القراءة (ملء الشاشة) -->
 <div id="reader" class="reader" data-theme="light" hidden role="dialog" aria-label="وضع القراءة">
+    <!-- ش٢: أزرار صغيرة عائمة فوق، وشريط عائم واحد تحت (التقليب ورقم الصفحة والانتقال) -->
     <div class="reader-bar">
         <button class="reader-x" id="reader-close" type="button" aria-label="الخروج من وضع القراءة">×</button>
-        <select id="reader-surah" aria-label="السورة"><option>السورة…</option></select>
         <div class="rd-tools">
             <button class="rd-icon" id="rd-search-btn" type="button" aria-label="البحث في القرآن" title="البحث في القرآن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
             <button class="rd-icon" id="rd-marks-btn" type="button" aria-label="العلامات والملاحظات" title="العلامات والملاحظات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/></svg></button>
-            <button class="rd-layout-btn" id="rd-layout-btn" type="button" aria-label="تنسيق المصحف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19l5-14 5 14M6 14h6"/><path d="M15.5 19c0-2.2 1.2-3.5 3-3.5s2.5 1 2.5 2.4V19M21 17.5h-3"/></svg><span>تنسيق المصحف</span></button>
+            <button class="rd-icon" id="rd-layout-btn" type="button" aria-label="تنسيق المصحف" title="تنسيق المصحف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19l5-14 5 14M6 14h6"/><path d="M15.5 19c0-2.2 1.2-3.5 3-3.5s2.5 1 2.5 2.4V19M21 17.5h-3"/></svg></button>
         </div>
     </div>
     <div class="reader-stage" id="reader-stage"></div>
     <div class="reader-foot">
-        <button type="button" id="rd-prev">الصفحة السابقة →</button>
-        <label>صفحة <input type="number" id="rd-page" min="1" max="604" inputmode="numeric"> / ٦٠٤</label>
-        <button type="button" id="rd-next">← الصفحة التالية</button>
+        <button type="button" class="rd-nav" id="rd-prev" aria-label="الصفحة السابقة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="rd-goto" id="rd-goto" aria-label="الانتقال إلى سورة أو جزء أو حزب أو صفحة"><span class="rd-goto-main"><b id="rd-page-no">١</b> / ٦٠٤</span><small id="rd-where">الفاتحة · الجزء ١</small></button>
+        <button type="button" class="rd-nav" id="rd-next" aria-label="الصفحة التالية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
     </div>
 </div>
 
@@ -637,6 +686,10 @@
         <div class="lay-row">
             <span class="lay-label">المظهر</span>
             <div class="segmented" id="reader-theme"><button type="button" data-rt="light">فاتح</button><button type="button" data-rt="sepia">ورقي</button><button type="button" data-rt="dark">داكن</button><button type="button" data-rt="auto">تلقائي</button></div>
+        </div>
+        <div class="lay-row">
+            <span class="lay-label">إضاءة دافئة<small>أريح للعين بالليل</small></span>
+            <div class="segmented" id="reader-warm"><button type="button" data-warm="auto">بالليل</button><button type="button" data-warm="on">دائمًا</button><button type="button" data-warm="off">لا</button></div>
         </div>
     </div>
 </div>
@@ -739,6 +792,7 @@
 <script src="assets/js/tasbih.js" defer></script>
 <script src="assets/js/home.js" defer></script>
 <script src="assets/js/share.js" defer></script>
+<script src="assets/js/extras.js" defer></script>
 <script src="assets/js/time-context.js" defer></script>
 <script src="assets/js/atmosphere.js" defer></script>
 <script src="assets/js/motion.js" defer></script>
