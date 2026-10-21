@@ -15,15 +15,17 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v27';
+const CACHE = 'mudhakkir-v28';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
-const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
+const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion', '14-performance', '15-look', '16-layout'].map(n => `./assets/css/${n}.css`);
+const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'offline', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
     './assets/img/logo-light.webp', './assets/img/logo-dark.webp', './assets/img/icon-192.webp', './assets/img/icon-192.png', './assets/img/favicon-64.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
-const DUE_WINDOW = 30 * 60 * 1000; // يُعرض التذكير إن تأخر وصول الإشعار حتى ٣٠ دقيقة
+// يُعرض التذكير إن تأخر وصول الإشعار حتى ساعة: السيرفر بيلقط المتأخر لحد ٣٠ دقيقة (جدول كل نص ساعة)،
+// وفوقها تأخير خدمة الإشعارات نفسها (TTL نص ساعة). و«shown» بيمنع التكرار.
+const DUE_WINDOW = 60 * 60 * 1000;
 const dataUrl = name => new URL('__mdk/' + name, self.registration.scope).href;
 
 // ---------- بيانات مشتركة مع الصفحة ----------
@@ -45,10 +47,12 @@ async function setApproved(name) {
     approvedName = name;
     await putJSON('approved', { cache: name });
 }
+// مخازن المصحف والبحث بلا نت (wird.js و offline.js) بتضل عند التحديث
+const KEEP_ALWAYS = /^mudhakkir-(quran|search)-/;
 async function cleanup() {
     const keep = new Set([CACHE, DATA, await approvedCache()]);
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => !keep.has(k)).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => !keep.has(k) && !KEEP_ALWAYS.test(k)).map(k => caches.delete(k)));
 }
 
 // التنزيل في الخلفية: نجلب الملفات الجديدة مباشرة من السيرفر (دون ذاكرة المتصفح) ونحفظها جانبًا
@@ -122,12 +126,58 @@ function occurrence(r, now) {
 let chain = Promise.resolve();
 const serial = fn => (chain = chain.then(fn, fn));
 
+// إ٢ (الإصدار ١٥): أزرار إشعار التذكير: «أتممت» (بتنحسب بإنجاز اليوم) و«بعد ١٠ دقائق» (غفوة)
+const SNOOZE_MS = 10 * 60 * 1000;
+function reminderActions(r) {
+    const snooze = { action: 'snooze', title: '⏰ بعد ١٠ دقائق' };
+    if (r.id === 'friday' || r.kahf) return [{ action: 'kahf', title: '📖 اقرأ الكهف' }, snooze];
+    if (r.id === 'wird' || r.wird) return [{ action: 'open-wird', title: '📖 افتح الورد' }, snooze];
+    return [{ action: 'done', title: '✓ أتممت' }, snooze];
+}
+// الغفوات: تذكير «مرة واحدة» بعد ١٠ دقائق. بنحفظها هون (الصفحة ما بتعرف عنها) وبنبعتها للسيرفر حتى توصل والتطبيق مسكّر
+async function liveSnoozes(now = Date.now()) {
+    const list = await getJSON('snoozes', []);
+    return (Array.isArray(list) ? list : []).filter(s => s && now - (s.at || 0) < DUE_WINDOW);
+}
+async function snooze(data, now = Date.now()) {
+    const at = new Date(now + SNOOZE_MS);
+    const s = {
+        id: 'snz-' + at.getTime(), title: data.title || 'تذكير', text: data.text || '',
+        time: `${pad(at.getHours())}:${pad(at.getMinutes())}`, repeat: 'once', days: [], date: dayKey(at), on: true, since: now, at: at.getTime(),
+        kahf: data.open === 'kahf' || undefined, wird: data.id === 'wird' || data.wird || undefined, url: data.url
+    };
+    const list = (await liveSnoozes(now)).concat(s);
+    await putJSON('snoozes', list);
+    await pushServerSync(list);
+}
+// نبعت للسيرفر نفس يلي بتبعته الصفحة (PushSync) + الغفوات
+async function pushServerSync(snoozes) {
+    try {
+        const sub = await self.registration.pushManager.getSubscription();
+        const state = await getJSON('state', null);
+        if (!sub || !state) return;
+        const now = Date.now();
+        const reminders = (state.reminders || []).filter(r => r && r.on).concat(snoozes.filter(s => s.at > now - 60000))
+            .map(({ id, time, repeat, days, date }) => ({ id, time, repeat, days, date }));
+        let tz = 'UTC'; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (e) {}
+        await fetch(PUSH_SERVER + '/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...sub.toJSON(), general: state.general !== false, tz, reminders }) });
+    } catch (e) {}
+}
+// «أتممت»: بتنسجّل لليوم، والصفحة بتضيفها لتقويم الأسبوع (WeekLog) أول ما تنفتح
+async function markDone(now = Date.now()) {
+    const d = new Date(now), list = await getJSON('weeklog-pending', []);
+    list.push({ day: dayKey(d), kind: 'a' });
+    await putJSON('weeklog-pending', list.slice(-30));
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    wins.forEach(w => w.postMessage({ type: 'mdk-weeklog' }));
+}
+
 async function checkReminders(now = Date.now()) {
     const state = await getJSON('state', null);
     if (!state || !Array.isArray(state.reminders)) return [];
     const shown = await getJSON('shown', {});
     const fired = [];
-    for (const r of state.reminders) {
+    for (const r of state.reminders.concat(await liveSnoozes(now))) {
         const at = occurrence(r, now);
         if (!at) continue;
         const key = r.id + '@' + dayKey(at);
@@ -140,8 +190,9 @@ async function checkReminders(now = Date.now()) {
     await putJSON('shown', shown);
     await Promise.all(fired.map(r => self.registration.showNotification(r.title || 'تذكير', {
         body: r.text, tag: 'rem-' + r.id, renotify: true, lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE,
-        requireInteraction: true, data: { kind: 'reminder', id: r.id, open: r.id === 'friday' ? 'kahf' : undefined },
-        actions: r.id === 'friday' ? [{ action: 'kahf', title: '📖 اقرأ الكهف' }] : []
+        requireInteraction: true,
+        data: { kind: 'reminder', id: r.id, title: r.title, text: r.text, url: r.url, wird: r.wird, open: r.id === 'friday' || r.kahf ? 'kahf' : undefined },
+        actions: reminderActions(r)
     })));
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     wins.forEach(w => w.postMessage({ type: 'mdk-reminder', reminders: fired.map(({ id, title, text }) => ({ id, title, text })) }));
@@ -244,6 +295,9 @@ self.addEventListener('notificationclick', event => {
     n.close();
     event.waitUntil((async () => {
         if (action === 'next') return showGeneral();
+        if (action === 'snooze' && data.kind === 'reminder') return snooze(data);
+        if (action === 'done' && data.kind === 'reminder') return markDone();
+        if (action === 'open-wird') return focusApp({ type: 'mdk-open-wird' }, './?open=wird');
         if (action === 'ask' && typeof event.reply === 'string' && event.reply.trim()) return answerFromNotification(event.reply);
         if (action === 'ask' || action === 'open-ask' || data.kind === 'ask-answer') return focusApp({ type: 'mdk-open-ask' }, './?ask=1');
         if (action === 'kahf' || data.open === 'kahf') return focusApp({ type: 'mdk-open-kahf' }, './?open=kahf');

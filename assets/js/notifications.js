@@ -21,7 +21,12 @@ const NotifyStore = (() => {
         if (!('caches' in window)) return;
         try { const c = await caches.open(DATA_CACHE); await c.put(url(name), new Response(JSON.stringify(value), { headers: { 'Content-Type': 'application/json' } })); } catch (e) {}
     }
-    return { put };
+    // يلي بيكتبه sw.js: الغفوات (إ٢) و«أتممت» من الإشعار
+    async function get(name, fallback = null) {
+        if (!('caches' in window)) return fallback;
+        try { const r = await (await caches.open(DATA_CACHE)).match(url(name)); return r ? await r.json() : fallback; } catch (e) { return fallback; }
+    }
+    return { put, get };
 })();
 
 // مواعيد التذكيرات (نفس المنطق موجود في sw.js)
@@ -121,7 +126,7 @@ const InAppReminder = (() => {
         setTimeout(() => { box.hidden = true; showing = false; next(); }, 380);
     }
     box?.querySelector('.iar-close').addEventListener('click', hide);
-    box?.querySelector('.iar-done').addEventListener('click', () => { DailyStats.add('tasbeeh', 1); hide(); });
+    box?.querySelector('.iar-done').addEventListener('click', () => { DailyStats.add('tasbeeh', 1); if (typeof WeekLog !== 'undefined') WeekLog.mark('a'); hide(); });
     return { show: list => { queue.push(...list); next(); } };
 })();
 
@@ -139,16 +144,27 @@ const PushSync = (() => {
         if (!PUSH_SERVER) return setState('nourl');
         if (!SW_OK || !('PushManager' in window)) return setState('unsupported');
         const general = GeneralReminder.isActive();
-        const reminders = allReminders().filter(r => r.on && Sched.next(r)).map(({ id, time, repeat, days, date }) => ({ id, time, repeat, days, date }));
+        // + غفوات «بعد ١٠ دقائق» من الإشعار (sw.js) حتى ما تنمسح من السيرفر لما نبعت التذكيرات
+        const snoozes = (await NotifyStore.get('snoozes', [])) || [];
+        const reminders = allReminders().filter(r => r.on && Sched.next(r))
+            .concat(Array.isArray(snoozes) ? snoozes.filter(s => s && s.at > Date.now() - 60000) : [])
+            .map(({ id, time, repeat, days, date }) => ({ id, time, repeat, days, date }));
         const need = Notifier.permission() === 'granted' && (general || reminders.length > 0);
         try {
             const reg = await navigator.serviceWorker.ready;
             let sub = await reg.pushManager.getSubscription();
             if (need) {
-                if (!sub) {
-                    const raw = atob(VAPID_PUBLIC_KEY.replace(/-/g, '+').replace(/_/g, '/'));
-                    sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: Uint8Array.from(raw, c => c.charCodeAt(0)) });
+                const raw = atob(VAPID_PUBLIC_KEY.replace(/-/g, '+').replace(/_/g, '/'));
+                const key = Uint8Array.from(raw, c => c.charCodeAt(0));
+                // اشتراك قديم بمفتاح غير مفتاح السيرفر الحالي: خدمة الإشعارات بترفضه (403) للأبد، فمنجدّده
+                const old = sub && sub.options && sub.options.applicationServerKey;
+                if (old && (old.byteLength !== key.length || new Uint8Array(old).some((b, i) => b !== key[i]))) {
+                    await post('/unsubscribe', { endpoint: sub.endpoint }).catch(() => {});
+                    await sub.unsubscribe().catch(() => {});
+                    try { localStorage.removeItem(SENT_KEY); } catch (e) {}
+                    sub = null;
                 }
+                if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
                 const body = { ...sub.toJSON(), general, tz: tz(), reminders };
                 const sig = JSON.stringify(body);
                 let sent = null;
@@ -424,8 +440,10 @@ const NotifyCheck = (() => {
                     await NotifyStore.put('test', null);
                     Object.assign(s, body.error === 'not-subscribed' || body.error === 'expired'
                         ? { status: 'fail', title: 'الخادم لم يجد اشتراك هذا الجهاز', detail: 'انتهى الاشتراك أو أُلغي.', fix: 'اضغط «إصلاح الاشتراك» ثم أعد الفحص.' }
-                        : { status: 'fail', title: 'تعذّر على الخادم إرسال التجربة', detail: 'حاول بعد قليل.' });
-                    needRepair = needRepair || body.error === 'not-subscribed' || body.error === 'expired';
+                        : body.status === 401 || body.status === 403
+                            ? { status: 'fail', title: 'خدمة الإشعارات رفضت رسالة الخادم', detail: `الرمز ${AR(body.status)}: توقيع الخادم أو الاشتراك غير مقبول.`, fix: 'اضغط «إصلاح الاشتراك» ثم أعد الفحص، وإن استمر فالمشكلة من إعداد الخادم.' }
+                            : { status: 'fail', title: 'تعذّر على الخادم إرسال التجربة', detail: 'حاول بعد قليل.' });
+                    needRepair = needRepair || body.error === 'not-subscribed' || body.error === 'expired' || body.status === 401 || body.status === 403;
                 } else if (body.error === 'limit') {
                     Object.assign(s, { status: 'warn', title: 'بلغت حدّ التجارب لهذا اليوم', detail: 'حاول غدًا.' });
                 } else if (await arrived) {

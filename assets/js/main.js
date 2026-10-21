@@ -13,7 +13,7 @@ document.addEventListener('keydown', e => {
 });
 
 // بطاقات الأقسام قابلة للتفعيل بلوحة المفاتيح
-document.querySelectorAll('[data-adhkar-group]').forEach(card => {
+document.querySelectorAll('[data-adhkar-group]:not(button)').forEach(card => {
     card.setAttribute('role', 'button');
     card.tabIndex = 0;
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); } });
@@ -38,6 +38,8 @@ UpdateNotice.init();
 Install.init();
 Wird.init();
 WirdIntro.init();
+WirdReminder.initRow();
+QuranOffline.init();
 Atmosphere.init();
 FX.init();
 Tasbih.init();

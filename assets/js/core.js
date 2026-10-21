@@ -113,49 +113,31 @@ const KeepAwake = (() => {
     setInterval(() => { if (lock && Date.now() - last >= IDLE_MS) sync(); }, 30000);
     return { on: r => { reasons.add(r); last = Date.now(); sync(); }, off: r => { reasons.delete(r); sync(); }, set: (r, v) => (v ? reasons.add(r) : reasons.delete(r), sync()) };
 })();
-// الورد: الشاشة شغّالة طول ما صفحة القرآن مفتوحة على تبويب الورد
+// الورد: الشاشة شغّالة طول ما صفحة القرآن مفتوحة
 function syncWirdAwake() {
-    const on = document.getElementById('page-quran')?.classList.contains('active-page') && QuranTabs.get() === 'wird';
-    KeepAwake.set('wird', !!on);
+    KeepAwake.set('wird', !!document.getElementById('page-quran')?.classList.contains('active-page'));
 }
 
+// صفحة القرآن (ق٣، الإصدار ١٥): بلا تبويبات. «الورد» = ورد اليوم بنفس الصفحة، و«المصحف» = زر «افتح المصحف».
+// بنضل نقبل show('wird' | 'mushaf') للروابط القديمة (المساعد، إشعار الكهف): بنمرّر للمكان المطلوب.
 const QuranTabs = (() => {
-    const KEY = 'mudhakkir-quran-tab';
-    let current = (() => { try { return localStorage.getItem(KEY) === 'mushaf' ? 'mushaf' : 'wird'; } catch (e) { return 'wird'; } })();
-    function show(tab = current) {
-        current = tab === 'mushaf' ? 'mushaf' : 'wird';
-        try { localStorage.setItem(KEY, current); } catch (e) {}
-        document.querySelectorAll('[data-qtab]').forEach(b => {
-            const on = b.dataset.qtab === current;
-            b.classList.toggle('active', on); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
-        });
-        const wird = document.getElementById('quran-wird'), mushaf = document.getElementById('quran-mushaf');
-        if (wird) wird.hidden = current !== 'wird';
-        if (mushaf) mushaf.hidden = current !== 'mushaf';
-        document.getElementById('page-quran')?.setAttribute('data-tab', current);
+    function show(tab = 'wird') {
         syncWirdAwake();
+        const target = tab === 'mushaf' ? document.getElementById('reader-enter') : document.querySelector('#quran-wird .single-verse-display');
+        const page = document.getElementById('page-quran');
+        if (!target || !page || !page.classList.contains('active-page')) return;
+        if (tab === 'mushaf' || tab === 'wird-now') setTimeout(() => target.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }), 120);
     }
-    function init() {
-        document.querySelectorAll('[data-qtab]').forEach(b => b.addEventListener('click', () => show(b.dataset.qtab)));
-        // أسهم لوحة المفاتيح بين التبويبين
-        document.querySelector('.quran-tabs')?.addEventListener('keydown', e => {
-            if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-            e.preventDefault();
-            show(current === 'wird' ? 'mushaf' : 'wird');
-            document.querySelector(`[data-qtab="${current}"]`)?.focus();
-        });
-        show(current);
-    }
-    return { init, show, get: () => current };
+    function init() { syncWirdAwake(); }
+    return { init, show, get: () => 'wird' };
 })();
 
 // 1. Navigation SPA
 const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings'];
-// صفحات قديمة صارت تبويبات: «القراءة الحرة» = القرآن ← المصحف (روابط المساعد وإشعار الكهف القديمة تبقى شغّالة)
+// صفحات قديمة صارت جزء من صفحة القرآن: «القراءة الحرة» = زر «افتح المصحف» (روابط المساعد وإشعار الكهف القديمة تبقى شغّالة)
 const PAGE_ALIAS = { 'free-reading': ['quran', 'mushaf'], wird: ['quran', 'wird'] };
 function navigateTo(pageId, tab) {
     if (PAGE_ALIAS[pageId]) [pageId, tab] = PAGE_ALIAS[pageId];
-    if (pageId === 'quran' && tab) QuranTabs.show(tab);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const current = document.querySelector('.page-view.active-page');
     const from = current ? current.id.replace('page-', '') : null;
@@ -171,8 +153,19 @@ function navigateTo(pageId, tab) {
         updateNavPill();
         syncWirdAwake();
         window.scrollTo({ top: 0, behavior: 'auto' });
+        if (pageId === 'quran' && tab) QuranTabs.show(tab);
     };
-    // انتقال ناعم بين الصفحات (المحتوى ينزلق باتجاه التنقل: لليسار للأمام في العربية)
+    // انتقال ناعم بين الصفحات. بالمؤثرات الخفيفة: بلا لقطة للصفحة (أخف على الجوال)، الصفحة الجديدة بتظهر بتلاشٍ ١٥٠ms
+    if (!reduce && from && from !== pageId && document.documentElement.classList.contains('fx-lite')) {
+        swap();
+        const p = document.getElementById('page-' + pageId);
+        if (p) {
+            p.classList.remove('page-enter'); void p.offsetWidth; p.classList.add('page-enter');
+            const end = e => { if (e.target !== p) return; p.classList.remove('page-enter'); p.removeEventListener('animationend', end); };
+            p.addEventListener('animationend', end);
+        }
+        return;
+    }
     if (!document.startViewTransition || reduce || document.hidden || !from || from === pageId || document.body.classList.contains('immersive')) return swap();
     const html = document.documentElement;
     html.dataset.vt = PAGE_ORDER.indexOf(pageId) >= PAGE_ORDER.indexOf(from) ? 'page-fwd' : 'page-back';

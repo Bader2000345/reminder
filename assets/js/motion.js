@@ -1,23 +1,12 @@
 /* =====================================================================
  * مُذكّر — motion.js
- * الحركة: ظهور عناصر القوائم، عمق الخلفية ونقاط النور، وميل الشعار بالفأرة.
+ * الحركة: ظهور عناصر القوائم، وميل الشعار بالفأرة.
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
-// ===== عمق هادئ للخلفية مع حركة المؤشر =====
-// (ميلان البطاقات ثلاثي الأبعاد أُزيل في الإصدار ٧: «إطار النور» وزخرفة الخلفية تكفي)
-(() => {
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-    const ambient = document.querySelector('.ambient');
-    let frame = 0, px = 0, py = 0;
-    const flush = () => { frame = 0; ambient.style.setProperty('--px', px.toFixed(3)); ambient.style.setProperty('--py', py.toFixed(3)); };
-    document.addEventListener('pointermove', e => {
-        if (reduce.matches || e.pointerType !== 'mouse' || !ambient || frame) return;
-        px = e.clientX / innerWidth - .5; py = e.clientY / innerHeight - .5; frame = requestAnimationFrame(flush);
-    }, { passive: true });
-})();
-
 // ===== حركات الظهور والتموّج =====
+// (الإصدار ١٥: انشال عمق الخلفية مع المؤشر والتمرير والإمالة، ونقاط النور: الخلفية صارت مشربية ثابتة
+//  بضو بيتنفّس (ج٥ بـ fx.js)، فما في داعي نحدّث متغيرات الخلفية مع كل تمرير — أخف بكتير عالجوال)
 const Motion = (() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     // البطاقات الرئيسية بيحرّكها fx.js (ب٢: البطاقة بتطلع وكلماتها بعدها)؛ هون بس العناصر يلي ما بيلمسها
@@ -28,39 +17,7 @@ const Motion = (() => {
         root.querySelectorAll(REVEAL).forEach(n => { if (!n.dataset.revealed) { n.classList.add('reveal'); io.observe(n); } });
     }
     // (التموّج عند الضغط انشال بالإصدار ١٤: الضغط صار توهّج ذهبي بالـ CSS — ز٣)
-    // الخلفية تتحرك بعمق مع التمرير، ومع إمالة الهاتف على أندرويد
-    function ambientMotion() {
-        const amb = document.querySelector('.ambient'); if (!amb) return;
-        let frame = 0, sy = 0, gx = 0, gy = 0;
-        const flush = () => { frame = 0; amb.style.setProperty('--px', gx.toFixed(3)); amb.style.setProperty('--py', (gy + sy).toFixed(3)); };
-        const queue = () => { if (!frame) frame = requestAnimationFrame(flush); };
-        addEventListener('scroll', () => { sy = Math.min(1.2, scrollY / innerHeight) * .6; queue(); }, { passive: true });
-        if (matchMedia('(hover: none)').matches && 'DeviceOrientationEvent' in window && typeof DeviceOrientationEvent.requestPermission !== 'function') {
-            addEventListener('deviceorientation', e => {
-                if (e.gamma == null) return;
-                gx = Math.max(-1, Math.min(1, e.gamma / 30)) * .8;
-                gy = Math.max(-1, Math.min(1, (e.beta - 45) / 30)) * .5;
-                queue();
-            }, { passive: true });
-        }
-    }
-    // نقاط نور (كالقناديل البعيدة) موزعة على أعماق مختلفة؛ ميلان الخلفية يُظهر عمقها الحقيقي
-    function buildMotes() {
-        const box = document.getElementById('motes'); if (!box || box.childElementCount) return;
-        let seed = 7;
-        const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-        const n = matchMedia('(max-width: 700px)').matches ? 14 : 22;
-        for (let i = 0; i < n; i++) {
-            const m = document.createElement('i');
-            m.className = 'mote' + (rnd() < .3 ? ' is-gold' : '');
-            const z = Math.round(-520 + rnd() * 640);
-            m.style.cssText = `left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 100).toFixed(1)}%;--z:${z}px;--s:${(2.5 + rnd() * 4.5).toFixed(1)}px;--d:${(-rnd() * 14).toFixed(1)}s;--t:${(10 + rnd() * 12).toFixed(1)}s`;
-            box.append(m);
-        }
-    }
     function init() {
-        buildMotes();
-        if (!reduce.matches) ambientMotion();
         if (reduce.matches || !('IntersectionObserver' in window)) return;
         io = new IntersectionObserver(entries => entries.forEach(en => {
             if (!en.isIntersecting) return;

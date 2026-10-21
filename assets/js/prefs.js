@@ -4,6 +4,7 @@
  *   - TextSize: حجم خط التطبيق كله (صغير، عادي، كبير، أكبر) من الإعدادات. بيكبّر محتوى الصفحات
  *     بدون ما يخرّب الشريط والأزرار العائمة. preload-theme.js بيطبّقه قبل الرسم.
  *   - VerseSize: حجم خط الآية بالورد ووضع التركيز (أزرار أ− أ+)، ومحفوظ.
+ *   - Effects (الإصدار ١٥): المؤثرات تلقائي / خفيفة / كاملة (html.fx-lite ← 14-performance.css).
  * Prefs.init() من main.js.
  * ===================================================================== */
 
@@ -45,9 +46,32 @@ const Prefs = (() => {
         if (announce && typeof Toast !== 'undefined') Toast.show(`حجم الآية: ${Math.round(STEPS[verse] * 100).toLocaleString('ar-EG')}٪`, 1200);
     }
 
+    // ---------- المؤثرات (الإصدار ١٥) ----------
+    // auto: خفيفة على الجوال والأجهزة الضعيفة، وكاملة على الكمبيوتر (نفس شرط preload-theme.js)
+    const FX_KEY = 'mudhakkir-effects';
+    const FX_LABEL = { auto: 'تلقائي', lite: 'خفيفة', full: 'كاملة' };
+    const autoLite = () => matchMedia('(pointer: coarse)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator.hardwareConcurrency || 8) <= 4 || !!(navigator.connection || {}).saveData;
+    let fx = ['lite', 'full'].includes(store.get(FX_KEY, 'auto')) ? store.get(FX_KEY, 'auto') : 'auto';
+    function applyFx(mode) {
+        fx = FX_LABEL[mode] ? mode : 'auto';
+        if (fx === 'auto') { try { localStorage.removeItem(FX_KEY); } catch (e) {} } else store.set(FX_KEY, fx);
+        const lite = fx === 'lite' || (fx === 'auto' && autoLite());
+        root.classList.toggle('fx-lite', lite);
+        document.querySelectorAll('#effects-seg [data-fx]').forEach(b => {
+            const on = b.dataset.fx === fx;
+            b.classList.toggle('active', on); b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1;
+        });
+        const st = document.getElementById('effects-status');
+        if (st) st.textContent = lite
+            ? `خفيفة${fx === 'auto' ? ' (تلقائي على هذا الجهاز)' : ''}: أسرع وأوفر للبطارية، بلا حركات ثقيلة`
+            : `كاملة${fx === 'auto' ? ' (تلقائي على هذا الجهاز)' : ''}: إطار النور على البطاقات والزجاج المغبّش`;
+    }
+
     function init() {
         applyText(text);
         applyVerse(verse);
+        applyFx(fx);
+        document.getElementById('effects-seg')?.addEventListener('click', e => { const b = e.target.closest('[data-fx]'); if (b) applyFx(b.dataset.fx); });
         const seg = document.getElementById('textsize-seg');
         seg?.addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) applyText(b.dataset.size); });
         seg?.addEventListener('keydown', e => {
@@ -62,5 +86,5 @@ const Prefs = (() => {
             applyVerse(verse + Number(b.dataset.verseZoom), true);
         });
     }
-    return { init, setText: applyText, text: () => text };
+    return { init, setText: applyText, text: () => text, setEffects: applyFx, effects: () => fx };
 })();

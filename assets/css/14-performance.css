@@ -1,0 +1,100 @@
+/* =====================================================================
+ * مُذكّر — 14-performance.css  (الإصدار ١٥: السلاسة)
+ * من مهارة motion (vectorlab): المدد ١٠٠/١٥٠/٢٠٠/٣٠٠ms فقط، الدخول ease-out والخروج ease-in،
+ * ولا يتحرك إلا transform و opacity، وبلا ارتداد (bounce/spring) على أدوات الواجهة.
+ * ومن anti-slop: بلا زجاج مغبّش (backdrop-filter) بالوضع الخفيف.
+ *
+ *   ١) المؤثرات «خفيفة» (html.fx-lite — الافتراضي على الجوال، وتنغيّر من الإعدادات ← المؤثرات):
+ *      بلا نجوم ولا توهّج يتحرك ولا إطار نور يدور ولا تنفّس المسبحة ولا لمعة شريط التقدّم، وبلا زجاج مغبّش.
+ *   ٢) النقش ثابت هادئ بكل الأوضاع (بلا ضو بيلحق الإصبع، وبلا تغيّر أثناء التمرير).
+ *   ٣) تبديل الفاتح والداكن: تلاشٍ ٢٠٠ms (بدل الدائرة وتحريك ألوان كل الصفحة).
+ *   ٤) البطاقات تظهر كاملة (تلاشٍ مع طلعة ٨px خلال ٢٠٠ms)، بلا تقسيم الكلام كلمة كلمة.
+ * آخر ملف CSS: بيعدّل فوق 01–13.
+ * ===================================================================== */
+
+:root {
+  --m-100:100ms; --m-150:150ms; --m-200:200ms; --m-300:300ms;
+  --ease-out:cubic-bezier(.16, 1, .3, 1);
+  --ease-in:cubic-bezier(.7, 0, .84, 0);
+}
+@keyframes mdkFadeIn { from { opacity:0; } }
+@keyframes mdkFadeOut { to { opacity:0; } }
+@keyframes mdkRise { from { opacity:0; transform:translateY(8px); } }
+@keyframes mdkPop { from { transform:scale(.9); } }
+
+/* ===== شاشة البداية: نص ثانية بدل ثانية وربع (fx.js ← SPLASH_MS) ===== */
+.splash { animation-duration:var(--m-200) !important; animation-delay:var(--m-300) !important; animation-timing-function:var(--ease-in) !important; }
+.splash .brand-logo { animation-duration:var(--m-300) !important; animation-timing-function:var(--ease-out) !important; }
+
+/* ===== ٢) النقش ثابت: طبقة كاملة بشفافية ثابتة + طبقة الأعلى، بلا بقعة ضوء ===== */
+.fx-pat-all { opacity:.34 !important; transition:none !important; will-change:auto; }
+.fx-lens { display:none !important; }
+
+/* ===== ٣) تبديل الفاتح والداكن: الجديد بيتلاشى فوق القديم خلال ٢٠٠ms ===== */
+/* أثناء التبديل ما في ولا انتقال لون، فما بينعاد رسم الصفحة كل لحظة */
+html.theme-fade *, html.theme-fade *::before, html.theme-fade *::after { transition:none !important; }
+html.theme-fade::view-transition-old(root) { animation:none; }
+html.theme-fade::view-transition-new(root) { animation:mdkFadeIn var(--m-200) var(--ease-out) both; clip-path:none; }
+/* ألوان الوقت بتتبدّل بهدوء بس بسرعة معقولة (كانت ٤ ثواني إعادة رسم) */
+html[data-sky-ready] { transition-duration:var(--m-300) !important; }
+
+/* ===== ٤) ظهور البطاقات كاملة (fx.js): تلاشٍ مع طلعة ٨px ورا بعض ===== */
+.fx-card-in { animation:mdkRise var(--m-200) var(--ease-out) var(--fx-card-d, 0ms) both; }
+.reveal.in { animation:mdkRise var(--m-200) var(--ease-out) var(--d, 0ms) backwards; }
+.fx-fade { animation:mdkFadeIn var(--m-200) var(--ease-out) var(--fx-wait, 0ms) both; }
+
+/* ===== الانتقال بين صفحات التطبيق: تكبير بسيط مع ظهور، بلا تمويه ===== */
+html[data-vt="page-fwd"]::view-transition-old(page), html[data-vt="page-back"]::view-transition-old(page) { animation:mdkFadeOut var(--m-100) var(--ease-in) both; }
+html[data-vt="page-fwd"]::view-transition-new(page), html[data-vt="page-back"]::view-transition-new(page) { animation:mdkPageIn var(--m-200) var(--ease-out) both; }
+@keyframes mdkPageIn { from { opacity:0; transform:scale(.985); } }
+/* بالوضع الخفيف ما في لقطة للصفحة أصلًا (core.js): الصفحة الجديدة بتظهر بتلاشٍ */
+.page-view.page-enter { animation:mdkFadeIn var(--m-150) var(--ease-out) both; }
+
+/* ===== أدوات الواجهة: بلا ارتداد، وبمدد قصيرة ===== */
+.nav-pill { transition:transform var(--m-300) var(--ease-out), width var(--m-200) var(--ease-out), height var(--m-200) var(--ease-out), opacity var(--m-200) !important; }
+.side-link.active svg { animation:mdkPop var(--m-200) var(--ease-out) both; }
+@media (max-width:700px) {
+  /* اسم الصفحة تحت الأيقونة: بالشفافية بس، مو بتغيير الارتفاع */
+  .side-link small { max-height:none !important; transition:opacity var(--m-150) var(--ease-out) !important; }
+  .side-link:not(.active) small { position:absolute; opacity:0; pointer-events:none; }
+}
+.modal.open .modal-card { animation:mdkRise var(--m-200) var(--ease-out) both !important; }
+.picker-card, .inapp-reminder, .tq-cube { transition-timing-function:var(--ease-out) !important; transition-duration:var(--m-200) !important; }
+.dk-counter.pop { animation:mdkPop var(--m-150) var(--ease-out); }
+.adhkar-detail { animation:mdkRise var(--m-200) var(--ease-out) both !important; }
+.adhkar-detail .dk-head, .reader-bar, .reader-foot, .wird-focus-close, .sidebar { transition:transform var(--m-200) var(--ease-out), opacity var(--m-200) var(--ease-out) !important; }
+#tasbih-count.is-pop, .tm-count.is-pop { animation:mdkPop var(--m-150) var(--ease-out); }
+.fx-ticker .tk-col { transition-duration:var(--m-300) !important; transition-timing-function:var(--ease-out) !important; }
+.rd-text.turn-next, .rd-sheet.turn-next { animation:mdkTurnNext var(--m-300) var(--ease-out); }
+.rd-text.turn-prev, .rd-sheet.turn-prev { animation:mdkTurnPrev var(--m-300) var(--ease-out); }
+@keyframes mdkTurnNext { from { transform:translateX(-14%); opacity:0; } }
+@keyframes mdkTurnPrev { from { transform:translateX(14%); opacity:0; } }
+.tb-wave { animation-duration:var(--m-300) !important; animation-timing-function:var(--ease-out) !important; }
+@media (max-width:700px) { .modal.open .modal-card { animation:mdkSheetUp var(--m-300) var(--ease-out) both !important; } }
+@keyframes mdkSheetUp { from { transform:translateY(24px); opacity:0; } }
+/* إطار التوهّج على «الاقتراح» كان يعيد رسم تدرّج دائري كل لحظة: صار نفس إطار النور (fx.js) */
+.smart-card::before { display:none !important; }
+
+/* ===== ١) المؤثرات الخفيفة ===== */
+html.fx-lite :is(.motes, .aurora, .beam-ring, .ic-glow) { display:none !important; }
+html.fx-lite #page-home::before, html.fx-lite #page-home::after { animation:none !important; }
+html.fx-lite .tasbih-orb:not(.tasbih-ripple) { animation:none; }
+html.fx-lite .ic-icon { animation:none !important; }
+html.fx-lite :is(.progress-track, .khatma-track, .wird-live-track) span::after { display:none; }
+html.fx-lite .home-date .sky-icon svg { animation:none !important; }
+/* بلا زجاج مغبّش: نفس الألوان بس أكثف شوي حتى تضل مقروءة */
+html.fx-lite *, html.fx-lite *::before, html.fx-lite *::after { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+html.fx-lite body:not(.dark-mode) .sidebar { background:rgba(255,253,247,.97) !important; }
+html.fx-lite body.dark-mode .sidebar { background:rgba(15,24,20,.97) !important; }
+html.fx-lite body:not(.dark-mode) :is(.ghost-button, .focus-button, .home-date, .theme-quick) { background:color-mix(in srgb, var(--paper) 90%, transparent); }
+html.fx-lite body.dark-mode :is(.ghost-button, .focus-button, .home-date, .theme-quick) { background:color-mix(in srgb, var(--surface-2) 94%, transparent); }
+html.fx-lite :is(.dhikr-next, .sound-toggle) { background:rgba(255,255,255,.14); }
+html.fx-lite .modal { background:rgba(8,20,15,.6); }
+html.fx-lite body.dark-mode .modal { background:rgba(0,0,0,.78); }
+/* الصفحة الجديدة بالوضع الخفيف: ظهور فقط */
+html.fx-lite .fx-card-in { animation-name:mdkFadeIn; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-card-in, .reveal.in, .fx-fade, .page-view.page-enter, .side-link.active svg, .modal.open .modal-card, .adhkar-detail { animation:none !important; }
+  html.theme-fade::view-transition-new(root) { animation:none; }
+}

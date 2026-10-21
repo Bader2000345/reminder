@@ -2,8 +2,8 @@
  * مُذكّر — extras.js  (الإصدار ١٤)
  *   Hijri      إ٤ التاريخ الهجري جنب التاريخ بالرئيسية (تقويم أم القرى من المتصفح نفسه، بلا نت)،
  *              مع تصحيح يوم ± من الإعدادات، وبطاقة للأيام المميزة (البيض، عاشوراء، عرفة، العشر، العيدين…)
- *   WeekLog    إ٨ تقويم آخر ٧ أيام بالرئيسية: الورد، الأذكار، التسبيح (نقاط هادية)
- *   Backup     إ٦ حفظ نسخة من كل بيانات مُذكّر بملف، واسترجاعها بأي جهاز
+ *   WeekLog    إ٨ تقويم آخر ٧ أيام بالرئيسية: الورد، الأذكار، التسبيح (نقاط هادية)،
+ *              و«إحصائيات الشهر» (الإصدار ١٥): آخر ٣٠ يوم كشبكة + أطول سلسلة، و«أتممت» من الإشعار (sw.js) *   Backup     إ٦ حفظ نسخة من كل بيانات مُذكّر بملف، واسترجاعها بأي جهاز
  *   Shortcuts  إ٧ اختصارات أيقونة التطبيق (manifest.json): ?open=tasbih-mode | morning | evening (والورد بـ wird-intro.js)
  * يُحمَّل بعد home.js و tasbih.js و adhkar-viewer.js وقبل main.js. التشغيل من main.js: Extras.init().
  * ===================================================================== */
@@ -86,15 +86,23 @@ const WeekLog = (() => {
     const keyOf = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
     // w: الورد كامل · r: قرأ من الورد · a: أذكار · t: تسبيح
-    function mark(kind) {
-        const log = read(), k = keyOf(new Date());
+    function mark(kind, k = keyOf(new Date())) {
+        const log = read();
         if (log[k] && log[k][kind]) return;
         log[k] = { ...(log[k] || {}), [kind]: 1 };
-        // نحتفظ بآخر ٦٠ يوم بس
+        // نحتفظ بآخر ٦٠ يوم بس (بتكفي لإحصائيات الشهر)
         const keys = Object.keys(log).sort();
         keys.slice(0, Math.max(0, keys.length - 60)).forEach(x => delete log[x]);
         try { localStorage.setItem(KEY, JSON.stringify(log)); } catch (e) {}
         render();
+    }
+    // إ٢: «أتممت» من إشعار التذكير (sw.js بيسجّلها والتطبيق مسكّر)
+    async function mergePending() {
+        if (typeof NotifyStore === 'undefined') return;
+        const list = await NotifyStore.get('weeklog-pending', []);
+        if (!Array.isArray(list) || !list.length) return;
+        await NotifyStore.put('weeklog-pending', []);
+        list.forEach(x => { if (x && /^\d{4}-\d{2}-\d{2}$/.test(x.day) && ['w', 'r', 'a', 't'].includes(x.kind)) mark(x.kind, x.day); });
     }
     function render() {
         const box = $('week-log'); if (!box) return;
@@ -111,18 +119,48 @@ const WeekLog = (() => {
         }
         box.innerHTML = cols.join('');
     }
+    // ---------- إ٨ إحصائيات الشهر (الإصدار ١٥): آخر ٣٠ يوم كشبكة، وعدد أيام كل عبادة، وأطول سلسلة ----------
+    function monthView() {
+        const log = read(), now = new Date(), days = [];
+        for (let i = 29; i >= 0; i--) { const d = new Date(now); d.setDate(now.getDate() - i); days.push({ d, e: log[keyOf(d)] || {} }); }
+        const count = f => days.filter(x => f(x.e)).length;
+        const any = e => e.w || e.r || e.a || e.t;
+        let best = 0, run = 0; days.forEach(x => { run = any(x.e) ? run + 1 : 0; best = Math.max(best, run); });
+        let cur = 0; for (let i = days.length - 1; i >= 0 && any(days[i].e); i--) cur++;
+        const AR = n => Number(n).toLocaleString('ar-EG');
+        const stat = (n, label, cls) => `<div class="ms-stat ${cls}"><b>${AR(n)}</b><small>${label}</small></div>`;
+        const box = document.createElement('div');
+        box.className = 'month-stats';
+        // أول خانة بالشبكة على يوم أسبوعها (السبت أول الأسبوع)
+        const lead = (days[0].d.getDay() + 1) % 7;
+        box.innerHTML = `
+            <p class="ms-lead">آخر ٣٠ يوم، من ${days[0].d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' })} لليوم</p>
+            <div class="ms-stats">${stat(count(e => e.w), 'يوم أتممت الورد', 'w')}${stat(count(e => e.w || e.r), 'يوم قرأت', 'r')}${stat(count(e => e.a), 'يوم أذكار', 'a')}${stat(count(e => e.t), 'يوم تسبيح', 't')}</div>
+            <div class="ms-grid" role="img" aria-label="${AR(count(any))} يوم فيه عبادة من آخر ٣٠ يوم">
+                ${['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'].map(d => `<span class="ms-h">${d}</span>`).join('')}
+                ${'<i class="ms-pad"></i>'.repeat(lead)}
+                ${days.map(({ d, e }) => { const n = (e.w || e.r ? 1 : 0) + (e.a ? 1 : 0) + (e.t ? 1 : 0); return `<i class="ms-d l${n}${keyOf(d) === keyOf(now) ? ' is-today' : ''}" title="${d.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' })}"><em>${AR(d.getDate())}</em></i>`; }).join('')}
+            </div>
+            <p class="ms-legend" aria-hidden="true"><i class="ms-d l0"></i>ولا شي <i class="ms-d l1"></i>عبادة <i class="ms-d l2"></i>عبادتين <i class="ms-d l3"></i>الثلاثة</p>
+            <div class="ms-streak"><span>السلسلة الحالية <b>${AR(cur)}</b> يوم</span><span>أطول سلسلة <b>${AR(best)}</b> يوم</span></div>`;
+        return box;
+    }
+    function openMonth() { if (typeof QSheet !== 'undefined') QSheet.open('إحصائيات الشهر', monthView()); }
     function init() {
         // اليوم من الإحصائيات الحالية (لو المستخدم سبّح أو قرأ قبل هالتحديث)
         if (typeof DailyStats !== 'undefined') { const s = DailyStats.get(); if (s.tasbeeh) mark('t'); if (s.wirdVerses) mark('r'); }
         render();
-        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') render(); });
+        mergePending();
+        $('month-open')?.addEventListener('click', openMonth);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { render(); mergePending(); } });
+        if (typeof SW_OK !== 'undefined' && SW_OK) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'mdk-weeklog') mergePending(); });
     }
-    return { init, mark, render };
+    return { init, mark, render, openMonth };
 })();
 
 const Backup = (() => {
     const $ = id => document.getElementById(id);
-    const SKIP = /^mudhakkir-(qp1-|push-sent|update-dismissed)/; // صفحات المصحف المخزنة (بتتنزّل من جديد) وحالات مؤقتة
+    const SKIP = /^mudhakkir-(qp1-|push-sent|update-dismissed|mushaf-offline)/; // صفحات المصحف المخزنة (بتتنزّل من جديد) وحالات مؤقتة
     const keys = () => { try { return Object.keys(localStorage).filter(k => k.startsWith('mudhakkir-') && !SKIP.test(k)); } catch (e) { return []; } };
     async function save() {
         const data = {};

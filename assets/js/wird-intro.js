@@ -14,10 +14,31 @@ const WirdReminder = (() => {
     const read = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
     const write = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
     const get = () => (/^\d{2}:\d{2}$/.test(read(KEY)) ? read(KEY) : '');
+    const LAST = 'mudhakkir-wird-reminder-last'; // آخر وقت اختاره، حتى يرجع إذا طفّى التذكير ورجع شغّله
     function set(time) {
-        write(KEY, /^\d{2}:\d{2}$/.test(time || '') ? time : '');
+        const t = /^\d{2}:\d{2}$/.test(time || '') ? time : '';
+        write(KEY, t);
+        if (t) write(LAST, t);
         write(SINCE, String(Date.now()));
         if (typeof syncNotifications === 'function') syncNotifications();
+        paintRow();
+    }
+    // م٣ (الإصدار ١٥): سطر «تذكير الورد» بصفحة أذكاري (وقت + مفتاح)
+    function paintRow() {
+        const time = document.getElementById('wird-rem-time'), sw = document.getElementById('wird-rem-switch'), st = document.getElementById('wird-rem-status');
+        if (!time || !sw) return;
+        const t = get();
+        sw.checked = !!t;
+        time.value = t || read(LAST) || '20:00';
+        time.disabled = !t;
+        if (st) st.textContent = t ? 'كل يوم، بالوقت يلي جنبه' : 'مطفي. شغّله واختار الوقت';
+    }
+    function initRow() {
+        const time = document.getElementById('wird-rem-time'), sw = document.getElementById('wird-rem-switch');
+        if (!time || !sw) return;
+        sw.addEventListener('change', () => set(sw.checked ? (time.value || '20:00') : ''));
+        time.addEventListener('change', () => { if (sw.checked && /^\d{2}:\d{2}$/.test(time.value)) set(time.value); });
+        paintRow();
     }
     // بنفس شكل التذكيرات الشخصية (يقرؤه sw.js والسيرفر)
     function entries() {
@@ -28,7 +49,7 @@ const WirdReminder = (() => {
             time, repeat: 'daily', days: [], date: '', since: Number(read(SINCE)) || Date.now(), url: './?open=wird'
         }];
     }
-    return { get, set, entries };
+    return { get, set, entries, initRow };
 })();
 
 const WirdIntro = (() => {
@@ -311,7 +332,9 @@ const WirdIntro = (() => {
         }
         // من إشعار الورد: ?open=wird
         const params = new URLSearchParams(location.search);
-        if (params.get('open') === 'wird') { history.replaceState(history.state, '', location.pathname); setTimeout(() => navigateTo('quran', 'wird'), 300); }
+        if (params.get('open') === 'wird') { history.replaceState(history.state, '', location.pathname); setTimeout(() => navigateTo('quran', 'wird-now'), 300); }
+        // زر «افتح الورد» بالإشعار والتطبيق مفتوح (sw.js)
+        if (typeof SW_OK !== 'undefined' && SW_OK) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'mdk-open-wird') navigateTo('quran', 'wird-now'); });
         maybeOpen();
     }
     return { init, open, close };

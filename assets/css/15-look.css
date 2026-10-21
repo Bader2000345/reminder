@@ -1,0 +1,60 @@
+/* =====================================================================
+ * مُذكّر — 15-look.css  (الإصدار ١٥: الشكل، من «معرض تصاميم مُذكّر ٥»: ب٢ ز٣ ن٣ د١ ف٢)
+ * مبني على مهارة colour-palette: العمق من حد رفيع ١px أولًا، والظل ناعم أقل من ٨٪،
+ * وبالداكن خط ضو رفيع فوق البطاقة بدل التوهّج. ولون تفاعلي واحد (الزمرّدي).
+ *   ب٢ البطاقات هادئة · ز٣ الأزرار الثانوية تعبئة زمرّدية خفيفة · ن٣ شريط التنقّل كبسولة زمرّدية
+ *   د١ الداكن الزمرّدي الليلي (الحالي) · ف٢ خلفية الفاتح عاجي سادة
+ * آخر ملف CSS: بيعدّل فوق 01–14.
+ * ===================================================================== */
+
+/* ===== ب٢ البطاقات: حد رفيع محايد + ظل ناعم جدًا (فاتح) / خط ضو فوق (داكن) ===== */
+body:not(.dark-mode) {
+  --shadow:0 1px 3px rgba(11,66,52,.06);
+  --lift:0 2px 8px rgba(11,66,52,.07);
+  --card-line:color-mix(in srgb, #17241f 9%, transparent);
+}
+body.dark-mode {
+  --shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  --lift:inset 0 1px 0 rgba(255,255,255,.08);
+  --card-line:color-mix(in srgb, #eef2ee 11%, transparent);
+}
+:is(.category-card, .quick-card, .khatma-card, .setting-card, .progress-card, .reader-hero, .personal-reminder, .reminder-item, .adhkar-list article, .home-card:not(.dhikr-card), .smart-card, .wird-streak-bar, .search-box, .hijri-card, .notify-check, .tb-chips button) {
+  border:1px solid var(--card-line) !important;
+  box-shadow:var(--shadow) !important;
+}
+/* التأشير: الحد بيغمق شوي، بلا رفع ولا ظل كبير */
+:is(.category-card, .quick-card, .setting-card, .personal-reminder, .adhkar-list article, .smart-card):hover {
+  border-color:color-mix(in srgb, var(--olive) 30%, var(--card-line)) !important;
+  box-shadow:var(--lift) !important; transform:none !important;
+}
+
+/* ===== ز٣ الأزرار الثانوية: تعبئة زمرّدية خفيفة بلا حد (إلا يلي فوق البطاقات الغامقة) ===== */
+:is(.ghost-button, .focus-button):not(.quran-hero *):not(.inapp-reminder *):not(.hero-ghost):not(.hero-solid) {
+  background:color-mix(in srgb, var(--olive) 11%, transparent) !important;
+  color:var(--olive) !important; border-color:transparent !important; box-shadow:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+body.dark-mode :is(.ghost-button, .focus-button):not(.quran-hero *):not(.inapp-reminder *):not(.hero-ghost):not(.hero-solid) {
+  background:color-mix(in srgb, var(--olive) 20%, transparent) !important; color:var(--olive-dark) !important;
+}
+:is(.ghost-button, .focus-button):not(.quran-hero *):not(.inapp-reminder *):not(.hero-ghost):not(.hero-solid):hover {
+  background:color-mix(in srgb, var(--olive) 17%, transparent) !important;
+}
+
+/* ===== ن٣ شريط التنقّل: كبسولة زمرّدية بالوضعين، والصفحة الحالية ذهبية ===== */
+.sidebar, body:not(.dark-mode) .sidebar, html.fx-lite body:not(.dark-mode) .sidebar, html.fx-lite body.dark-mode .sidebar, html.fx-lite .sidebar {
+  background:#0b3d31 !important; border:1px solid rgba(255,255,255,.08) !important;
+  box-shadow:0 12px 26px -12px rgba(6,37,29,.55) !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+body.dark-mode .sidebar, html.fx-lite body.dark-mode .sidebar { background:#163a30 !important; box-shadow:0 12px 26px -10px rgba(0,0,0,.6) !important; }
+.side-link { color:rgba(255,255,255,.7) !important; }
+.side-link:hover { color:#fff !important; background:rgba(255,255,255,.06) !important; }
+.side-link.active, .side-link.active:hover { color:#0b3d31 !important; background:transparent !important; }
+.nav-pill { background:#f1d48a !important; box-shadow:none !important; }
+.sidebar .brand-logo { background-image:var(--logo-dark) !important; }
+.side-link:focus-visible { outline:2px solid #f1d48a; outline-offset:2px; }
+
+/* ===== ف٢ خلفية الفاتح: عاجي سادة (بلا تدرّج السماء) ===== */
+body:not(.dark-mode) .ambient { background:#f4efe4; }
+body:not(.dark-mode) { --cream:#f4efe4; }

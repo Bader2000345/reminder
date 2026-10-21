@@ -1,6 +1,6 @@
 /* =====================================================================
  * مُذكّر — theme.js
- * المظهر: فاتح / داكن / حسب الجهاز / حسب الشمس (حساب الشروق والغروب)، والانتقال الدائري.
+ * المظهر: فاتح / داكن / حسب الجهاز / حسب الشمس (حساب الشروق والغروب)، والتبديل بتلاشٍ سريع.
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
@@ -58,15 +58,18 @@ function applyTheme(origin) {
     const status = document.getElementById('theme-status'); if (status) status.textContent = themeStatusText();
     const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = dark ? '#08110e' : '#0b4234';
     if (dark === document.body.classList.contains('dark-mode')) return;
-    const flip = () => document.body.classList.toggle('dark-mode', dark);
-    // انتقال دائري ناعم من مكان الضغط
-    if (origin && document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.style.setProperty('--vt-x', origin.x + 'px');
-        document.documentElement.style.setProperty('--vt-y', origin.y + 'px');
+    const html = document.documentElement;
+    // أثناء التبديل ما في ولا انتقال لون (theme-fade بـ 14-performance.css): الألوان الجديدة بتطلع دفعة وحدة
+    const flip = () => { html.classList.add('theme-fade'); document.body.classList.toggle('dark-mode', dark); };
+    let cleared = false;
+    const done = () => { if (cleared) return; cleared = true; requestAnimationFrame(() => html.classList.remove('theme-fade')); };
+    setTimeout(done, 500); // أمان: لو المتصفح تخطّى الحركة أو علّقت، الانتقالات بترجع
+    // الإصدار ١٥: تلاشٍ سريع ٢٠٠ms (بدل الدائرة)، الشكل الجديد بيظهر فوق القديم
+    if (origin && document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches && !document.hidden) {
         const vt = document.startViewTransition(flip);
         // إن تخطّى المتصفح الحركة (تبويب مخفي مثلًا) يبقى التبديل نفسه مطبّقًا
-        vt.ready.catch(() => {}); vt.finished.catch(() => {});
-    } else flip();
+        vt.ready.catch(() => {}); vt.finished.then(done, done);
+    } else { flip(); done(); }
 }
 function setThemeMode(mode, origin) {
     themeMode = mode;

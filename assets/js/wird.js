@@ -70,16 +70,44 @@ const QuranData = (() => {
     const surahAtPage = page => SURAH_START_PAGES.reduce((found, start, i) => (start <= page ? i + 1 : found), 1);
 
     const normalize = rows => rows.map(r => ({ text: r.t, numberInSurah: r.n, juz: r.j, surah: { number: r.s, name: r.sn } }));
-    function readStored(n) {
+    // الإصدار ١٥: الصفحات المحفوظة صارت بـ Cache API بدل localStorage (المصحف كامل ما بيثقّل فتح التطبيق،
+    // و localStorage بيتحمّل كله بالذاكرة أول ما يفتح). الصفحات القديمة بتنقل لحالها أول ما تنقرا.
+    // sw.js ما بيمسح هالمخزن عند التحديث.
+    const PAGE_CACHE = 'mudhakkir-quran-v1';
+    const hasCaches = typeof caches !== 'undefined';
+    const pageUrl = n => new URL('__mdk/qp/' + n, document.baseURI).href;
+    const okRows = rows => Array.isArray(rows) && rows.length ? rows : null;
+    async function readStored(n) {
         try {
-            const rows = JSON.parse(localStorage.getItem(STORE_PREFIX + n));
-            return Array.isArray(rows) && rows.length ? rows : null;
-        } catch (e) { return null; }
+            const old = okRows(JSON.parse(localStorage.getItem(STORE_PREFIX + n)));
+            if (old) {
+                if (hasCaches && await writeStored(n, old)) { try { localStorage.removeItem(STORE_PREFIX + n); } catch (e) {} }
+                return old;
+            }
+        } catch (e) {}
+        if (!hasCaches) return null;
+        try { const r = await (await caches.open(PAGE_CACHE)).match(pageUrl(n)); return r ? okRows(await r.json()) : null; } catch (e) { return null; }
     }
-    function writeStored(n, rows) {
-        try { localStorage.setItem(STORE_PREFIX + n, JSON.stringify(rows)); } catch (e) { /* التخزين ممتلئ: نتجاوز بصمت */ }
+    async function writeStored(n, rows) {
+        if (hasCaches) {
+            try { await (await caches.open(PAGE_CACHE)).put(pageUrl(n), new Response(JSON.stringify(rows), { headers: { 'Content-Type': 'application/json' } })); return true; }
+            catch (e) { /* التخزين ممتلئ: نجرّب localStorage */ }
+        }
+        try { localStorage.setItem(STORE_PREFIX + n, JSON.stringify(rows)); return true; } catch (e) { return false; }
     }
+    // إ٣: نتأكد إنو الصفحة محفوظة بالجهاز (بلا ما نحتفظ فيها بالذاكرة) — لتنزيل المصحف كامل
+    async function ensureStored(n) {
+        n = clampPage(n);
+        if (cache.has(n) || await readStored(n)) return true;
+        return writeStored(n, await fetchRows(n));
+    }
+    // المصدر الأساسي alquran.cloud، وإذا وقف (متل ما صار بالإصدار ١٥: خطأ 503 عندهم) منجيب نفس الصفحة من Quran.com
+    // (نفس ترقيم مصحف المدينة ٦٠٤ صفحة). الصفحة بتنحفظ بالجهاز بعد أول مرة فما بتحتاج نت بعدها.
     async function fetchRows(n) {
+        try { return await fetchCloud(n); }
+        catch (e) { return await fetchQuranCom(n); }
+    }
+    async function fetchCloud(n) {
         const res = await fetch(`${API}${n}/quran-uthmani`);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const json = await res.json();
@@ -91,12 +119,25 @@ const QuranData = (() => {
             return row;
         });
     }
+    async function fetchQuranCom(n) {
+        const res = await fetch(`https://api.quran.com/api/v4/verses/by_page/${n}?fields=text_uthmani&per_page=50&words=false`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        const verses = json && json.verses;
+        if (!Array.isArray(verses) || !verses.length) throw new Error('Bad payload');
+        return verses.map(v => {
+            const [s, a] = String(v.verse_key).split(':').map(Number);
+            const row = { t: String(v.text_uthmani || '').trim(), n: a, s, j: v.juz_number };
+            if (a === 1) row.sn = 'سورة ' + (typeof SURAH_NAMES !== 'undefined' ? SURAH_NAMES[s - 1] : s);
+            return row;
+        });
+    }
     function getPage(n) {
         n = clampPage(n);
         if (cache.has(n)) return Promise.resolve(cache.get(n));
         if (!inflight.has(n)) {
             const job = (async () => {
-                let rows = readStored(n);
+                let rows = await readStored(n);
                 if (!rows) { rows = await fetchRows(n); writeStored(n, rows); }
                 const ayahs = normalize(rows);
                 cache.set(n, ayahs);
@@ -115,7 +156,7 @@ const QuranData = (() => {
         return stripMarks(words[0]) === 'بسم' ? words.slice(4).join(' ') : a.text;
     }
 
-    return { TOTAL_PAGES, BASMALA, SURAH_START_PAGES, QUARTERS, getPage, hasBasmalaHeader, verseText, pageAt, juzOfPage, hizbOfPage, quarterAt, endMark, surahStartPage, surahAtPage };
+    return { TOTAL_PAGES, BASMALA, SURAH_START_PAGES, QUARTERS, getPage, ensureStored, hasBasmalaHeader, verseText, pageAt, juzOfPage, hizbOfPage, quarterAt, endMark, surahStartPage, surahAtPage };
 })();
 
 const Wird = (() => {
@@ -363,8 +404,44 @@ const Wird = (() => {
         $('prev-verse-btn').disabled = !canGoBack();
         $('wird-page-btn').disabled = S.today.done || isComplete() || !current;
     }
+    // ق٣ (الإصدار ١٥): رأس صفحة القرآن «ختمتي»: الأجزاء الـ٣٠ كمربعات، ونص الزرّين الكبار
+    let juzCache = { key: '', cells: [] };
+    function juzCells() {
+        const key = `${S.startPage}:${S.readCount}`;
+        if (juzCache.key === key) return juzCache.cells;
+        const size = Array(31).fill(0), read = Array(31).fill(0);
+        for (let p = 1; p <= TOTAL; p++) size[QuranData.juzOfPage(p)]++;
+        const n = Math.min(S.readCount, TOTAL);
+        for (let c = 0; c < n; c++) read[QuranData.juzOfPage(pageNo(c))]++;
+        juzCache = { key, cells: size.slice(1).map((s, i) => (s ? read[i + 1] / s : 0)) };
+        return juzCache.cells;
+    }
+    function renderTop() {
+        const grid = $('juz-grid'); if (!grid) return;
+        const pct = Math.round(khatmaFraction() * 100);
+        const nowJuz = isComplete() ? 30 : QuranData.juzOfPage(pageNo(S.readCount));
+        $('kt-juz').textContent = fmt(nowJuz);
+        $('kt-pct').textContent = `${fmt(pct)}٪ من الختمة`;
+        const cells = juzCells();
+        if (grid.children.length !== 30) grid.replaceChildren(...cells.map(() => document.createElement('i')));
+        cells.forEach((f, i) => {
+            const el = grid.children[i];
+            el.className = f >= 1 ? 'done' : (!isComplete() && i + 1 === nowJuz) ? 'now' : f > 0 ? 'part' : '';
+        });
+        const r = rangeInfo(), { dayN, totalDays } = planDays(), t = S.today;
+        const range = r.from === r.to ? `الصفحة ${fmt(r.from)}` : `الصفحات ${fmt(r.from)}–${fmt(r.to)}`;
+        $('kt-today').textContent = isComplete() ? 'أتممت الختمة، تقبّل الله منك'
+            : t.done ? `أتممت ورد اليوم ✓ · ${range}` : `ورد اليوم: ${range} · ${fmt(Math.round(todayFraction() * 100))}٪`;
+        const lead = $('quran-lead');
+        if (lead) lead.textContent = isComplete() ? `ختمات مكتملة: ${fmt(S.khatmas)}` : `اليوم ${fmt(dayN)} من ${fmt(totalDays)} بخطّتك`;
+        const sub = $('q-continue-sub');
+        if (sub) sub.textContent = isComplete() ? 'ابدأ ختمة جديدة' : t.done ? 'أتممت وردك اليوم ✓' : `${fmt(Math.max(0, S.readCount - t.fromCount))} من ${fmt(t.pages)} صفحة`;
+        const plan = $('q-plan-sub');
+        if (plan) plan.textContent = S.mode === 'sahaba' ? 'تحزيب الصحابة · حزب كل يوم'
+            : S.mode === 'daily' ? `${fmt(S.pagesPerDay)} صفحة كل يوم` : `ختمة خلال ${daysLabel(S.days)}`;
+    }
     function renderAll() {
-        renderHeader(); renderProgress(); renderKhatma(); renderStreak(); renderDashboard(); renderBanner(); renderControls();
+        renderHeader(); renderProgress(); renderKhatma(); renderStreak(); renderDashboard(); renderBanner(); renderControls(); renderTop();
     }
 
     function showLoadError() {
@@ -628,6 +705,14 @@ const Wird = (() => {
         $('wird-reader-btn').addEventListener('click', () => Reader.openAt(readerStartPage()));
         $('wird-edit-btn').addEventListener('click', () => openPlanModal());
         $('wird-new-khatma').addEventListener('click', () => openPlanModal(true));
+        // ق٣: «تابع الورد» بينزل لبطاقة الآية، و«خطة الختمة» بتفتح تعديل الورد
+        $('q-continue')?.addEventListener('click', () => {
+            if (isComplete()) { openPlanModal(true); return; }
+            const card = document.querySelector('#quran-wird .single-verse-display');
+            card?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            setTimeout(() => $('next-verse-btn')?.focus({ preventScroll: true }), 400);
+        });
+        $('q-plan')?.addEventListener('click', () => openPlanModal());
         // وضع التركيز: ملء الشاشة، وزر الإغلاق يظهر بضغطة على الشاشة
         const focusRoot = $('wird-focus');
         // الشاشة ما بتطفي طول ما وضع التركيز مفتوح (KeepAwake بـ core.js)

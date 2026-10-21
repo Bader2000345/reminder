@@ -396,6 +396,8 @@ const QuranMarks = (() => {
 const QuranSearch = (() => {
     const API = 'https://api.alquran.cloud/v1/';
     const strip = s => (typeof Knowledge !== 'undefined' ? Knowledge.norm(s) : String(s)).trim();
+    // «نتيجة واحدة، نتيجتان، ٣ نتائج، ١١ نتيجة» + (أول ٦٠) إذا أكتر
+    const countLabel = n => (n === 1 ? 'نتيجة واحدة' : n === 2 ? 'نتيجتان' : n <= 10 ? `${qAr(n)} نتائج` : `${qAr(n)} نتيجة`) + (n > 60 ? ' (أول ٦٠)' : '');
     function view(onGo) {
         const box = qEl('div', 'qs-view');
         const form = qEl('form', 'qs-form');
@@ -405,17 +407,41 @@ const QuranSearch = (() => {
         const info = qEl('p', 'qs-info', 'مثال: الصبر، رحمة الله، إن مع العسر يسرا');
         const results = qEl('div', 'qs-results');
         let token = 0;
+        // إ٤ (الإصدار ١٥): البحث محلي من نص القرآن المحفوظ بالجهاز (offline.js)، أول مرة بينزل النص (~٤٠٠ كيلو)
+        async function runLocal(q, my) {
+            if (typeof QuranIndex === 'undefined') return false;
+            const ready = await QuranIndex.has();
+            if (!ready && !navigator.onLine) return false;
+            if (!ready) info.textContent = 'جارٍ تجهيز البحث أول مرة (بيشتغل بعدها بلا نت)…';
+            let r;
+            try { r = await QuranIndex.search(q, 60); } catch (e) { return false; }
+            if (my !== token) return true;
+            info.textContent = r.count ? countLabel(r.count) : 'لا توجد نتائج. جرّب كلمة أخرى أو اكتبها دون تشكيل.';
+            r.items.forEach(m => {
+                const b = qEl('button', 'qs-item'); b.type = 'button';
+                const at = QuranIndex.locate(m.t, r.qn);
+                const snippet = at ? qEsc(m.t.slice(0, at[0])) + `<mark>${qEsc(m.t.slice(at[0], at[1]))}</mark>` + qEsc(m.t.slice(at[1])) : qEsc(m.t);
+                b.innerHTML = `<small>${qEsc(ayahRef(m.s, m.a))}</small><span>${snippet}</span>`;
+                b.addEventListener('click', () => { QSheet.close(); onGo(QuranIndex.pageOf(m.s, m.a), `${m.s}:${m.a}`); });
+                results.append(b);
+            });
+            return true;
+        }
         async function run() {
             const q = strip(input.value);
             if (q.length < 2) { info.textContent = 'اكتب حرفين على الأقل.'; return; }
             const my = ++token;
             info.textContent = 'جارٍ البحث…'; results.replaceChildren();
+            if (await runLocal(input.value, my)) return;
+            if (my !== token) return;
             try {
                 const res = await fetch(`${API}search/${encodeURIComponent(q)}/all/quran-simple-clean`);
                 const j = res.ok ? await res.json() : null;
                 if (my !== token) return;
+                // خدمة البحث نفسها متوقفة (مو النت): رسالة واضحة بدل «لا توجد نتائج»
+                if (!res.ok && res.status >= 500) { info.textContent = 'خدمة البحث متوقفة مؤقتًا من مصدرها، حاول بعد قليل.'; return; }
                 const matches = (j && j.data && j.data.matches) || [];
-                info.textContent = matches.length ? `${qAr(j.data.count)} نتيجة${j.data.count > 60 ? ' (أول ٦٠)' : ''}` : 'لا توجد نتائج. جرّب كلمة أخرى أو اكتبها دون تشكيل.';
+                info.textContent = matches.length ? countLabel(j.data.count) : 'لا توجد نتائج. جرّب كلمة أخرى أو اكتبها دون تشكيل.';
                 // مطابقة حرفًا بحرف للإبراز (إن = ان، ى = ي، ة = ه) دون تغيير طول النص
                 const flat = s => s.replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
                 matches.slice(0, 60).forEach(m => {
@@ -425,10 +451,15 @@ const QuranSearch = (() => {
                     b.innerHTML = `<small>${qEsc(ayahRef(m.surah.number, m.numberInSurah))}</small><span>${snippet}</span>`;
                     b.addEventListener('click', async () => {
                         b.disabled = true;
-                        try {
-                            const r = await (await fetch(`${API}ayah/${m.number}`)).json();
-                            QSheet.close(); onGo(r.data.page, `${m.surah.number}:${m.numberInSurah}`);
-                        } catch (e) { b.disabled = false; Toast.show('تعذّر فتح الآية، حاول مرة أخرى'); }
+                        const key = `${m.surah.number}:${m.numberInSurah}`;
+                        // رقم صفحة الآية: من alquran.cloud، وإن تعذّر فمن Quran.com
+                        const pageOf = async () => {
+                            try { const r = await fetch(`${API}ayah/${m.number}`); if (r.ok) return (await r.json()).data.page; } catch (e) {}
+                            const r2 = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?fields=page_number&words=false`);
+                            return (await r2.json()).verse.page_number;
+                        };
+                        try { const page = await pageOf(); QSheet.close(); onGo(page, key); }
+                        catch (e) { b.disabled = false; Toast.show('تعذّر فتح الآية، حاول مرة أخرى'); }
                     });
                     results.append(b);
                 });

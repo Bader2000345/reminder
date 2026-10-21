@@ -1,6 +1,7 @@
 /* =====================================================================
  * مُذكّر — reminders.js
- * أذكاري: التذكيرات الشخصية (يومي / أيام محددة / مرة واحدة)، البطاقات، ونموذج الإضافة والتعديل.
+ * أذكاري: التذكيرات الشخصية (يومي / أيام محددة / مرة واحدة)، البطاقات، ونموذج الإضافة والتعديل،
+ * و«جاهزة بضغطة» (إ١، الإصدار ١٥).
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
@@ -87,6 +88,50 @@ const Reminders = (() => {
             box.insertBefore(card, $('rem-empty'));
         });
         $('rem-empty').style.display = list.length ? 'none' : 'block';
+        renderTemplates();
+        // سطر الوصف تحت العنوان: كم تذكير شغّال (الشخصية + الجمعة + الورد + الأذكار العامة)
+        const lead = $('mine-lead');
+        if (lead) {
+            const n = allReminders().filter(r => r.on).length + (GeneralReminder.isActive() ? 1 : 0);
+            const AR = Number(n).toLocaleString('ar-EG');
+            lead.textContent = !n ? 'تذكيراتك، تصلك في وقتها' : n === 1 ? 'تذكير واحد مفعّل' : n === 2 ? 'تذكيران مفعّلان'
+                : n <= 10 ? `${AR} تذكيرات مفعّلة` : `${AR} تذكيرًا مفعّلًا`;
+        }
+    }
+
+    // ---------- إ١ (الإصدار ١٥): تذكيرات جاهزة بضغطة ----------
+    // يلي بتضيفه بيختفي من هون (منعرفه بـ tpl)، وبتقدر تعدّله أو تحذفه متل أي تذكير
+    const TEMPLATES = [
+        { tpl: 'morning', title: 'أذكار الصباح', text: 'حان وقت أذكار الصباح، ابدأ يومك بذكر الله.', time: '06:00', repeat: 'daily' },
+        { tpl: 'evening', title: 'أذكار المساء', text: 'حان وقت أذكار المساء، اختم نهارك بذكر الله.', time: '17:00', repeat: 'daily' },
+        { tpl: 'mulk', title: 'سورة الملك', text: 'اقرأ سورة الملك قبل ما تنام.', time: '22:00', repeat: 'daily' },
+        { tpl: 'sleep', title: 'أذكار النوم', text: 'قبل ما تنام: آية الكرسي والمعوّذات وأذكار النوم.', time: '23:00', repeat: 'daily' },
+        { tpl: 'salat-friday', title: 'الصلاة على النبي ﷺ', text: 'يوم الجمعة: أكثر من الصلاة على النبي ﷺ. اللهم صلِّ وسلّم على نبينا محمد.', time: '12:00', repeat: 'days', days: [5] },
+        { tpl: 'fast', title: 'صيام الاثنين والخميس', text: 'بكرا يوم صيام سنّة، انوِ الصيام من الليلة إن استطعت.', time: '21:00', repeat: 'days', days: [0, 3] }
+    ];
+    function renderTemplates() {
+        const box = $('rem-templates'); if (!box) return;
+        const taken = new Set(list.map(r => r.tpl).filter(Boolean));
+        const free = TEMPLATES.filter(t => !taken.has(t.tpl));
+        box.replaceChildren(...free.map(t => {
+            const b = el('button', 'glist-row tpl-row'); b.type = 'button';
+            const copy = el('span', 'tpl-copy');
+            copy.append(el('strong', '', t.title), el('small', '', scheduleText({ ...t, days: t.days || [] })));
+            b.append(copy, el('span', 'tpl-add', 'إضافة'));
+            b.setAttribute('aria-label', `إضافة تذكير ${t.title}، ${scheduleText({ ...t, days: t.days || [] })}`);
+            b.addEventListener('click', () => addPreset(t));
+            return b;
+        }));
+        if (!free.length) box.append(el('p', 'empty-note', 'أضفت كل التذكيرات الجاهزة ✓ وبتقدر تعدّلها من فوق.'));
+    }
+    async function addPreset(t) {
+        if (list.some(r => r.tpl === t.tpl)) return;
+        list.push({ id: Date.now(), title: t.title, text: t.text, time: t.time, repeat: t.repeat, days: t.days || [], date: '', preset: t.time, on: true, since: Date.now(), tpl: t.tpl });
+        persist();
+        await Notifier.ensurePermission();
+        render();
+        syncNotifications();
+        Toast.show(`انضاف «${t.title}»، بيوصلك ${scheduleText({ ...t, days: t.days || [] })}`);
     }
 
     // ---------- نموذج الإضافة والتعديل ----------
@@ -200,5 +245,5 @@ const Reminders = (() => {
         render();
         tick();
     }
-    return { init, render, list: () => list, openForm };
+    return { init, render, list: () => list, openForm, addPreset, TEMPLATES };
 })();

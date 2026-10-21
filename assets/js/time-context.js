@@ -27,6 +27,23 @@ const TimeContext = (() => {
         const icon = document.getElementById('smart-icon'); if (icon) icon.innerHTML = s.icon;
         const action = document.getElementById('smart-action');
         if (action) action.innerHTML = `فتح ${s.title} <span>←</span>`;
+        orderShelf(now.getHours());
+    }
+    // ذ٣ (الإصدار ١٥): رفّ «حسب وقتك» بالأذكار: يلي وقتها هلّق أول وحدة وعليها «الآن»، والباقي بترتيب اليوم
+    const DAY_ORDER = ['wake', 'morning', 'evening', 'sleep'];
+    let shelfFor = '';
+    function orderShelf(h) {
+        const shelf = document.getElementById('time-shelf'); if (!shelf) return;
+        const now = h >= 4 && h < 6 ? 'wake' : slotFor(h);
+        if (shelfFor === now) return;
+        shelfFor = now;
+        const i = DAY_ORDER.indexOf(now), order = [...DAY_ORDER.slice(i), ...DAY_ORDER.slice(0, i)];
+        order.forEach(k => {
+            const card = shelf.querySelector(`[data-slot="${k}"]`); if (!card) return;
+            shelf.append(card);
+            card.classList.toggle('is-now', k === now);
+            if (k === now) card.setAttribute('aria-current', 'time'); else card.removeAttribute('aria-current');
+        });
     }
     function init() {
         const action = document.getElementById('smart-action');
@@ -100,7 +117,7 @@ const FridayReminder = (() => {
         if (card) card.hidden = !(isOn() && isFriday());
     }
     function openKahf() {
-        navigateTo('free-reading');
+        navigateTo('quran');
         if (typeof Reader !== 'undefined' && Reader.openAt) Reader.openAt(KAHF_PAGE, '18:1', true);
     }
     function init() {
