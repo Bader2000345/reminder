@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="assets/css/14-performance.css">
     <link rel="stylesheet" href="assets/css/15-look.css">
     <link rel="stylesheet" href="assets/css/16-layout.css">
+    <link rel="stylesheet" href="assets/css/17-mushaf.css">
 </head>
 <body>
 
@@ -692,7 +693,12 @@
     <div class="rd-layout" id="rd-layout">
         <div class="lay-row">
             <span class="lay-label">العرض</span>
-            <div class="segmented" id="reader-mode"><button type="button" data-mode="text">قرآني (نصي)</button><button type="button" data-mode="image">مصوّر</button></div>
+            <div class="segmented" id="reader-mode"><button type="button" data-mode="mushaf">مصحف المدينة</button><button type="button" data-mode="text">نصي</button><button type="button" data-mode="image">مصوّر</button></div>
+        </div>
+        <!-- الإصدار ١٥: صفحة وحدة أو صفحتين متقابلتين متل المصحف المفتوح (reader.js) -->
+        <div class="lay-row">
+            <span class="lay-label">الصفحات<small>تلقائي: صفحتين عالشاشة العريضة</small></span>
+            <div class="segmented" id="reader-spread"><button type="button" data-spread="auto">تلقائي</button><button type="button" data-spread="one">صفحة</button><button type="button" data-spread="two">صفحتين</button></div>
         </div>
         <div class="lay-text-only" id="lay-text-only">
             <div class="lay-preview" id="lay-preview" aria-hidden="true"></div>
@@ -815,6 +821,7 @@
 <script src="assets/js/wird-intro.js" defer></script>
 <script src="assets/js/quran-tools.js" defer></script>
 <script src="assets/js/offline.js" defer></script>
+<script src="assets/js/mushaf.js" defer></script>
 <script src="assets/js/reader.js" defer></script>
 <script src="assets/js/notifications.js" defer></script>
 <script src="assets/js/reminders.js" defer></script>

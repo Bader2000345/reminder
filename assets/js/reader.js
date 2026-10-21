@@ -1,8 +1,9 @@
 /* =====================================================================
  * مُذكّر — reader.js
- * القراءة الحرة بملء الشاشة (الإصدار ١٤: ص٣ ع١ ط٣ ش٢ ل١ إ٢ إ٣ إ٩):
+ * القراءة الحرة بملء الشاشة (الإصدار ١٤: ص٣ ع١ ط٣ ش٢ ل١ إ٢ إ٣ إ٩ — والإصدار ١٥: مصحف المدينة وصفحتين):
  *   - فوق: إغلاق، البحث، العلامات، و«تنسيق المصحف»
- *     (العرض قرآني/مصوّر، الخط، حجم الخط، ألوان التجويد — في القرآني فقط — والمظهر والإضاءة الدافئة)
+ *     (العرض: مصحف المدينة (mushaf.js، متل الطبعة) / نصي / مصوّر، الصفحات: تلقائي / صفحة / صفحتين،
+ *      الخط وحجمه وألوان التجويد — في النصي فقط — والمظهر والإضاءة الدافئة)
  *   - تحت: شريط عائم واحد للتقليب، ورقم الصفحة بيفتح «الانتقال» (السور، الأجزاء، الأحزاب وأرباعها)
  *   - الصفحة ورقة مصحف مزخرفة: اسم السورة والجزء والحزب فوق، «۞» عند كل ربع، و«۝» برقم الآية والصفحة
  *   - النص يُرسم آية آية: الضغط المطوّل على آية يفتح أدواتها (التفسير، النسخ، المشاركة، العلامات…)
@@ -14,8 +15,12 @@
 const Reader = (() => {
     const $ = id => document.getElementById(id);
     const KEY = 'mudhakkir-reader', TOTAL = 604;
-    const st = { page: 1, mode: 'text', theme: 'auto', size: 30, font: 'amiri', tajweed: false, warm: 'auto' };
+    const st = { page: 1, mode: 'mushaf', spread: 'auto', theme: 'auto', size: 30, font: 'amiri', tajweed: false, warm: 'auto' };
     try { Object.assign(st, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+    // الإصدار ١٥: العرض الأساسي صار «مصحف المدينة» (متل الطبعة). يلي كان على النصي بينقل له مرة وحدة، وبيقدر يرجع من «تنسيق المصحف»
+    if (st.v !== 16) { if (st.mode === 'text') st.mode = 'mushaf'; st.v = 16; }
+    if (!['mushaf', 'text', 'image'].includes(st.mode)) st.mode = 'mushaf';
+    if (!['auto', 'one', 'two'].includes(st.spread)) st.spread = 'auto';
     const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
     const root = $('reader'), stage = $('reader-stage');
     const ar = n => Number(n).toLocaleString('ar-EG');
@@ -36,10 +41,10 @@ const Reader = (() => {
         save();
         $('rd-size-val').textContent = st.size.toLocaleString('ar-EG');
         paintPreview();
-        const box = stage.querySelector('.rd-text');
-        if (!box) return;
+        const boxes = stage.querySelectorAll('.rd-text');
+        if (!boxes.length) return;
         const ratio = stage.scrollHeight > stage.clientHeight ? stage.scrollTop / (stage.scrollHeight - stage.clientHeight) : 0;
-        box.style.fontSize = st.size + 'px';
+        boxes.forEach(box => { box.style.fontSize = st.size + 'px'; });
         stage.scrollTop = ratio * (stage.scrollHeight - stage.clientHeight);
         fitSoon();
     }
@@ -47,8 +52,11 @@ const Reader = (() => {
     // ضبط السطور متل المصحف: النص مضبوط من الطرفين، وأي سطر بيطلع فيه فراغ أكبر من ضعف المسافة العادية
     // بنحطّ بآخره فاصل سطر، فبيصطف لليمين بدل ما تتمدد الفراغات. بينعاد مع كل تغيير بالحجم أو العرض أو الخط.
     function fitLines() {
-        const box = stage.querySelector('.rd-text:not(.rd-skeleton)');
-        if (!box || root.hidden) return;
+        if (root.hidden) return;
+        if (st.mode === 'mushaf') return fitMushaf();
+        stage.querySelectorAll('.rd-text:not(.rd-skeleton)').forEach(fitBox);
+    }
+    function fitBox(box) {
         box.querySelectorAll('br.jbr').forEach(b => { const p = b.parentNode; b.remove(); p.normalize(); });
         const fs = parseFloat(getComputedStyle(box).fontSize), limit = fs * .62, r = document.createRange();
         box.querySelectorAll('p').forEach(p => {
@@ -77,6 +85,37 @@ const Reader = (() => {
     let fitTimer = 0;
     const fitSoon = (ms = 120) => { clearTimeout(fitTimer); fitTimer = setTimeout(fitLines, ms); };
 
+    // ---------- الإصدار ١٥: صفحة وحدة أو صفحتين متقابلتين متل المصحف المفتوح ----------
+    // «تلقائي»: صفحتين لما الشاشة عريضة (كمبيوتر، تابلت بالعرض)، وصفحة وحدة عالجوال
+    const isSpread = () => st.spread === 'two' || (st.spread === 'auto' && stage.clientWidth >= 900 && stage.clientWidth > stage.clientHeight * 1.2);
+    // الصفحة الفردية يمين والزوجية شمال (متل المصحف: ١ و٢ متقابلتين)
+    function spreadOf(n) {
+        if (!isSpread()) return [n];
+        const a = n % 2 ? n : n - 1;
+        return a + 1 <= TOTAL ? [a, a + 1] : [a];
+    }
+    let shownSpread = [1];
+    // المساحة المتاحة لكل صفحة من صفحات المصحف
+    function pageBox(count) {
+        const cs = getComputedStyle(stage);
+        const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const h = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        const gap = count > 1 ? Math.min(24, w * .02) : 0;
+        return { w: (w - gap) / count, h };
+    }
+    function fitMushaf() {
+        const cards = [...stage.querySelectorAll('.qp:not(.qp-skeleton)')];
+        if (!cards.length) return;
+        // صفحتين: نفس الحجم للتنتين (الأصغر) حتى يبينوا متل كتاب مفتوح
+        const box = pageBox(cards.length);
+        const sizes = cards.map(c => Mushaf.fit(c, box));
+        if (cards.length > 1) {
+            const fs = Math.min(...sizes); cards.forEach(c => Mushaf.fit(c, box, fs));
+            const w = Math.max(...cards.map(c => parseFloat(c.style.width) || 0)); // نفس العرض للصفحتين
+            cards.forEach(c => { c.style.width = w + 'px'; });
+        }
+    }
+
     function paintPreview() {
         const p = $('lay-preview'); if (!p) return;
         p.dataset.font = st.font;
@@ -95,30 +134,38 @@ const Reader = (() => {
         document.querySelectorAll('[data-rt]').forEach(b => b.classList.toggle('active', b.dataset.rt === st.theme));
         document.querySelectorAll('#reader-mode [data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === st.mode));
         document.querySelectorAll('#reader-font [data-font]').forEach(b => b.classList.toggle('active', b.dataset.font === st.font));
-        // الخط وحجمه والتجويد تظهر في العرض القرآني فقط
+        document.querySelectorAll('#reader-spread [data-spread]').forEach(b => b.classList.toggle('active', b.dataset.spread === st.spread));
+        // الخط وحجمه والتجويد تظهر في العرض النصي فقط
         $('lay-text-only').hidden = st.mode !== 'text';
         $('lay-image-note').hidden = st.mode === 'text';
+        const note = $('lay-image-note');
+        if (note) note.textContent = st.mode === 'mushaf'
+            ? 'مصحف المدينة: الصفحة متل الطبعة بالضبط وبتاخد حجمها من الشاشة. الخط وحجمه وألوان التجويد بالعرض النصي.'
+            : 'الخط وحجمه وألوان التجويد متاحة في العرض النصي.';
         $('rd-tajweed').checked = !!st.tajweed;
         paintPreview();
     }
 
     const getPage = n => QuranData.getPage(n);
 
-    // شكل الآيات المعلَّمة (علامة، تمييز، ملاحظة)
+    // شكل الآيات المعلَّمة (علامة، تمييز، ملاحظة) — بالنصي الآية عنصر واحد، وبمصحف المدينة كل كلمة لحالها
     function paintMarks() {
-        stage.querySelectorAll('.ayah').forEach(sp => {
-            const k = sp.dataset.k, c = AyahStore.color(k);
-            sp.classList.toggle('is-bm', AyahStore.isBookmarked(k));
-            sp.classList.toggle('has-note', !!AyahStore.note(k));
-            ['gold', 'green', 'blue', 'rose'].forEach(x => sp.classList.toggle('hl-' + x, c === x));
+        const memo = new Map();
+        stage.querySelectorAll('.ayah, .qw').forEach(sp => {
+            const k = sp.dataset.k;
+            if (!memo.has(k)) memo.set(k, { c: AyahStore.color(k), bm: AyahStore.isBookmarked(k), note: !!AyahStore.note(k) });
+            const m = memo.get(k);
+            sp.classList.toggle('is-bm', m.bm);
+            sp.classList.toggle('has-note', m.note);
+            ['gold', 'green', 'blue', 'rose'].forEach(x => sp.classList.toggle('hl-' + x, m.c === x));
         });
     }
     function flash(key) {
-        const sp = stage.querySelector(`.ayah[data-k="${key}"]`);
-        if (!sp) return;
-        sp.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-        sp.classList.add('is-flash');
-        setTimeout(() => sp.classList.remove('is-flash'), 2800);
+        const all = stage.querySelectorAll(`.ayah[data-k="${key}"], .qw[data-k="${key}"]`);
+        if (!all.length) return;
+        all[0].scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        all.forEach(sp => sp.classList.add('is-flash'));
+        setTimeout(() => all.forEach(sp => sp.classList.remove('is-flash')), 2800);
     }
 
     // ل١: الصفحة الجديدة بتدخل من جهة التقليب (التالية من الشمال، السابقة من اليمين)
@@ -126,42 +173,102 @@ const Reader = (() => {
         const d = turnDir; turnDir = 0;
         if (!d || reduceMotion.matches) return;
         node.classList.add(d > 0 ? 'turn-next' : 'turn-prev');
-        node.addEventListener('animationend', () => node.classList.remove('turn-next', 'turn-prev'), { once: true });
+        // بس حركة الغلاف نفسه (مو حركات الكلمات جوّاه)، ومع احتياط إذا ما وصل animationend (نافذة مخفية مثلًا)
+        const done = () => { clearTimeout(t); node.classList.remove('turn-next', 'turn-prev'); node.removeEventListener('animationend', end); };
+        const end = e => { if (e.target === node) done(); };
+        const t = setTimeout(done, 600);
+        node.addEventListener('animationend', end);
     }
-    // الشريط العائم: رقم الصفحة، والسورة والجزء
-    function paintBar(n, ayahs) {
-        $('rd-page-no').textContent = ar(n);
+    // الشريط العائم: رقم الصفحة (أو الصفحتين)، والسورة والجزء
+    function paintBar(pages, ayahs) {
+        const n = pages[0];
+        $('rd-page-no').textContent = pages.map(ar).join('–');
         const s = ayahs ? ayahs[0].surah.number : QuranData.surahAtPage(n);
         $('rd-where').textContent = `${surahName(s)} · الجزء ${ar(QuranData.juzOfPage(n))}`;
     }
 
+    // الصفحة (أو الصفحتين) داخل غلاف واحد بيتحرّك مع التقليب
+    function show(nodes, pages) {
+        const wrap = el('div', 'rd-spread' + (pages.length > 1 ? ' is-two' : ''));
+        wrap.append(...nodes);
+        stage.replaceChildren(wrap);
+        stage.dataset.mode = st.mode;
+        animateTurn(wrap);
+        return wrap;
+    }
+    // هيكل تحميل بشكل الصفحة بدل نص «جارٍ التحميل»
+    function skeleton(pages) {
+        show(pages.map(() => {
+            const sk = el('div', st.mode === 'mushaf' ? 'qp qp-skeleton' : 'rd-text rd-skeleton'); sk.setAttribute('aria-label', 'جارٍ تحميل الصفحة');
+            for (let i = 0; i < (st.mode === 'mushaf' ? 15 : 11); i++) sk.append(el('i', 'sk-line'));
+            return sk;
+        }), pages);
+    }
+
     async function render() {
-        const my = ++token, n = st.page;
-        paintBar(n);
+        const my = ++token, pages = spreadOf(st.page);
+        shownSpread = pages;
+        paintBar(pages);
         stage.scrollTop = 0;
         current = null;
         if (st.mode === 'image') {
-            const img = el('img', 'rd-img'); img.alt = 'صفحة ' + n; img.src = CDN(n);
-            const sheet = el('div', 'rd-sheet'); sheet.append(img);
-            img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = RAW(n); } };
-            stage.replaceChildren(sheet);
-            animateTurn(sheet);
-            if (n < TOTAL) new Image().src = CDN(n + 1);
+            show(pages.map(n => {
+                const img = el('img', 'rd-img'); img.alt = 'صفحة ' + n; img.src = CDN(n);
+                const sheet = el('div', 'rd-sheet'); sheet.dataset.page = n; sheet.append(img);
+                img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = RAW(n); } };
+                return sheet;
+            }), pages);
+            const next = pages[pages.length - 1] + 1;
+            if (next <= TOTAL) new Image().src = CDN(next);
             return;
         }
-        // هيكل تحميل بشكل الصفحة بدل نص «جارٍ التحميل»
-        const sk = el('div', 'rd-text rd-skeleton'); sk.setAttribute('aria-label', 'جارٍ تحميل الصفحة');
-        for (let i = 0; i < 11; i++) sk.append(el('i', 'sk-line'));
-        stage.replaceChildren(sk);
-        let ayahs, tj = null;
+        // الهيكل بيطلع بس إذا التحميل طوّل (الصفحة المحفوظة بتطلع فورًا بلا ومضة)
+        const dir = turnDir; turnDir = 0;
+        const skTimer = setTimeout(() => { if (my === token) skeleton(pages); }, 140);
+        const ready = () => { clearTimeout(skTimer); turnDir = dir; };
+        if (st.mode === 'mushaf') {
+            // مصحف المدينة؛ إذا ما قدر يحمّل (أول مرة بلا نت) منعرض النص بداله
+            try {
+                const cards = await Promise.all(pages.map(p => Mushaf.page(p)));
+                if (my !== token) return;
+                ready();
+                show(cards, pages);
+                fitMushaf();
+                current = { n: pages[0], pages };
+                afterRender(pages, my);
+                return;
+            } catch (e) {
+                if (my !== token) return;
+                Toast.show('مصحف المدينة بدّه نت أول مرة لهالصفحة، عرضنالك النص');
+            }
+        }
+        let data;
         try {
-            [ayahs, tj] = await Promise.all([getPage(n), st.tajweed ? Tajweed.getPage(n).catch(() => null) : null]);
-        } catch (e) { if (my === token) stage.replaceChildren(msg('تعذر تحميل الصفحة. تحقق من الاتصال بالإنترنت.')); return; }
+            data = await Promise.all(pages.map(n => Promise.all([getPage(n), st.tajweed ? Tajweed.getPage(n).catch(() => null) : null])));
+        } catch (e) { if (my === token) { clearTimeout(skTimer); stage.replaceChildren(msg('تعذر تحميل الصفحة. تحقق من الاتصال بالإنترنت.')); } return; }
         if (my !== token) return;
-        if (st.tajweed && !tj) Toast.show('تعذّر تحميل ألوان التجويد لهذه الصفحة');
-        // ط٣: ورقة مصحف مزخرفة؛ فوقها اسم السورة والجزء والحزب، وتحتها رقم الصفحة بعلامة «۝»
+        if (st.tajweed && data.some(([, tj]) => !tj)) Toast.show('تعذّر تحميل ألوان التجويد لهذه الصفحة');
+        ready();
+        show(data.map(([ayahs, tj], i) => textPage(pages[i], ayahs, tj)), pages);
+        current = { n: pages[0], pages, ayahs: data[0][0] };
+        paintBar(pages, data[0][0]);
+        fitLines();
+        afterRender(pages, my);
+    }
+    function afterRender(pages, my) {
+        paintMarks();
+        if (pendingFlash) { const k = pendingFlash; pendingFlash = null; requestAnimationFrame(() => flash(k)); setTimeout(() => flash(k), 120); }
+        const next = pages[pages.length - 1] + 1;
+        if (next <= TOTAL) {
+            if (st.mode === 'mushaf') { Mushaf.prefetch(next); if (pages.length > 1) Mushaf.prefetch(next + 1); }
+            else getPage(next).catch(() => {});
+        }
+    }
+
+    // ط٣: ورقة مصحف مزخرفة (العرض النصي)؛ فوقها اسم السورة والجزء والحزب، وتحتها رقم الصفحة بعلامة «۝»
+    function textPage(n, ayahs, tj) {
         const box = el('div', 'rd-text'); box.style.fontSize = st.size + 'px';
-        box.dataset.font = st.font;
+        box.dataset.font = st.font; box.dataset.page = n;
         box.classList.toggle('has-tajweed', !!tj);
         const head = el('div', 'rd-head'); head.setAttribute('aria-hidden', 'true');
         head.append(el('span', '', 'سورة ' + surahName(ayahs[0].surah.number)), el('span', '', `الجزء ${ar(QuranData.juzOfPage(n))} · الحزب ${ar(QuranData.hizbOfPage(n))}`));
@@ -195,27 +302,25 @@ const Reader = (() => {
         });
         const foot = el('div', 'rd-foot'); foot.append(el('span', 'rd-pno', QuranData.endMark(n))); foot.setAttribute('aria-label', 'صفحة ' + ar(n));
         box.append(foot);
-        stage.replaceChildren(box);
-        current = { n, ayahs };
-        paintBar(n, ayahs);
-        fitLines();
-        paintMarks();
-        animateTurn(box);
-        if (pendingFlash) { const k = pendingFlash; pendingFlash = null; requestAnimationFrame(() => flash(k)); setTimeout(() => flash(k), 120); }
-        if (n < TOTAL) getPage(n + 1).catch(() => {});
+        return box;
     }
 
     let advanceHook = null;
     function goTo(n, sequential = false, flashKey = null) {
-        const prev = st.page;
+        const prev = shownSpread;
         n = Math.max(1, Math.min(TOTAL, parseInt(n, 10) || 1));
-        turnDir = Math.sign(n - prev);
+        turnDir = Math.sign(n - st.page);
         pendingFlash = flashKey;
-        if (flashKey && st.mode !== 'text') { st.mode = 'text'; applyTheme(); } // الإضاءة تحتاج العرض القرآني
-        if (n === prev && flashKey && current && current.n === n) { st.page = n; pendingFlash = null; flash(flashKey); return; }
+        if (flashKey && st.mode === 'image') { st.mode = 'mushaf'; applyTheme(); } // الإضاءة تحتاج نص (مصحف المدينة أو النصي)
+        // الصفحة المطلوبة معروضة أصلًا (صفحة أو ضمن الصفحتين): منضوّي الآية بس
+        if (flashKey && current && prev.includes(n) && st.mode !== 'image') { st.page = n; save(); pendingFlash = null; flash(flashKey); return; }
         st.page = n; save(); render(); updateResume();
-        if (sequential && n === prev + 1 && advanceHook) advanceHook(prev);
+        // تقدّم الورد: كل صفحة قرأها قبل ما يقلّب للي بعدها
+        if (sequential && advanceHook && n === prev[prev.length - 1] + 1) prev.forEach(p => advanceHook(p));
     }
+    // التالي/السابق: صفحة، أو صفحتين بالمصحف المفتوح
+    const nextPage = () => { const n = shownSpread[shownSpread.length - 1] + 1; if (n <= TOTAL) goTo(n, true); };
+    const prevPage = () => { const n = shownSpread[0] - 1; if (n >= 1) goTo(n); };
     function updateResume() { const r = $('reader-resume'); if (r) r.textContent = 'متابعة من صفحة ' + st.page.toLocaleString('ar-EG'); }
 
     // ملء الشاشة دون شريط التنقل؛ الأدوات تختفي بعد لحظات وتظهر بضغطة على الصفحة
@@ -256,7 +361,7 @@ const Reader = (() => {
         const list = el('div', 'gt-list');
         let tab = 'surah';
         try { tab = localStorage.getItem(GT_KEY) || 'surah'; } catch (e) {}
-        const curSurah = current ? current.ayahs[0].surah.number : QuranData.surahAtPage(st.page);
+        const curSurah = current && current.ayahs ? current.ayahs[0].surah.number : QuranData.surahAtPage(st.page);
         const curJuz = QuranData.juzOfPage(st.page), curHizb = QuranData.hizbOfPage(st.page);
         const row = (n, title, sub, p, k, on) => `<button type="button" class="gt-row${on ? ' is-on' : ''}" data-p="${p}" data-k="${k}"${on ? ' aria-current="true"' : ''}><span class="gt-n">${ar(n)}</span><span class="gt-t"><b>${title}</b><small>${sub}</small></span></button>`;
         const Q = QuranData.QUARTERS;
@@ -279,8 +384,8 @@ const Reader = (() => {
         list.addEventListener('click', e => {
             const b = e.target.closest('[data-p]'); if (!b) return;
             QSheet.close();
-            // الإضاءة على أول آية بالعرض النصي فقط (ما منغيّر العرض المصوّر)
-            goTo(Number(b.dataset.p), false, st.mode === 'text' && !/:1$/.test(b.dataset.k) ? b.dataset.k : null);
+            // الإضاءة على أول آية (ما منغيّر العرض المصوّر)
+            goTo(Number(b.dataset.p), false, st.mode !== 'image' && !/:1$/.test(b.dataset.k) ? b.dataset.k : null);
         });
         paint();
         v.append(form, tabs, list);
@@ -292,23 +397,28 @@ const Reader = (() => {
     }
 
     // ---------- أدوات الآية: ضغط مطوّل (أو زر الفأرة الأيمن) ----------
-    function openAyah(sp) {
-        if (!current) return;
-        const ay = current.ayahs[Number(sp.dataset.i)];
-        if (!ay) return;
-        sp.classList.add('is-selected');
+    // بالنصي الآية عنصر واحد، وبمصحف المدينة كلماتها موزّعة على السطور (كلها عليها data-k)
+    async function openAyah(sp) {
+        const k = sp.dataset.k; if (!k) return;
+        const [s, a] = k.split(':').map(Number);
+        const page = Number(sp.closest('[data-page]')?.dataset.page) || st.page;
+        const group = stage.querySelectorAll(`.ayah[data-k="${k}"], .qw[data-k="${k}"]`);
+        group.forEach(x => x.classList.add('is-selected'));
         try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
         Immersive.show(root);
-        AyahSheet.open({ s: ay.surah.number, a: ay.numberInSurah, page: st.page, text: QuranData.verseText(ay) }, {
+        // نص الآية (للنسخ والمشاركة) من بيانات المصحف النصية — محفوظة غالبًا
+        let text = '';
+        try { const ay = (await getPage(page)).find(x => x.surah.number === s && x.numberInSurah === a); if (ay) text = QuranData.verseText(ay); } catch (e) {}
+        AyahSheet.open({ s, a, page, text }, {
             onChange: paintMarks,
-            onClose: () => sp.classList.remove('is-selected')
+            onClose: () => group.forEach(x => x.classList.remove('is-selected'))
         });
     }
     let lpTimer = 0, lpStart = null;
     const cancelPress = () => { clearTimeout(lpTimer); lpStart = null; };
     stage.addEventListener('pointerdown', e => {
-        if (st.mode !== 'text' || (e.pointerType === 'mouse' && e.button !== 0)) return;
-        const sp = e.target.closest('.ayah'); if (!sp) return;
+        if (st.mode === 'image' || (e.pointerType === 'mouse' && e.button !== 0)) return;
+        const sp = e.target.closest('.ayah, .qw'); if (!sp) return;
         lpStart = { x: e.clientX, y: e.clientY };
         clearTimeout(lpTimer);
         lpTimer = setTimeout(() => { lpStart = null; suppressTap = true; moved = true; openAyah(sp); }, 480);
@@ -317,27 +427,33 @@ const Reader = (() => {
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => stage.addEventListener(t, cancelPress));
     stage.addEventListener('scroll', cancelPress, { passive: true });
     stage.addEventListener('contextmenu', e => {
-        const sp = e.target.closest('.ayah');
-        if (!sp || st.mode !== 'text') return;
+        const sp = e.target.closest('.ayah, .qw');
+        if (!sp || st.mode === 'image') return;
         e.preventDefault(); cancelPress(); suppressTap = true; openAyah(sp);
     });
 
     // ---------- الشريط ولوحة «تنسيق المصحف» ----------
     $('reader-enter')?.addEventListener('click', enter);
     $('reader-close')?.addEventListener('click', () => close());
-    $('rd-next')?.addEventListener('click', () => goTo(st.page + 1, true));
-    $('rd-prev')?.addEventListener('click', () => goTo(st.page - 1));
+    $('rd-next')?.addEventListener('click', nextPage);
+    $('rd-prev')?.addEventListener('click', prevPage);
     $('rd-goto')?.addEventListener('click', openGoto);
     $('rd-layout-btn')?.addEventListener('click', () => { applyTheme(); QSheet.open('تنسيق المصحف', $('rd-layout')); });
     $('rd-marks-btn')?.addEventListener('click', () => QSheet.open('العلامات والملاحظات', QuranMarks.view((p, k) => goTo(p, false, k))));
     $('rd-search-btn')?.addEventListener('click', () => QSheet.open('البحث في القرآن', QuranSearch.view((p, k) => goTo(p, false, k))));
     document.querySelectorAll('#reader-mode [data-mode]').forEach(b => b.addEventListener('click', () => { st.mode = b.dataset.mode; save(); applyTheme(); render(); }));
+    document.querySelectorAll('#reader-spread [data-spread]').forEach(b => b.addEventListener('click', () => { st.spread = b.dataset.spread; save(); applyTheme(); if (!root.hidden) render(); }));
     document.querySelectorAll('#reader-font [data-font]').forEach(b => b.addEventListener('click', () => {
         st.font = b.dataset.font; save(); applyTheme();
-        const box = stage.querySelector('.rd-text'); if (box) box.dataset.font = st.font;
+        stage.querySelectorAll('.rd-text').forEach(box => { box.dataset.font = st.font; });
         document.fonts?.ready.then(() => fitSoon(0)); fitSoon(60);
     }));
-    addEventListener('resize', () => fitSoon(160));
+    // تغيير حجم الشاشة: «تلقائي» ممكن يتحول بين صفحة وصفحتين، وإلا منعيد ضبط الحجم بس
+    addEventListener('resize', () => {
+        if (root.hidden) return;
+        clearTimeout(fitTimer);
+        fitTimer = setTimeout(() => { if (spreadOf(st.page).length !== shownSpread.length) render(); else fitLines(); }, 160);
+    });
     document.fonts?.addEventListener?.('loadingdone', () => fitSoon(0));
     $('rd-tajweed')?.addEventListener('change', e => { st.tajweed = e.target.checked; save(); paintPreview(); if (st.mode === 'text') render(); });
     $('rd-tajweed-legend-btn')?.addEventListener('click', e => {
@@ -366,8 +482,8 @@ const Reader = (() => {
     document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && usedFs && !root.hidden) close(); });
     document.addEventListener('keydown', e => {
         if (root.hidden || QSheet.isOpen() || document.body.classList.contains('ask-open') || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
-        if (e.key === 'ArrowLeft') goTo(st.page + 1, true);
-        else if (e.key === 'ArrowRight') goTo(st.page - 1);
+        if (e.key === 'ArrowLeft') nextPage();
+        else if (e.key === 'ArrowRight') prevPage();
         else if (e.key === 'Escape') close();
     });
     let tx = 0, ty = 0, moved = false, multi = false;
@@ -379,7 +495,7 @@ const Reader = (() => {
         if (multi) { moved = true; if (!e.touches.length) multi = false; return; }
         const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
         if (Math.abs(dx) > 10 || Math.abs(dy) > 10) moved = true; // تمرير أو سحب، لا ضغطة
-        if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(st.page + (dx > 0 ? 1 : -1), dx > 0);
+        if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) (dx > 0 ? nextPage : prevPage)();
     }, { passive: true });
     // ضغطة قصيرة = إظهار/إخفاء الأدوات، أما بعد الضغط المطوّل فلا
     Immersive.bindTap(root, stage, () => { if (suppressTap) { suppressTap = false; return true; } return moved; });
@@ -392,10 +508,10 @@ const Reader = (() => {
     applyTheme(); updateResume();
     // soft: لا نغيّر العرض المصوّر من أجل الإضاءة (مثل فتح سورة الكهف)
     function openAt(page, flashKey = null, soft = false) {
-        if (soft && st.mode !== 'text') flashKey = null;
+        if (soft && st.mode === 'image') flashKey = null;
         if (!root.hidden) return goTo(page, false, flashKey); // مفتوح أصلًا: ننتقل فقط
         st.page = Math.max(1, Math.min(TOTAL, parseInt(page, 10) || 1));
-        if (flashKey && st.mode !== 'text') st.mode = 'text'; // الإضاءة تحتاج العرض القرآني
+        if (flashKey && st.mode === 'image') st.mode = 'mushaf'; // الإضاءة تحتاج نص (مصحف المدينة أو النصي)
         pendingFlash = flashKey;
         save(); updateResume(); enter();
     }

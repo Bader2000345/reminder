@@ -101,7 +101,7 @@ const QuranIndex = (() => {
         while (end < t.length && MARK.test(t[end])) end++;
         return [map[i], end];
     }
-    return { load, has, search, locate, pageOf, foldQuery };
+    return { load, has, search, locate, pageOf, foldQuery, COUNTS };
 })();
 
 const QuranOffline = (() => {
