@@ -4,7 +4,7 @@
  *              مع تصحيح يوم ± من الإعدادات، وبطاقة للأيام المميزة (البيض، عاشوراء، عرفة، العشر، العيدين…)
  *   WeekLog    إ٨ تقويم آخر ٧ أيام بالرئيسية: الورد، الأذكار، التسبيح (نقاط هادية)،
  *              و«إحصائيات الشهر» (الإصدار ١٥): آخر ٣٠ يوم كشبكة + أطول سلسلة، و«أتممت» من الإشعار (sw.js) *   Backup     إ٦ حفظ نسخة من كل بيانات مُذكّر بملف، واسترجاعها بأي جهاز
- *   Shortcuts  إ٧ اختصارات أيقونة التطبيق (manifest.json): ?open=tasbih-mode | morning | evening (والورد بـ wird-intro.js)
+ *   Shortcuts  إ٧ اختصارات أيقونة التطبيق (manifest.json): ?open=tasbih-mode | morning | evening | screen (والورد بـ wird-intro.js)
  * يُحمَّل بعد home.js و tasbih.js و adhkar-viewer.js وقبل main.js. التشغيل من main.js: Extras.init().
  * ===================================================================== */
 
@@ -213,7 +213,8 @@ const Shortcuts = (() => {
         const act = {
             'tasbih-mode': () => { navigateTo('tasbih'); setTimeout(() => Tasbih.openMode(), 350); },
             morning: () => { navigateTo('adhkar'); setTimeout(() => AdhkarViewer.open('morning'), 300); },
-            evening: () => { navigateTo('adhkar'); setTimeout(() => AdhkarViewer.open('evening'), 300); }
+            evening: () => { navigateTo('adhkar'); setTimeout(() => AdhkarViewer.open('evening'), 300); },
+            screen: () => MdkScreen.open()
         }[open];
         if (!act) return;
         history.replaceState(history.state, '', location.pathname);

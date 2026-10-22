@@ -1,93 +1,215 @@
 /* =====================================================================
- * مُذكّر — 17-mushaf.css  (الإصدار ١٥)
- * «مصحف المدينة» (mushaf.js): ورقة بيضا ناعمة، ١٥ سطر متل الطبعة، إطار اسم السورة مزخرف،
- * والبسملة بخط المصحف، و«۞» بالهامش عند كل ربع. والصفحتين المتقابلتين متل كتاب مفتوح.
- * حجم كل شي بوحدة em من --qfs (بيحسبه Mushaf.fit حتى تبيّن الصفحة كلها).
+ * مُذكّر — 17-mushaf.css  (الإصدار ١٥، والإصدار ١٦ من معرض ٩: م١ ب٣ ل١ ن٢ ش٢)
+ * المصحف بملء الشاشة متل تطبيق آية — بلا مربع بنص الشاشة:
+ *   م١ الصفحة بعرض الشاشة وطولها: فوق السورة · الساعة · الجزء، وتحت ربع الحزب · رقم الصفحة
+ *   ب٣ إطار اسم السورة زمرّدي بورود ذهبية (mushaf.js بيرسمه بقياسه الحقيقي)
+ *   ل١ ورق عاجي بالفاتح، وأسود عميق بالداكن مع علامات آيات رمادية
+ *   ن٢ النصي: كل آية بسطرها وبينهن فاصل رفيع
+ *   ش٢ «شريط الصفحات» تحت بعرض الشاشة (الصفحات، شريط التمرير، الفواصل)
+ * حجم مصحف المدينة كله بوحدة em من --qfs (بيحسبه Mushaf.fit). آخر ملف: بيعدّل فوق 01–16.
  * ===================================================================== */
 
-.reader { --qp-paper:#fffefa; --qp-ink:#2b2a27; --qp-muted:#8d7f62; --qp-mark:#8f6a2c; --qp-band:#f1e6cb; --qp-gold:#a8843f; }
-.reader[data-theme="sepia"] { --qp-paper:#fbf3df; --qp-ink:#3a2e1c; --qp-muted:#8a7350; --qp-mark:#8a6426; --qp-band:#efdfba; }
-.reader[data-theme="dark"] { --qp-paper:#151d19; --qp-ink:#e9e4d6; --qp-muted:#9c947d; --qp-mark:#d4b56e; --qp-band:#262418; --qp-gold:#c9a45c; }
-.reader[data-warm]:not([data-theme="dark"]) { --qp-paper:#fbf0da; --qp-ink:#3b2f20; }
-.reader[data-warm][data-theme="dark"] { --qp-paper:#19170f; --qp-ink:#ecdcbc; }
+.reader {
+  --qp-paper:#fbf7ec; --qp-ink:#1d1b17; --qp-muted:#857c6c; --qp-mark:#8d6b2f; --qp-gold:#b08d4a;
+  --qp-bar:#fffdf7; --qp-accent:#1f8f6c; --qp-line:color-mix(in srgb, var(--qp-ink) 12%, transparent);
+  --rd-fg:var(--qp-ink);
+}
+.reader[data-theme="sepia"] { --qp-paper:#f3e8cf; --qp-ink:#3a2e1c; --qp-muted:#87704e; --qp-mark:#7d5a22; --qp-bar:#f8eedb; }
+.reader[data-theme="dark"] { --qp-paper:#050706; --qp-ink:#f1eee6; --qp-muted:#8e8e88; --qp-mark:#a7a7a1; --qp-gold:#c9a45c; --qp-bar:#131615; --qp-accent:#35b88f; }
+.reader[data-warm]:not([data-theme="dark"]) { --qp-paper:#f7ead0; --qp-ink:#3b2f20; --qp-bar:#fbf1dc; }
+.reader[data-warm][data-theme="dark"] { --qp-paper:#0b0a07; --qp-ink:#ecdcbc; --qp-mark:#a39a86; --qp-bar:#17150f; }
+.reader { background:var(--qp-paper) !important; background-image:none !important; color:var(--qp-ink); }
 
-/* المسرح: الصفحة بالنص، والأدوات فوق وتحت بتطلع وبتختفي فوقها */
-.reader-stage[data-mode="mushaf"] { align-items:center !important; justify-content:center; padding:calc(54px + env(safe-area-inset-top, 0px)) 8px calc(74px + env(safe-area-inset-bottom, 0px)) !important; }
-.rd-spread { display:flex; justify-content:center; align-items:flex-start; width:100%; margin:auto; }
-.rd-spread.is-two { gap:clamp(6px, 1.4vw, 18px); }
-.rd-spread.is-two > .rd-text, .rd-spread.is-two > .rd-sheet { flex:1 1 0; min-width:0; }
+/* ---------- فوق: شريط بعرض الشاشة (بيغطّي راس الصفحة لما يطلع، متل آية) ---------- */
+.reader .reader-bar {
+  position:absolute !important; top:0 !important; left:0 !important; right:0 !important; width:auto !important; z-index:4;
+  display:flex !important; align-items:center; justify-content:space-between !important; gap:8px !important;
+  padding:calc(4px + env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) 4px max(8px, env(safe-area-inset-left, 0px)) !important;
+  background:var(--qp-bar) !important; border:0 !important; border-bottom:1px solid var(--qp-line) !important;
+  box-shadow:0 10px 26px -22px rgba(0,0,0,.45) !important;
+}
+.reader .reader-bar .reader-x, .reader .reader-bar .rd-icon {
+  width:44px; height:44px; border-radius:12px; display:grid; place-items:center; padding:0; color:var(--qp-ink);
+  background:transparent; border:0; box-shadow:none; -webkit-backdrop-filter:none; backdrop-filter:none;
+  transition:background-color var(--m-150, 150ms) ease;
+}
+.reader .reader-bar .reader-x:hover, .reader .reader-bar .rd-icon:hover { background:color-mix(in srgb, var(--qp-ink) 7%, transparent); }
+.reader .reader-bar .rd-icon svg { width:22px; height:22px; }
+.reader.chrome-hidden .reader-bar { transform:translateY(-100%) !important; opacity:0; pointer-events:none; }
 
-/* ---------- الورقة ---------- */
+/* ---------- المسرح: الصفحة بملء الشاشة ---------- */
+.reader .reader-stage {
+  position:absolute !important; inset:0; z-index:1; display:block !important; overflow:hidden !important; perspective:1400px;
+  padding:env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px) !important;
+}
+.reader .reader-stage[data-mode="text"] { overflow-x:hidden !important; overflow-y:auto !important; overscroll-behavior:contain; }
+.rd-spread { display:flex; width:100%; height:100%; }
+.reader-stage[data-mode="text"] .rd-spread { height:auto; min-height:100%; align-items:stretch; }
+.rd-msg { margin:auto; padding:40vh 24px 0; text-align:center; color:var(--qp-muted); }
+
+/* ---------- م١ صفحة مصحف المدينة ---------- */
 .qp {
-  --qfs:24px; font-size:var(--qfs); position:relative; flex:none; box-sizing:border-box; direction:rtl;
-  padding:.9em var(--qpad, 18px) .7em; border-radius:14px; background:var(--qp-paper); color:var(--qp-ink);
-  box-shadow:0 1px 2px rgba(60,45,20,.06), 0 14px 34px -16px rgba(60,45,20,.28);
+  --qfs:24px; --qpad:14px; position:relative; flex:1 1 0; min-width:0; height:100%; overflow:hidden;
+  display:flex; flex-direction:column; box-sizing:border-box; direction:rtl; color:var(--qp-ink);
   -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
 }
-.reader[data-theme="dark"] .qp { box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 16px 38px -16px rgba(0,0,0,.7); }
-/* صفحتين: متل كتاب مفتوح، ظل خفيف عند الكعب */
-.rd-spread.is-two .qp:first-child { border-radius:14px 4px 4px 14px; background-image:linear-gradient(to left, transparent 92%, rgba(60,45,20,.07)); }
-.rd-spread.is-two .qp:last-child { border-radius:4px 14px 14px 4px; background-image:linear-gradient(to right, transparent 92%, rgba(60,45,20,.07)); }
-.reader[data-theme="dark"] .rd-spread.is-two .qp:first-child { background-image:linear-gradient(to left, transparent 92%, rgba(0,0,0,.35)); }
-.reader[data-theme="dark"] .rd-spread.is-two .qp:last-child { background-image:linear-gradient(to right, transparent 92%, rgba(0,0,0,.35)); }
+/* راس الصفحة وتذييلها (مصحف المدينة والنصي): بعرض السطور، مو بعرض الشاشة كلها عالكمبيوتر */
+.pg-top, .pg-foot {
+  flex:none; box-sizing:border-box; width:min(100%, calc(var(--qw, 100%) + var(--qpad, 14px) * 2 + 8px)); margin-inline:auto;
+  display:grid; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr); align-items:center; gap:10px;
+  padding-inline:var(--qpad, 14px); font:500 12px/1.3 var(--font-main); color:var(--qp-muted); white-space:nowrap;
+}
+.pg-top > *, .pg-foot > * { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.pg-top > :first-child, .pg-foot > :first-child { justify-self:start; }
+.pg-top > :last-child, .pg-foot > :last-child { justify-self:end; }
+.pg-top { height:34px; }
+.pg-foot { height:30px; }
+.pg-clock { font-weight:600; color:color-mix(in srgb, var(--qp-ink) 72%, transparent); font-variant-numeric:tabular-nums; }
+.pg-no { font-weight:600; color:color-mix(in srgb, var(--qp-ink) 70%, transparent); font-variant-numeric:tabular-nums; }
+.pg-q { color:var(--qp-mark); }
 
-.qp-top { display:flex; justify-content:space-between; gap:1em; margin-bottom:.3em; font:500 .42em/2 var(--font-main); color:var(--qp-muted); }
-.qp-no { margin-top:.2em; text-align:center; font:500 .42em/2 var(--font-main); color:var(--qp-muted); font-variant-numeric:tabular-nums; }
-.qp-lines { line-height:1.72; }
-.qp-line { position:relative; height:1.72em; display:flex; align-items:center; justify-content:center; white-space:nowrap; }
+/* ١٥ سطر بتتوزّع على طول الصفحة، والكلام بعرضها */
+.qp-lines {
+  flex:1 1 auto; min-height:0; box-sizing:border-box; width:var(--qw, 100%); max-width:calc(100% - var(--qpad) * 2); margin-inline:auto;
+  font-size:var(--qfs); display:grid; grid-template-rows:repeat(var(--rows, 15), minmax(0, 1fr));
+}
+.qp-line { position:relative; min-height:0; display:flex; align-items:center; justify-content:center; white-space:nowrap; line-height:1; }
 .qp-in { display:inline; }
 .qp-line.is-full > .qp-in { display:flex; justify-content:space-between; width:100%; }
 .qp-lines.is-measuring .qp-in { display:inline-block !important; width:auto !important; }
 .qw { border-radius:.18em; cursor:default; transition:background-color var(--m-150, 150ms) ease; }
 .qw.is-end { color:var(--qp-mark); }
-
 /* «۞» بالهامش عند أول كل ربع حزب */
-.qp-hizb { position:absolute; inset-inline-start:calc(var(--qpad, 18px) * -.82); top:50%; transform:translateY(-50%); font:400 .5em/1 "Amiri", serif; color:var(--qp-gold); }
+.qp-hizb { position:absolute; inset-inline-start:calc(var(--qpad) * -.95); top:50%; transform:translateY(-50%); font:400 .5em/1 "Amiri", serif; color:var(--qp-gold); }
 .qp-hizb.is-hizb { font-size:.62em; }
-
 /* البسملة بخط المصحف */
-.qp-line.is-basmala > .qp-in { font-size:1.4em; line-height:1; }
+.qp-line.is-basmala > .qp-in { font-size:1.32em; line-height:1; }
 .qp-line.is-basmala > .qp-in.is-text { font:400 .82em/1.6 "Amiri Quran", "Amiri", serif; }
 
-/* ---------- إطار اسم السورة ---------- */
-.qp-surah {
-  position:relative; width:100%; height:1.5em; display:flex; align-items:center; justify-content:center;
-  background:center / 100% 100% no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 940 100' preserveAspectRatio='none'%3E%3Crect x='3' y='9' width='934' height='82' rx='8' fill='%23f1e6cb' stroke='%23a8843f' stroke-width='3'/%3E%3Crect x='12' y='18' width='916' height='64' rx='5' fill='none' stroke='%23a8843f' stroke-width='1.2'/%3E%3Cpath d='M118 50h82M740 50h82' stroke='%23a8843f' stroke-width='1.5'/%3E%3Cpath d='M118 30h70M752 30h70M118 70h70M752 70h70' stroke='%23c9a45c' stroke-width='1' stroke-dasharray='3 6'/%3E%3Cpath d='M200 50Q232 20 292 20H648Q708 20 740 50Q708 80 648 80H292Q232 80 200 50Z' fill='%23fffefa' stroke='%23a8843f' stroke-width='2'/%3E%3Cg fill='%23fffefa' stroke='%23a8843f' stroke-width='2'%3E%3Ccircle cx='62' cy='50' r='36'/%3E%3Ccircle cx='878' cy='50' r='36'/%3E%3C/g%3E%3Cg fill='%23e6d3a3' stroke='%23a8843f' stroke-width='1.2'%3E%3Cpath d='M62 26L69 43L86 50L69 57L62 74L55 57L38 50L55 43Z'/%3E%3Cpath d='M878 26L885 43L902 50L885 57L878 74L871 57L854 50L871 43Z'/%3E%3C/g%3E%3Cg fill='%23a8843f'%3E%3Ccircle cx='62' cy='50' r='4'/%3E%3Ccircle cx='878' cy='50' r='4'/%3E%3C/g%3E%3C/svg%3E");
+/* الفاتحة وأول البقرة: السطور بالنص بإطار ذهبي رفيع متل أول المصحف */
+.qp.is-opening .qp-lines {
+  flex:0 0 auto; margin:auto; width:calc(var(--qw, 60%) + 3em); max-width:none; padding:1.2em 1.5em;
+  align-content:center; grid-template-rows:repeat(var(--rows, 8), calc(var(--qfs) * 1.9));
+  border-radius:.4em; box-shadow:inset 0 0 0 1px var(--qp-gold), inset 0 0 0 .22em var(--qp-paper), inset 0 0 0 calc(.22em + 1px) var(--qp-gold);
 }
-.reader[data-theme="dark"] .qp-surah {
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 940 100' preserveAspectRatio='none'%3E%3Crect x='3' y='9' width='934' height='82' rx='8' fill='%23262418' stroke='%23c9a45c' stroke-width='3'/%3E%3Crect x='12' y='18' width='916' height='64' rx='5' fill='none' stroke='%23c9a45c' stroke-width='1.2'/%3E%3Cpath d='M118 50h82M740 50h82' stroke='%23c9a45c' stroke-width='1.5'/%3E%3Cpath d='M118 30h70M752 30h70M118 70h70M752 70h70' stroke='%23a8843f' stroke-width='1' stroke-dasharray='3 6'/%3E%3Cpath d='M200 50Q232 20 292 20H648Q708 20 740 50Q708 80 648 80H292Q232 80 200 50Z' fill='%23151d19' stroke='%23c9a45c' stroke-width='2'/%3E%3Cg fill='%23151d19' stroke='%23c9a45c' stroke-width='2'%3E%3Ccircle cx='62' cy='50' r='36'/%3E%3Ccircle cx='878' cy='50' r='36'/%3E%3C/g%3E%3Cg fill='%236b5a33' stroke='%23c9a45c' stroke-width='1.2'%3E%3Cpath d='M62 26L69 43L86 50L69 57L62 74L55 57L38 50L55 43Z'/%3E%3Cpath d='M878 26L885 43L902 50L885 57L878 74L871 57L854 50L871 43Z'/%3E%3C/g%3E%3Cg fill='%23c9a45c'%3E%3Ccircle cx='62' cy='50' r='4'/%3E%3Ccircle cx='878' cy='50' r='4'/%3E%3C/g%3E%3C/svg%3E");
-}
-.qp-surah-name { font-family:qcf_names, "Amiri", serif; font-size:1.32em; line-height:1; color:var(--qp-ink); transform:translateY(.06em); }
+
+.qp.is-opening .pg-top, .qp.is-opening .pg-foot { width:min(100%, calc(var(--qw, 60%) + var(--qfs) * 3 + var(--qpad) * 2)); }
+
+/* صفحتين متقابلتين: كعب خفيف بالنص متل الكتاب المفتوح */
+.rd-spread.is-two > .qp:first-child { background:linear-gradient(to left, transparent 93%, rgba(60,45,20,.07)); box-shadow:inset 1px 0 0 var(--qp-line); }
+.rd-spread.is-two > .qp:last-child { background:linear-gradient(to right, transparent 93%, rgba(60,45,20,.07)); }
+.reader[data-theme="dark"] .rd-spread.is-two > .qp:first-child { background:linear-gradient(to left, transparent 93%, rgba(255,255,255,.035)); }
+.reader[data-theme="dark"] .rd-spread.is-two > .qp:last-child { background:linear-gradient(to right, transparent 93%, rgba(255,255,255,.035)); }
+.rd-spread.is-two > .tp:first-child { box-shadow:inset 1px 0 0 var(--qp-line); }
+
+/* ---------- ب٣ إطار اسم السورة (الرسم من mushaf.js بقياسه) ---------- */
+.qp-surah { position:relative; box-sizing:border-box; width:100%; height:min(94%, 1.7em); display:flex; align-items:center; justify-content:center; background:center / 100% 100% no-repeat; }
+.qp-surah-name { font-family:qcf_names, "Amiri", serif; font-size:1.3em; line-height:1; color:var(--ban-ink, var(--qp-ink)); transform:translateY(.06em); }
 /* إذا ما تحمّل خط أسماء السور: الاسم بخط أميري */
 .no-names-font .qp-surah-name { font-size:0; }
-.no-names-font .qp-surah-name::after { content:attr(data-fallback); font:700 calc(var(--qfs) * .58)/1 "Amiri", serif; }
+.no-names-font .qp-surah-name::after { content:attr(data-fallback); font:700 max(14px, calc(var(--qfs, 24px) * .58))/1 "Amiri", serif; }
+.tp .no-names-font .qp-surah-name::after { font-size:clamp(15px, 4.2vw, 20px); }
 
-/* الفاتحة وأول البقرة: السطور بالنص متل أول المصحف */
-.qp.is-opening .qp-lines { padding:1.2em 0 1.6em; }
-.qp.is-opening { box-shadow:inset 0 0 0 .32em var(--qp-paper), inset 0 0 0 .4em var(--qp-gold), 0 14px 34px -16px rgba(60,45,20,.28); }
+/* ---------- ن٢ العرض النصي بملء الشاشة ---------- */
+.tp { --qpad:clamp(16px, 4vw, 28px); flex:1 1 0; min-width:0; display:flex; flex-direction:column; direction:rtl; color:var(--qp-ink); }
+.tp-body {
+  flex:1 0 auto; box-sizing:border-box; width:100%; max-width:760px; margin-inline:auto; padding:2px var(--qpad) 10px;
+  font-family:"Amiri Quran", "Amiri", serif; line-height:2.05; letter-spacing:0;
+}
+.tp[data-font="scheherazade"] .tp-body { font-family:"Scheherazade New", "Amiri Quran", serif; }
+.tp[data-font="naskh"] .tp-body { font-family:"Noto Naskh Arabic", "Amiri", serif; line-height:2.2; }
+.tp-a { margin:0; padding:.5em 0; text-align:right; }
+.tp-a + .tp-a { border-top:1px solid var(--qp-line); }
+.tp-basmala { margin:.15em 0 0; text-align:center; font-size:.95em; }
+.tp .qp-surah { font-size:clamp(20px, 6vw, 30px); height:1.75em; margin:.7em 0 .25em; font-family:var(--font-main); line-height:1; }
+.tp .pg-top, .tp .pg-foot { width:100%; max-width:760px; }
+.tp .pg-foot { border-top:1px solid var(--qp-line); }
+/* آخر الصفحة: مسافة لـ«شريط الصفحات» حتى ما يغطّي آخر آية */
+.reader-stage[data-mode="text"] .tp { padding-bottom:calc(84px + env(safe-area-inset-bottom, 0px)); }
+.tp .ayah { border-radius:8px; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; cursor:pointer; transition:background-color var(--m-200, 200ms) ease, box-shadow var(--m-200, 200ms) ease; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+.tp .ayah-num { font-family:"Amiri Quran", "Amiri", serif; font-weight:400; color:var(--qp-mark); white-space:nowrap; }
+.tp .ayah.hl-gold, .qp .qw.hl-gold { background:rgba(214,176,98,.30); }
+.tp .ayah.hl-green, .qp .qw.hl-green { background:rgba(46,140,105,.22); }
+.tp .ayah.hl-blue, .qp .qw.hl-blue { background:rgba(70,130,220,.20); }
+.tp .ayah.hl-rose, .qp .qw.hl-rose { background:rgba(220,110,140,.20); }
+.tp .ayah.is-bm .ayah-num { color:var(--qp-accent); background:color-mix(in srgb, var(--qp-accent) 14%, transparent); border-radius:999px; padding:0 .14em; }
+.tp .ayah.has-note .ayah-num::after { content:""; display:inline-block; width:.32em; height:.32em; margin-inline-start:.15em; border-radius:50%; background:var(--qp-gold); vertical-align:super; }
+.tp .ayah.is-selected, .qp .qw.is-selected { background:color-mix(in srgb, var(--qp-accent) 18%, transparent); }
+.tp .ayah.is-selected { box-shadow:0 0 0 2px color-mix(in srgb, var(--qp-accent) 30%, transparent); }
+.tp .ayah.is-flash, .qp .qw.is-flash { animation:ayahFlash 2.6s ease; }
+.qp .qw.is-end.is-bm { color:var(--qp-accent); }
 
-/* ---------- التمييز والعلامات (متل العرض النصي) ---------- */
-.qp .qw.hl-gold { background:rgba(214,176,98,.30); }
-.qp .qw.hl-green { background:rgba(46,140,105,.22); }
-.qp .qw.hl-blue { background:rgba(70,130,220,.20); }
-.qp .qw.hl-rose { background:rgba(220,110,140,.20); }
-.qp .qw.is-end.is-bm { color:var(--olive); }
-.reader[data-theme="dark"] .qp .qw.is-end.is-bm { color:#8fd3b5; }
-.qp .qw.is-selected { background:color-mix(in srgb, var(--olive) 18%, transparent); }
-.qp .qw.is-flash { animation:ayahFlash 2.6s ease; }
+/* ---------- هيكل التحميل بشكل الصفحة ---------- */
+.qp-skeleton, .tp-skeleton { flex:1 1 0; display:flex; flex-direction:column; justify-content:space-evenly; gap:10px; padding:48px max(18px, 6vw) 44px; }
+.qp-skeleton .sk-line, .tp-skeleton .sk-line { display:block; width:min(100%, 560px); height:14px; margin-inline:auto; border-radius:6px; background:color-mix(in srgb, var(--qp-ink) 8%, transparent); }
+.qp-skeleton .sk-line:nth-child(4n), .tp-skeleton .sk-line:nth-child(3n) { width:min(72%, 400px); }
+.tp-skeleton { justify-content:flex-start; gap:22px; }
 
-/* هيكل التحميل */
-.qp-skeleton { width:min(100%, 460px); padding:1.4em 22px; display:flex; flex-direction:column; gap:1.05em; }
-.qp-skeleton .sk-line { display:block; height:.55em; border-radius:6px; background:color-mix(in srgb, var(--qp-ink) 8%, transparent); }
-.qp-skeleton .sk-line:nth-child(3n) { width:86%; margin-inline:auto; }
+/* ---------- ش٢ «شريط الصفحات» تحت بعرض الشاشة ---------- */
+.rd-pager {
+  position:absolute; left:0; right:0; bottom:0; z-index:4; display:flex; flex-direction:column; gap:4px; direction:rtl;
+  padding:6px max(12px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+  background:var(--qp-bar); color:var(--qp-ink); border-top:1px solid var(--qp-line); box-shadow:0 -12px 28px -22px rgba(0,0,0,.4);
+  transition:transform var(--m-200, 200ms) var(--ease-out, ease), opacity var(--m-200, 200ms) ease;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+}
+.reader.chrome-hidden .rd-pager { transform:translateY(100%); opacity:0; pointer-events:none; }
+.pg-label {
+  align-self:center; max-width:100%; min-height:34px; display:inline-flex; align-items:center; gap:8px; padding:0 12px;
+  border:0; border-radius:10px; background:none; color:inherit; font:500 13px/1.3 var(--font-main); cursor:pointer;
+  transition:background-color var(--m-150, 150ms) ease;
+}
+.pg-label:hover { background:color-mix(in srgb, var(--qp-ink) 6%, transparent); }
+.pg-label b { font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.pg-label span { min-width:0; color:var(--qp-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pg-label svg { flex:none; width:15px; height:15px; color:var(--qp-muted); }
+.pg-body { min-height:38px; display:flex; flex-direction:column; justify-content:center; }
+/* الصفحات: شرائح صغيرة، والصفحة المعروضة زمرّدية، وأول كل سورة أغمق */
+.pg-strip {
+  display:flex; gap:4px; overflow-x:auto; overflow-y:hidden; padding:4px 0; scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior-x:contain; touch-action:pan-x;
+  -webkit-mask-image:linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-image:linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.pg-strip::-webkit-scrollbar { display:none; }
+.pg-strip::before, .pg-strip::after { content:""; flex:0 0 calc(50% - 10px); }
+.pg-tile { flex:none; width:12px; height:30px; border-radius:4px; scroll-snap-align:center; cursor:pointer; background:color-mix(in srgb, var(--qp-ink) 11%, transparent); transition:background-color var(--m-150, 150ms) ease, transform var(--m-150, 150ms) ease; }
+.pg-tile.is-surah { background:color-mix(in srgb, var(--qp-ink) 26%, transparent); }
+.pg-tile.on { background:var(--qp-accent); }
+.pg-tile.is-c { background:var(--qp-accent); transform:scaleY(1.14); }
+/* شريط التمرير: الصفحة ١ يمين متل المصحف */
+.pg-slide { padding:2px 2px 0; }
+.pg-range { display:block; width:100%; height:30px; margin:0; accent-color:var(--qp-accent); cursor:pointer; }
+/* الفواصل: آياتك المعلَّمة */
+.pg-marks { display:flex; gap:6px; overflow-x:auto; padding:2px 0; scrollbar-width:none; touch-action:pan-x; }
+.pg-marks::-webkit-scrollbar { display:none; }
+.pg-mark { flex:none; min-height:36px; display:inline-flex; align-items:center; gap:7px; padding:0 12px; border-radius:10px; border:1px solid var(--qp-line); background:transparent; color:inherit; font:500 12.5px var(--font-main); cursor:pointer; white-space:nowrap; transition:background-color var(--m-150, 150ms) ease; }
+.pg-mark:hover { background:color-mix(in srgb, var(--qp-ink) 6%, transparent); }
+.pg-mark i { flex:none; width:10px; height:10px; border-radius:50%; background:var(--qp-gold); }
+.pg-mark i.k-bm { width:9px; height:14px; border-radius:1px; background:var(--qp-accent); clip-path:polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); }
+.pg-mark i.hl-gold { background:#d6b062; } .pg-mark i.hl-green { background:#2e8c69; } .pg-mark i.hl-blue { background:#4682dc; } .pg-mark i.hl-rose { background:#dc6e8c; }
+.pg-empty { margin:0; padding:6px 4px; text-align:center; font:400 12.5px/1.6 var(--font-main); color:var(--qp-muted); }
+.rd-pager :is(.pg-label, .pg-mark, .pg-range):focus-visible { outline:2px solid var(--qp-accent); outline-offset:2px; }
 
-/* التقليب (ح٥ «قلب ورقة خفيف» من معرض ٨): الصفحة بتنفتح من عند الكعب بزاوية ١٤° مع تلاشٍ، ٣٠٠ms.
-   transform و opacity بس، فخفيفة عالجوال. وبيشمل الصفحتين سوا بالمصحف المفتوح. */
-.reader-stage { perspective:1400px; }
+/* اختيار نمط الشريط (لوحة «نمط شريط الصفحات») */
+.pg-menu { display:flex; flex-direction:column; gap:12px; }
+.pg-menu-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+.pg-opt { display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 4px 12px; border-radius:16px; border:1px solid var(--line); background:var(--paper); color:var(--ink); font:500 13px var(--font-main); cursor:pointer; transition:border-color var(--m-150, 150ms) ease; }
+.pg-opt[aria-pressed="true"] { border-color:var(--olive); box-shadow:inset 0 0 0 1px var(--olive); }
+.pg-thumb { width:64px; height:28px; border-radius:8px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; gap:3px; }
+.pg-thumb.is-pages i { width:7px; height:16px; border-radius:2px; background:color-mix(in srgb, var(--ink) 20%, transparent); }
+.pg-thumb.is-slide i { position:relative; width:46px; height:5px; border-radius:4px; background:color-mix(in srgb, var(--ink) 20%, transparent); }
+.pg-thumb.is-slide i::after { content:""; position:absolute; left:18px; top:-4px; width:13px; height:13px; border-radius:50%; background:var(--olive); }
+.pg-thumb.is-marks i { width:9px; height:15px; background:color-mix(in srgb, var(--ink) 20%, transparent); clip-path:polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); }
+.pg-thumb.is-pages i.c { background:var(--olive); }
+.pg-thumb.is-marks i.c { background:var(--gold, #c9a45c); }
+.pg-menu-hint { margin:0; text-align:center; font-size:12.5px; line-height:1.6; color:var(--muted); }
+
+/* ---------- ح٥ التقليب «قلب ورقة خفيف» (معرض ٨) ----------
+   الصفحة بتنفتح من عند الكعب بزاوية ١٤° مع تلاشٍ، ٣٠٠ms، transform و opacity بس. وبيشمل الصفحتين سوا. */
 .rd-spread.turn-next { transform-origin:right center; animation:rdFlipNext var(--m-300, 300ms) cubic-bezier(.16,1,.3,1); }
 .rd-spread.turn-prev { transform-origin:left center; animation:rdFlipPrev var(--m-300, 300ms) cubic-bezier(.16,1,.3,1); }
 @keyframes rdFlipNext { from { transform:rotateY(-14deg); opacity:0; } }
 @keyframes rdFlipPrev { from { transform:rotateY(14deg); opacity:0; } }
 @media (prefers-reduced-motion: reduce) {
-  .rd-spread.turn-next, .rd-spread.turn-prev, .qp .qw.is-flash { animation:none !important; }
+  .rd-spread.turn-next, .rd-spread.turn-prev, .qp .qw.is-flash, .tp .ayah.is-flash { animation:none !important; }
+  .rd-pager, .reader .reader-bar, .pg-tile { transition:none !important; }
 }

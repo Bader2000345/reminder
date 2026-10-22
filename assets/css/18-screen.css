@@ -1,0 +1,114 @@
+/* =====================================================================
+ * مُذكّر — 18-screen.css  (الإصدار ١٦، معرض ٩)
+ * «شاشة مُذكّر» (screen.js): شاشة كاملة متل أدوات الجوال، بثلاث أنماط:
+ *   س٢ بطاقات متل الأدوات (الجوال والتابلت) · س١ لوحة التلفزيون (زمرّدي بمشربية) · س٣ هادئة لليل (اللابتوب)
+ * المقاسات كلها بـ vmin و clamp، فنفس الشاشة بتطلع حلوة عالجوال وعالتلفزيون الكبير.
+ * ===================================================================== */
+
+body.screen-open { overflow:hidden; }
+.mdk-screen {
+  --scr-dx:0px; --scr-dy:0px;
+  position:fixed; inset:0; z-index:10000; overflow:hidden; direction:rtl; isolation:isolate;
+  font-family:var(--font-main); color:#f2efe6; background:#030504;
+  -webkit-user-select:none; user-select:none;
+}
+.mdk-screen[hidden] { display:none; }
+
+/* ---------- الأدوات: إغلاق ونمط الشاشة (بتطلع بضغطة وبتختفي لحالها) ---------- */
+.scr-tools {
+  position:absolute; z-index:3; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  padding:calc(10px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) 14px max(14px, env(safe-area-inset-left, 0px));
+  background:linear-gradient(rgba(0,0,0,.55), transparent);
+  transition:opacity var(--m-200, 200ms) ease, transform var(--m-200, 200ms) var(--ease-out, ease);
+}
+.mdk-screen.chrome-hidden .scr-tools { opacity:0; transform:translateY(-100%); pointer-events:none; }
+.scr-x { width:44px; height:44px; flex:none; display:grid; place-items:center; padding:0; border-radius:12px; border:1px solid rgba(255,255,255,.2); background:rgba(0,0,0,.4); color:#fff; font:400 24px/1 var(--font-main); cursor:pointer; }
+.scr-style { display:flex; gap:2px; padding:3px; border-radius:12px; background:rgba(0,0,0,.42); border:1px solid rgba(255,255,255,.16); }
+.scr-style button { min-height:38px; padding:0 12px; border:0; border-radius:9px; background:transparent; color:rgba(255,255,255,.85); font:500 13px var(--font-main); cursor:pointer; transition:background-color var(--m-150, 150ms) ease; }
+.scr-style button[aria-pressed="true"] { background:#f2efe6; color:#0b2a21; }
+.scr-x:focus-visible, .scr-style button:focus-visible { outline:2px solid #e6c879; outline-offset:2px; }
+
+/* ---------- المشترك ---------- */
+.scr-body {
+  position:absolute; inset:0; box-sizing:border-box; display:grid; gap:clamp(10px, 1.8vmin, 22px);
+  padding:max(clamp(14px, 3vmin, 48px), env(safe-area-inset-top, 0px)) max(clamp(14px, 3vmin, 48px), env(safe-area-inset-right, 0px)) max(clamp(14px, 3vmin, 48px), env(safe-area-inset-bottom, 0px)) max(clamp(14px, 3vmin, 48px), env(safe-area-inset-left, 0px));
+  transform:translate(var(--scr-dx), var(--scr-dy)); transition:transform 1.2s ease;
+}
+.scr-card { min-width:0; min-height:0; overflow:hidden; display:flex; flex-direction:column; gap:clamp(4px, .9vmin, 12px); padding:clamp(14px, 2.6vmin, 30px); border-radius:clamp(16px, 2.6vmin, 30px); }
+.scr-k { font-size:clamp(12px, 1.7vmin, 19px); opacity:.76; }
+.scr-src { font-size:clamp(12px, 1.6vmin, 18px); opacity:.72; }
+.scr-text { margin:0; font:400 clamp(17px, 3vmin, 38px)/1.9 "Amiri", serif; text-wrap:balance; }
+.scr-text.is-quran { font-family:"Amiri Quran", "Amiri", serif; }
+.scr-text.is-dhikr { font-size:clamp(16px, 2.6vmin, 30px); }
+.scr-clock { display:inline-flex; align-items:baseline; gap:.16em; line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.scr-time { font-weight:300; letter-spacing:0; }
+.scr-period { font-size:.3em; font-weight:400; opacity:.75; }
+.scr-date { font-size:clamp(13px, 2vmin, 22px); opacity:.84; }
+.scr-date .scr-h::before { content:" – "; opacity:.6; }
+.c-clock .scr-date { display:flex; flex-direction:column; gap:2px; }
+.c-clock .scr-date .scr-h::before { content:none; }
+.scr-brand { font:700 clamp(12px, 1.7vmin, 19px) var(--font-main); color:#e6c879; }
+.scr-big { font-size:clamp(16px, 2.7vmin, 30px); font-weight:600; line-height:1.4; }
+.scr-bar { display:block; height:clamp(5px, .8vmin, 9px); border-radius:9px; background:rgba(255,255,255,.14); overflow:hidden; }
+.scr-bar i { display:block; height:100%; border-radius:inherit; background:#e6c879; }
+
+/* ---------- س١ لوحة التلفزيون: زمرّدي غامق ومشربية بالزاوية ---------- */
+.mdk-screen[data-style="1"] { background:radial-gradient(120% 90% at 100% 0%, #1d6b55 0%, transparent 55%), linear-gradient(160deg, #0f3d31, #061d17); }
+.mdk-screen[data-style="1"]::before {
+  content:""; position:absolute; z-index:-1; top:-3vmin; left:-6vmin; width:48vmin; height:48vmin; opacity:.5; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%231d6b55'/%3E%3Cg fill='%230b2a21'%3E%3Ccircle cx='18' cy='18' r='9'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='36' cy='0' r='6'/%3E%3Ccircle cx='0' cy='36' r='6'/%3E%3Ccircle cx='36' cy='36' r='6'/%3E%3C/g%3E%3Ccircle cx='18' cy='18' r='2' fill='%23c9a45c'/%3E%3C/svg%3E") 0 0 / clamp(28px, 4.6vmin, 52px);
+  -webkit-mask-image:radial-gradient(120% 90% at 0 0, #000 35%, transparent 72%); mask-image:radial-gradient(120% 90% at 0 0, #000 35%, transparent 72%);
+}
+.mdk-screen[data-style="1"] .scr-body { grid-template-columns:1.1fr 1fr; grid-template-rows:auto 1fr auto; }
+.s1-top { grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.s1-clock { align-self:center; }
+.s1-clock .scr-clock { font-size:clamp(64px, 18vmin, 220px); }
+.s1-daily { align-self:center; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.08); }
+.s1-row { grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:inherit; }
+.s1-row .scr-card { background:rgba(0,0,0,.24); border:1px solid rgba(255,255,255,.06); }
+
+/* ---------- س٢ بطاقات متل الأدوات (بيتبع الفاتح والداكن) ---------- */
+.mdk-screen[data-style="2"] { background:#e9ece7; color:#15201c; }
+body.dark-mode .mdk-screen[data-style="2"] { background:#070b09; color:#f2efe6; }
+.mdk-screen[data-style="2"] .scr-body { grid-template-columns:1fr 1fr 1.25fr; grid-template-rows:1fr 1fr; grid-template-areas:"clock wird daily" "dhikr dhikr daily"; }
+.c-clock { grid-area:clock; background:#0f5c48; color:#fff; justify-content:space-between; }
+.c-clock .scr-clock { font-size:clamp(44px, 10vmin, 120px); }
+.c-wird { grid-area:wird; background:#fffdf7; align-items:center; justify-content:center; text-align:center; }
+body.dark-mode .c-wird { background:#141c18; }
+.c-daily { grid-area:daily; position:relative; isolation:isolate; justify-content:center; background:linear-gradient(170deg, #1f3a32, #0b1a15); color:#f2efe6; }
+.c-daily .scr-text { font-size:clamp(21px, 4.2vmin, 46px); }
+/* مشربية خفيفة بزاوية البطاقة (نفس نقش اللوحة) */
+.c-daily::before {
+  content:""; position:absolute; z-index:-1; top:0; left:0; width:min(70%, 46vmin); aspect-ratio:1; opacity:.4; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%231f4a3e'/%3E%3Cg fill='%230b1a15'%3E%3Ccircle cx='18' cy='18' r='9'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='36' cy='0' r='6'/%3E%3Ccircle cx='0' cy='36' r='6'/%3E%3Ccircle cx='36' cy='36' r='6'/%3E%3C/g%3E%3Ccircle cx='18' cy='18' r='2' fill='%23c9a45c'/%3E%3C/svg%3E") 0 0 / clamp(26px, 4.4vmin, 48px);
+  -webkit-mask-image:radial-gradient(110% 90% at 0 0, #000 30%, transparent 70%); mask-image:radial-gradient(110% 90% at 0 0, #000 30%, transparent 70%);
+}
+.c-dhikr { grid-area:dhikr; justify-content:center; background:#f4e6c4; color:#3b2d08; }
+body.dark-mode .c-dhikr { background:#2a2414; color:#f1dca6; }
+.scr-ring { --p:0; width:clamp(84px, 17vmin, 190px); aspect-ratio:1; flex:none; border-radius:50%; display:grid; place-items:center; background:conic-gradient(#1f9a74 calc(var(--p) * 1%), color-mix(in srgb, currentColor 13%, transparent) 0); }
+.scr-ring b { width:78%; aspect-ratio:1; border-radius:50%; display:grid; place-items:center; background:#fffdf7; font-size:clamp(17px, 3.2vmin, 34px); font-weight:600; font-variant-numeric:tabular-nums; }
+body.dark-mode .scr-ring b { background:#141c18; }
+
+/* ---------- س٣ هادئة لليل: أسود، الساعة كبيرة، وسطر واحد بيتبدّل ---------- */
+.mdk-screen[data-style="3"] { background:#030504; color:#e9e3d2; }
+.mdk-screen[data-style="3"] .scr-body { grid-template-rows:1fr auto auto 1fr; justify-items:center; text-align:center; gap:clamp(8px, 1.6vmin, 18px); }
+.mdk-screen[data-style="3"] .scr-clock { grid-row:2; font-size:clamp(72px, 24vmin, 280px); }
+.mdk-screen[data-style="3"] .scr-date { grid-row:3; color:#9b968a; opacity:1; }
+.s3-line { grid-row:4; align-self:start; max-width:min(86%, 42ch); margin:clamp(14px, 3.4vmin, 40px) 0 0; font:400 clamp(17px, 3.2vmin, 34px)/1.9 "Amiri", serif; color:#d9c99a; text-wrap:balance; transition:opacity 600ms ease; }
+.s3-line.is-fading { opacity:0; }
+
+/* ---------- الشاشة الطولية (الجوال): كلشي فوق بعض ---------- */
+@media (max-aspect-ratio: 1/1) {
+  .mdk-screen[data-style="1"] .scr-body { grid-template-columns:1fr; grid-template-rows:auto auto 1fr auto; }
+  .s1-row { grid-template-columns:1fr; }
+  .mdk-screen[data-style="2"] .scr-body { grid-template-columns:1fr 1fr; grid-template-rows:auto auto 1fr; grid-template-areas:"clock wird" "dhikr dhikr" "daily daily"; }
+  .c-clock .scr-clock { font-size:clamp(40px, 12vw, 72px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scr-body, .s3-line, .scr-tools { transition:none !important; }
+}
+
+/* ---------- زر الشاشة بالرئيسية (مقابل زر الفاتح/الداكن) ---------- */
+.home-intro .screen-quick { position:absolute; top:0; right:0; left:auto; color:var(--olive); }
+.screen-quick svg { width:21px; height:21px; }
+body.dark-mode .screen-quick { color:var(--olive-dark, #8fd3b5); }

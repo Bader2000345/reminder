@@ -59,6 +59,13 @@
       "short_name": "المساء",
       "url": "./index.html?open=evening",
       "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "شاشة مُذكّر",
+      "short_name": "الشاشة",
+      "description": "الساعة وورد اليوم وذكر الوقت بملء الشاشة",
+      "url": "./index.html?open=screen",
+      "icons": [{ "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

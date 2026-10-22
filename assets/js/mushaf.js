@@ -2,13 +2,15 @@
  * مُذكّر — mushaf.js  (الإصدار ١٥)
  * «مصحف المدينة»: صفحة المصحف متل الطبعة بالضبط — ١٥ سطر، وكل سطر بكلماته متل المصحف المطبوع،
  * بخط مجمع الملك فهد (QCF V1: لكل صفحة خطّها)، وإطار اسم السورة والبسملة مخطوطين.
+ * الشكل (الإصدار ١٦، معرض ٩: م١ ب٣ ل١): الصفحة بملء الشاشة بلا مربع متل تطبيق آية، فوق السورة والساعة والجزء،
+ * وتحت ربع الحزب ورقم الصفحة، وإطار السورة زمرّدي بورود ذهبية.
  *   - البيانات: api.quran.com (كل كلمة برقم سطرها ورمزها بخط الصفحة) — بنحفظ نسخة صغيرة (٢–٣ كيلو للصفحة)
  *   - الخطوط: static.qurancdn.com (حوالي ٨٠ كيلو للصفحة)، وأسماء السور بخط الثلث (sura_names)
  *   - كلشي بينحفظ بالجهاز (Cache API، نفس مخزن المصحف) بعد أول مرة، فالصفحة يلي فتحتها بتشتغل بلا نت
  *   - الكلمات عليها data-k (رقم الآية) فالضغط المطوّل والتمييز والعلامات بيشتغلوا متل العرض النصي
+ *   - راس الصفحة وتذييلها وإطار السورة بيستعملهن العرض النصي كمان (reader.js)
  * يُحمَّل بعد wird.js (QuranData) و offline.js (QuranIndex.COUNTS)، وقبل reader.js (هو يلي بيرسم فيه).
  * ===================================================================== */
-
 const Mushaf = (() => {
     const STORE = 'mudhakkir-quran-v1';
     const hasCaches = typeof caches !== 'undefined';
@@ -95,6 +97,7 @@ const Mushaf = (() => {
     const ayahCount = s => (typeof QuranIndex !== 'undefined' && QuranIndex.COUNTS ? QuranIndex.COUNTS[s - 1] : 0);
     const split = k => k.split(':').map(Number);
     // السطور الفاضية: إطار اسم السورة والبسملة قبل أول آية من كل سورة (والفاتحة والتوبة إطار بس)
+    // ملاحظة: بالطبعة الكلاسيكية بعض السور إطارها بآخر الصفحة يلي قبل (متل ص بآخر ٤٥٢) وبسملتها أول الصفحة
     function plan(d, n) {
         const kinds = d.lines.map(l => (l.length ? 'text' : 'empty'));
         const surahOf = new Array(15).fill(0);
@@ -103,7 +106,6 @@ const Mushaf = (() => {
             const first = d.lines[i][0][0], [s, a] = split(first);
             // أول سطر بالسورة: الآية ١ وما بلشت بالسطر يلي قبله
             if (a !== 1 || (j > 0 && d.lines[used[j - 1]].some(w => w[0] === first))) return;
-            // أول سطر بالسورة: نرجع للسطور الفاضية قبله
             let gap = 0; while (i - gap - 1 >= 0 && kinds[i - gap - 1] === 'empty') gap++;
             const headerOnly = s === 1 || s === 9;
             if (gap >= 1) { kinds[i - 1] = headerOnly ? 'surah' : 'basmala'; surahOf[i - 1] = s; }
@@ -121,6 +123,51 @@ const Mushaf = (() => {
         return { kinds, surahOf };
     }
 
+    // ---------- راس الصفحة وتذييلها (متل تطبيق آية، م١): السورة · الساعة · الجزء، وتحت ربع الحزب · رقم الصفحة ----------
+    const clockText = () => new Date().toLocaleTimeString('ar-EG', { hour: 'numeric', minute: '2-digit' });
+    // ربع الحزب يلي بيبلّش بهالصفحة (ما في صفحة فيها ربعين)
+    function quarterLabel(n) {
+        const Q = QuranData.QUARTERS;
+        const i = Q.findIndex((q, idx) => idx > 0 && q[2] === n);
+        if (i < 0) return '';
+        const h = Math.floor(i / 4) + 1, r = i % 4;
+        return r ? `${['', 'ربع', 'نصف', 'ثلاثة أرباع'][r]} الحزب ${ar(h)}` : `الحزب ${ar(h)}`;
+    }
+    function pageTop(n, s) {
+        const top = el('div', 'pg-top'); top.setAttribute('aria-hidden', 'true');
+        top.append(el('span', '', surahName(s)), el('span', 'pg-clock', clockText()), el('span', '', `الجزء ${ar(QuranData.juzOfPage(n))}`));
+        return top;
+    }
+    function pageFoot(n) {
+        const foot = el('div', 'pg-foot');
+        foot.append(el('span', 'pg-q', quarterLabel(n)), el('span', 'pg-no', ar(n)), el('span'));
+        foot.setAttribute('aria-label', 'صفحة ' + ar(n));
+        return foot;
+    }
+    // الساعة براس الصفحة بتتحدّث (كل ٣٠ ثانية، بس والمصحف مفتوح)
+    const tickClocks = root => root.querySelectorAll('.pg-clock').forEach(c => { c.textContent = clockText(); });
+
+    // ---------- إطار اسم السورة (ب٣ «زمرّدي مُذكّر») ----------
+    // بنرسمه بقياس الإطار الحقيقي على الشاشة، فالورود بتضل مدوّرة بأي عرض
+    const BANNER = {
+        light: { band: '#0f5c48', edge: '#0b3d31', orn: '#e6c879', cart: '#fbf7ec', cartEdge: '#c9a45c', dots: '#1a6e58', ink: '#0b3d31' },
+        sepia: { band: '#0f5c48', edge: '#0b3d31', orn: '#e6c879', cart: '#f8eedb', cartEdge: '#c9a45c', dots: '#1a6e58', ink: '#0b3d31' },
+        dark: { band: '#0f3d31', edge: '#c9a45c', orn: '#d9bb72', cart: '#07120e', cartEdge: '#c9a45c', dots: '#185744', ink: '#f1eee6' }
+    };
+    function bannerSVG(w, h, P) {
+        const cy = h / 2, R = h * .34, r = h * .2;
+        const rosette = (cx, rr) => {
+            let p = '';
+            for (let i = 0; i < 8; i++) p += `<ellipse cx='${cx}' cy='${cy - rr * .5}' rx='${rr * .2}' ry='${rr * .5}' transform='rotate(${i * 45} ${cx} ${cy})'/>`;
+            return `<circle cx='${cx}' cy='${cy}' r='${rr}' fill='${P.cart}' stroke='${P.edge}' stroke-width='1'/><g fill='${P.orn}' opacity='.9'>${p}</g><circle cx='${cx}' cy='${cy}' r='${rr * .2}' fill='${P.cart}' stroke='${P.orn}'/>`;
+        };
+        const x1 = h * 2.15, x2 = w - h * 2.15, k = h * .34;
+        const cart = `M${x1} ${cy}Q${x1 + h * .35} ${cy - k} ${x1 + h * .95} ${cy - k}H${x2 - h * .95}Q${x2 - h * .35} ${cy - k} ${x2} ${cy}Q${x2 - h * .35} ${cy + k} ${x2 - h * .95} ${cy + k}H${x1 + h * .95}Q${x1 + h * .35} ${cy + k} ${x1} ${cy}Z`;
+        const scroll = (a, dir) => `<path d='M${a} ${cy}q${dir * h * .18} ${-h * .22} ${dir * h * .36} 0t${dir * h * .36} 0' fill='none' stroke='${P.orn}' stroke-width='1.2'/>`;
+        const ps = h * .24;
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'><defs><pattern id='p' width='${ps}' height='${ps}' patternUnits='userSpaceOnUse'><circle cx='${ps / 2}' cy='${ps / 2}' r='${ps * .16}' fill='${P.dots}'/></pattern></defs><rect x='1' y='1' width='${w - 2}' height='${h - 2}' rx='${h * .14}' fill='${P.band}' stroke='${P.edge}' stroke-width='1.5'/><rect x='${h * .1}' y='${h * .1}' width='${w - h * .2}' height='${h * .8}' rx='${h * .1}' fill='url(#p)' stroke='${P.edge}' stroke-width='.8'/>${rosette(h * .62, R)}${rosette(w - h * .62, R)}${rosette(h * 1.5, r)}${rosette(w - h * 1.5, r)}${scroll(h * 1.72, 1)}${scroll(w - h * 1.72, -1)}<path d='${cart}' fill='${P.cart}' stroke='${P.cartEdge}' stroke-width='1.4'/></svg>`;
+        return `url("data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}")`;
+    }
     function surahBanner(s) {
         const b = el('div', 'qp-surah');
         b.setAttribute('role', 'heading'); b.setAttribute('aria-level', '2');
@@ -129,26 +176,42 @@ const Mushaf = (() => {
         name.setAttribute('aria-hidden', 'true');
         name.dataset.fallback = 'سورة ' + surahName(s);
         b.append(name);
+        // إذا ما تحمّل خط أسماء السور (أول مرة بلا نت): الاسم بخط أميري
+        namesFont().catch(() => b.classList.add('no-names-font'));
         return b;
     }
+    // ارسم كل الإطارات جوّا عنصر (بعد ما ينضبط حجمه)
+    function paintBanners(root) {
+        const theme = root.closest('.reader')?.dataset.theme || 'light';
+        const P = BANNER[theme] || BANNER.light;
+        root.querySelectorAll('.qp-surah').forEach(b => {
+            const r = b.getBoundingClientRect();
+            if (r.width < 40 || r.height < 8) return;
+            const key = `${theme}:${Math.round(r.width)}x${Math.round(r.height)}`;
+            if (b.dataset.drawn === key) return;
+            b.dataset.drawn = key;
+            b.style.backgroundImage = bannerSVG(Math.round(r.width), Math.round(r.height), P);
+            b.style.setProperty('--ban-ink', P.ink);
+        });
+    }
 
-    // صفحة كاملة (عنصر DOM) — بيرسمها reader.js وبيضبط حجمها fit()
+    // ---------- صفحة مصحف المدينة كاملة (م١: بملء الشاشة بلا مربع) ----------
     async function page(n) {
         const [d, fam] = await Promise.all([pageData(n), pageFont(n)]);
-        const names = namesFont().catch(() => null);
         const bsml = basmala().catch(() => null);
+        await namesFont().catch(() => null);
         const { kinds, surahOf } = plan(d, n);
         const card = el('article', 'qp' + (n <= 2 ? ' is-opening' : ''));
         card.dataset.page = n;
         const firstKey = (d.lines.find(l => l.length) || [[`${QuranData.surahAtPage(n)}:1`]])[0][0];
-        const head = el('div', 'qp-top'); head.setAttribute('aria-hidden', 'true');
-        head.append(el('span', '', surahName(split(firstKey)[0])), el('span', '', `الجزء ${ar(QuranData.juzOfPage(n))}`));
         const body = el('div', 'qp-lines'); body.style.fontFamily = `${fam}, 'Amiri Quran', serif`;
-        const [namesOk, bsmlCodes] = await Promise.all([names, bsml]);
+        const bsmlCodes = await bsml;
+        let rows = 0;
         kinds.forEach((k, i) => {
             if (n <= 2 && k === 'empty') return; // الفاتحة وأول البقرة: السطور بالنص بلا فراغات تحت
+            rows++;
             const line = el('div', 'qp-line');
-            if (k === 'surah') { line.classList.add('is-banner'); line.append(surahBanner(surahOf[i])); if (!namesOk) line.classList.add('no-names-font'); }
+            if (k === 'surah') { line.classList.add('is-banner'); line.append(surahBanner(surahOf[i])); }
             else if (k === 'basmala') {
                 line.classList.add('is-basmala');
                 const t = el('span', 'qp-in'); t.setAttribute('aria-label', QuranData.BASMALA);
@@ -178,8 +241,9 @@ const Mushaf = (() => {
             } else line.classList.add('is-empty');
             body.append(line);
         });
-        const foot = el('div', 'qp-no', ar(n)); foot.setAttribute('aria-label', 'صفحة ' + ar(n));
-        card.append(head, body, foot);
+        body.style.setProperty('--rows', rows);
+        card.dataset.surah = split(firstKey)[0]; // سورة أول سطر (لشريط الصفحات تحت)
+        card.append(pageTop(n, split(firstKey)[0]), body, pageFoot(n));
         return card;
     }
     // أول كلمة من الآية (مو تكملة آية من السطر يلي قبل)
@@ -188,31 +252,33 @@ const Mushaf = (() => {
         return true;
     }
 
-    // ---------- ضبط الحجم: الصفحة كلها بتبيّن، والسطور الكاملة مضبوطة من الطرفين ----------
-    // box: {w, h} المساحة المتاحة لكل صفحة، و fixed: حجم خط ثابت (للصفحتين المتقابلتين). بترجّع الحجم
-    function fit(card, box, fixed = 0) {
+    // ---------- ضبط الحجم: الكلام بياخد عرض الشاشة، والسطور الـ١٥ بتتوزّع على طولها (متل آية) ----------
+    // boxW: العرض المتاح لهالصفحة، fixed: حجم ثابت (للصفحتين المتقابلتين). بترجّع الحجم
+    function fit(card, boxW, fixed = 0) {
         const body = card.querySelector('.qp-lines');
-        if (!body) return;
+        if (!body) return 0;
+        const rows = Number(body.style.getPropertyValue('--rows')) || 15;
         card.style.setProperty('--qfs', '20px');
         body.classList.add('is-measuring');
-        const ins = [...body.querySelectorAll('.qp-line:not(.is-banner) > .qp-in')];
+        const ins = [...body.querySelectorAll('.qp-line:not(.is-banner):not(.is-basmala) > .qp-in')];
         const widths = ins.map(x => x.getBoundingClientRect().width);
         body.classList.remove('is-measuring');
-        const maxW = Math.max(1, ...widths) / 20; // عرض أطول سطر لكل 1px من حجم الخط
-        const rows = body.children.length;
-        // الارتفاع: السطور (1.72) + رأس وتذييل وحواف (حوالي 4.6 سطر من حجم الخط)
-        const padX = Math.min(28, Math.max(14, box.w * .05));
-        const fsW = (box.w - padX * 2) / maxW;
-        const fsH = box.h / (rows * 1.72 + (rows < 15 ? 7 : 4.6));
-        // الصفحة لازم تبيّن كلها (حتى صفحتين على جوال بالطول بتطلع صغيرة بس مرتّبة)
-        const fs = fixed || Math.max(6, Math.min(fsW, fsH, 46));
+        const longest = Math.max(1, ...widths), maxW = Math.max(longest / 20, 13.2);
+        const padX = Math.min(26, Math.max(12, boxW * .035));
+        // الارتفاع المتاح للسطور: الصفحة ناقص راسها وتذييلها
+        const top = card.querySelector('.pg-top'), foot = card.querySelector('.pg-foot');
+        const availH = card.clientHeight - (top ? top.offsetHeight : 0) - (foot ? foot.offsetHeight : 0) - 8;
+        // الفاتحة وأول البقرة: السطور بالنص جوّا إطار (٣em زيادة بالعرض والطول)
+        const opening = card.classList.contains('is-opening');
+        const fsW = (boxW - padX * 2) / (maxW + (opening ? 3 : 0));
+        const fsH = opening ? availH / (rows * 1.9 + 3) : availH / (rows * 1.42);
+        const fs = fixed || Math.max(6, Math.min(fsW, fsH, opening ? 40 : 52));
         card.style.setProperty('--qfs', fs.toFixed(2) + 'px');
+        card.style.setProperty('--qw', (maxW * fs).toFixed(1) + 'px');
         card.style.setProperty('--qpad', padX.toFixed(1) + 'px');
-        // عرض الصفحة: أطول سطر عادي بالمصحف (حوالي ١٤ ضعف حجم الخط) حتى الصفحتين المتقابلتين يطلعوا بنفس العرض
-        card.style.width = Math.min(box.w, Math.max(maxW, 13.6) * fs + padX * 2).toFixed(1) + 'px';
         // السطر الكامل بيتوزّع من الطرفين؛ القصير (آخر سورة) بيضل بالنص
-        const longest = Math.max(...widths);
-        ins.forEach((x, i) => x.parentElement.classList.toggle('is-full', !card.classList.contains('is-opening') && widths[i] >= longest * .86));
+        ins.forEach((x, i) => x.parentElement.classList.toggle('is-full', !opening && widths[i] >= longest * .86));
+        paintBanners(card);
         return fs;
     }
 
@@ -220,5 +286,5 @@ const Mushaf = (() => {
     const prefetch = n => { if (n >= 1 && n <= 604) Promise.all([pageData(n), pageFont(n)]).catch(() => {}); };
     // هل الصفحة محفوظة بالجهاز؟ (للعمل بلا نت)
     const isStored = async n => !!(await fromCache('qcf/' + n)) && !!(await fromCache('qcf-font/' + n));
-    return { page, fit, prefetch, isStored, pageData };
+    return { page, fit, prefetch, isStored, pageData, pageTop, pageFoot, surahBanner, paintBanners, tickClocks, quarterLabel, namesFont };
 })();
