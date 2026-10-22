@@ -15,12 +15,14 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v29';
+const CACHE = 'mudhakkir-v30';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
 const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion', '14-performance', '15-look', '16-layout', '17-mushaf', '18-screen'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'offline', 'mushaf', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'screen', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
-const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES,
+const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'offline', 'mushaf', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'screen', 'widgets', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
+// محتوى «شاشة مُذكّر» (نفس محتوى الأدوات برّا التطبيق): بيتخزّن متل ملفات التطبيق حتى تشتغل الشاشة بلا نت
+const DATA_FILES = ['./assets/data/widget-content.json'];
+const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES, ...DATA_FILES,
     './assets/img/logo-light.webp', './assets/img/logo-dark.webp', './assets/img/icon-192.webp', './assets/img/icon-192.png', './assets/img/favicon-64.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
 // يُعرض التذكير إن تأخر وصول الإشعار حتى ساعة: السيرفر بيلقط المتأخر لحد ٣٠ دقيقة (جدول كل نص ساعة)،
@@ -87,7 +89,10 @@ self.addEventListener('fetch', event => {
     if (req.method !== 'GET') return;
     const url = new URL(req.url);
     if (url.origin !== self.location.origin || url.pathname.includes('/__mdk/') || url.pathname.endsWith('/version.json')) return;
-    const isApp = req.mode === 'navigate' || ['script', 'style', 'image', 'manifest', 'font'].includes(req.destination);
+    // صفحات الأدوات برّا التطبيق (widget/: خلفية اللابتوب، لوحة التلفزيون، كود الآيفون) من الشبكة دايمًا،
+    // وإلا كان التنقّل إلها بيرجع الصفحة الرئيسية المحفوظة
+    if (url.pathname.includes('/widget/')) return;
+    const isApp = req.mode === 'navigate' || ['script', 'style', 'image', 'manifest', 'font'].includes(req.destination) || url.pathname.includes('/assets/data/');
     if (!isApp) return;
     event.respondWith((async () => {
         const name = await approvedCache();

@@ -3,6 +3,7 @@
  * «شاشة مُذكّر» (screen.js): شاشة كاملة متل أدوات الجوال، بثلاث أنماط:
  *   س٢ بطاقات متل الأدوات (الجوال والتابلت) · س١ لوحة التلفزيون (زمرّدي بمشربية) · س٣ هادئة لليل (اللابتوب)
  * المقاسات كلها بـ vmin و clamp، فنفس الشاشة بتطلع حلوة عالجوال وعالتلفزيون الكبير.
+ * وبآخره: لوحة «أدوات مُذكّر» (widgets.js) لإعداد الأدوات برّا التطبيق.
  * ===================================================================== */
 
 body.screen-open { overflow:hidden; }
@@ -112,3 +113,18 @@ body.dark-mode .scr-ring b { background:#141c18; }
 .home-intro .screen-quick { position:absolute; top:0; right:0; left:auto; color:var(--olive); }
 .screen-quick svg { width:21px; height:21px; }
 body.dark-mode .screen-quick { color:var(--olive-dark, #8fd3b5); }
+
+/* ---------- «أدوات مُذكّر» (widgets.js): خطوات كل جهاز بلوحة الإعداد ---------- */
+.wg-view { display:flex; flex-direction:column; gap:18px; }
+.wg-lead { margin:0; color:var(--muted); font-size:14px; line-height:1.8; }
+.wg-sec { display:flex; flex-direction:column; gap:10px; padding-top:14px; border-top:1px solid var(--line); }
+.wg-sec h4 { margin:0; font:700 15.5px/1.5 var(--font-main); color:var(--ink); }
+.wg-steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; counter-reset:wgstep; }
+.wg-steps li { counter-increment:wgstep; display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:14px; background:var(--surface-2, color-mix(in srgb, var(--ink) 5%, transparent)); color:var(--ink); font-size:13.5px; line-height:1.8; }
+.wg-steps li::before { content:counter(wgstep, arabic-indic); flex:none; display:grid; place-items:center; width:24px; height:24px; margin-top:2px; border-radius:50%; background:var(--olive); color:#fff; font-size:12px; font-weight:700; }
+.wg-steps li > span { flex:1; min-width:0; }
+.wg-steps b { font-weight:600; }
+.wg-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.wg-actions .primary-button, .wg-actions .ghost-button { margin:0; min-height:44px; display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+.wg-manual { width:100%; min-height:90px; border-radius:12px; border:1px solid var(--line); background:var(--paper); color:var(--ink); font:12px/1.5 ui-monospace, Consolas, monospace; direction:ltr; }
+.wg-privacy { margin:0; padding-top:12px; border-top:1px solid var(--line); font-size:12.5px; line-height:1.8; color:var(--muted); }

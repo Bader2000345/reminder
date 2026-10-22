@@ -45,6 +45,7 @@ FX.init();
 Tasbih.init();
 Extras.init();
 MdkScreen.init();
+Widgets.init();
 FocusTools.init();
 Reader.setAdvanceHook(Wird.onReaderAdvance);
 Share.init();

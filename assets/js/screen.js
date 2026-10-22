@@ -7,7 +7,8 @@
  *   الشاشة ما بتطفي (KeepAwake)، والأدوات (إغلاق والنمط) بتطلع بضغطة. الخروج: × أو Esc أو زر الرجوع.
  *   بالنمطين الغامقين الكلام بيتزحزح بكسلات قليلة كل دقيقة حتى ما يعلّم عالشاشة (OLED والتلفزيون).
  * الفتح: زر الرئيسية، الإعدادات، ‎?open=screen‎ (اختصار الأيقونة)، والمساعد.
- * يعتمد على Wird.snapshot (wird.js) و Hijri (extras.js) و ADHKAR_DATABASE (adhkar-data.js) و KeepAwake/Immersive (core.js).
+ * المحتوى من assets/data/widget-content.json (نفس محتوى الأدوات برّا التطبيق، widgets.js و widget/).
+ * يعتمد على Wird.snapshot (wird.js) و Hijri (extras.js) و KeepAwake/Immersive (core.js).
  * ===================================================================== */
 
 const MdkScreen = (() => {
@@ -42,55 +43,34 @@ const MdkScreen = (() => {
     const hijri = () => { try { return (typeof Hijri !== 'undefined' && Hijri.today()?.text) || ''; } catch (e) { return ''; } };
     // الصباح من الفجر للعصر تقريبًا، والمساء بعده
     const isMorning = () => { const h = new Date().getHours(); return h >= 3 && h < 15; };
+    // المحتوى (الأذكار القصيرة، آيات وأحاديث اليوم) من assets/data/widget-content.json:
+    // نفس الملف يلي بتقرا منه الأدوات برّا التطبيق (worker.js ← /widget)، فالشاشة والأدوات بيعرضوا نفس الشي.
+    // محفوظ بالـ Service Worker، فبيشتغل بلا نت. وإذا ما وصل لسبب ما منعرض المحتوى الاحتياطي.
+    const FALLBACK = { ayat: [['أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', 'الرعد ٢٨']], hadith: [['أَحَبُّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ', 'متفق عليه']], morning: [], evening: [] };
+    let content = null;
+    function loadContent() {
+        if (content) return Promise.resolve(content);
+        return fetch(new URL('assets/data/widget-content.json', document.baseURI))
+            .then(r => (r.ok ? r.json() : null)).catch(() => null)
+            .then(d => { content = d && Array.isArray(d.ayat) && d.ayat.length ? d : FALLBACK; return content; });
+    }
+    const C = () => content || FALLBACK;
     function dhikr() {
-        const key = isMorning() ? 'morning' : 'evening';
-        const g = typeof ADHKAR_DATABASE !== 'undefined' && ADHKAR_DATABASE[key];
-        const list = g ? g.items.filter(it => it.text && it.text.length <= 240) : [];
-        if (!list.length) return { kicker: isMorning() ? 'من أذكار الصباح' : 'من أذكار المساء', text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', count: 100 };
+        const kicker = isMorning() ? 'من أذكار الصباح' : 'من أذكار المساء';
+        let list = C()[isMorning() ? 'morning' : 'evening'] || [];
+        // احتياط: من قاعدة الأذكار نفسها
+        if (!list.length && typeof ADHKAR_DATABASE !== 'undefined') list = (ADHKAR_DATABASE[isMorning() ? 'morning' : 'evening']?.items || []).filter(it => it.text && it.text.length <= 240).map(it => [it.text.replace(/\s+/g, ' ').trim(), it.count || 1]);
+        if (!list.length) return { kicker, text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', count: 100 };
         // بيتبدّل كل دقيقتين
-        const it = list[Math.floor(Date.now() / 120000) % list.length];
-        return { kicker: isMorning() ? 'من أذكار الصباح' : 'من أذكار المساء', text: it.text.replace(/\s+/g, ' ').trim(), count: it.count || 1 };
+        const [text, count] = list[Math.floor(Date.now() / 120000) % list.length];
+        return { kicker, text, count: count || 1 };
     }
     // آية أو حديث اليوم: يوم آية ويوم حديث (أحاديث من الصحيحين)
-    const AYAT = [
-        ['أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', 'الرعد ٢٨'],
-        ['فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ', 'البقرة ١٥٢'],
-        ['إِنَّ مَعَ الْعُسْرِ يُسْرًا', 'الشرح ٦'],
-        ['وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ', 'الطلاق ٣'],
-        ['وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ', 'البقرة ١٨٦'],
-        ['لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا', 'البقرة ٢٨٦'],
-        ['وَقُل رَّبِّ زِدْنِي عِلْمًا', 'طه ١١٤'],
-        ['إِنَّ اللَّهَ مَعَ الصَّابِرِينَ', 'البقرة ١٥٣'],
-        ['وَرَحْمَتِي وَسِعَتْ كُلَّ شَيْءٍ', 'الأعراف ١٥٦'],
-        ['ادْعُونِي أَسْتَجِبْ لَكُمْ', 'غافر ٦٠'],
-        ['وَاصْبِرْ وَمَا صَبْرُكَ إِلَّا بِاللَّهِ', 'النحل ١٢٧'],
-        ['لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ', 'الزمر ٥٣'],
-        ['وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ', 'الحديد ٤'],
-        ['حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ', 'آل عمران ١٧٣'],
-        ['رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ', 'البقرة ٢٠١'],
-        ['وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ', 'الضحى ٥'],
-        ['إِنَّ الْحَسَنَاتِ يُذْهِبْنَ السَّيِّئَاتِ', 'هود ١١٤'],
-        ['وَاللَّهُ يُحِبُّ الْمُحْسِنِينَ', 'آل عمران ١٣٤']
-    ];
-    const HADITH = [
-        ['كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ، حَبِيبَتَانِ إِلَى الرَّحْمَنِ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ', 'متفق عليه'],
-        ['أَحَبُّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ', 'متفق عليه'],
-        ['إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ', 'متفق عليه'],
-        ['خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ', 'رواه البخاري'],
-        ['اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لِأَصْحَابِهِ', 'رواه مسلم'],
-        ['مَثَلُ الَّذِي يَذْكُرُ رَبَّهُ وَالَّذِي لَا يَذْكُرُ رَبَّهُ مَثَلُ الْحَيِّ وَالْمَيِّتِ', 'رواه البخاري'],
-        ['مَنْ قَالَ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، فِي يَوْمٍ مِائَةَ مَرَّةٍ، حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ', 'متفق عليه'],
-        ['لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ', 'متفق عليه'],
-        ['الطُّهُورُ شَطْرُ الْإِيمَانِ، وَالْحَمْدُ لِلَّهِ تَمْلَأُ الْمِيزَانَ', 'رواه مسلم'],
-        ['مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ', 'متفق عليه'],
-        ['يَسِّرُوا وَلَا تُعَسِّرُوا، وَبَشِّرُوا وَلَا تُنَفِّرُوا', 'متفق عليه'],
-        ['الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ', 'متفق عليه']
-    ];
     const dayIndex = () => { const d = new Date(); return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5); };
     function daily() {
-        const i = dayIndex();
-        if (i % 2 === 0) { const [t, src] = AYAT[(i / 2) % AYAT.length]; return { kicker: 'آية اليوم', text: `﴿${t}﴾`, src, quran: true }; }
-        const [t, src] = HADITH[((i - 1) / 2) % HADITH.length];
+        const i = dayIndex(), { ayat, hadith } = C();
+        if (i % 2 === 0) { const [t, src] = ayat[(i / 2) % ayat.length]; return { kicker: 'آية اليوم', text: `﴿${t}﴾`, src, quran: true }; }
+        const [t, src] = hadith[((i - 1) / 2) % hadith.length];
         return { kicker: 'حديث اليوم', text: `قال رسول الله ﷺ: «${t}»`, src, quran: false };
     }
     function wird() {
@@ -167,6 +147,7 @@ const MdkScreen = (() => {
         document.body.classList.add('screen-open');
         lastMinute = '';
         render(); tick();
+        if (!content) loadContent().then(() => { if (!root.hidden) render(); });
         clearInterval(timer); timer = setInterval(tick, 5000);
         KeepAwake.on('screen');
         Immersive.enter(root, { onClose: close, hideAfter: 3000 });

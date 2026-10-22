@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>مُذكّر على خلفية الشاشة</title>
+<!-- =====================================================================
+ مُذكّر — widget/wallpaper.html  (الإصدار ١٧، معرض ١٠: ل٢ «أداة على خلفية الشاشة»)
+ النمط الهادئ (س٣) كخلفية للابتوب، شغّال والتطبيق مسكّر:
+   ويندوز: برنامج Lively Wallpaper (مجاني من Microsoft Store) ← إضافة خلفية ← رابط هالصفحة
+   ماك: برنامج Plash (مجاني من App Store) ← رابط هالصفحة
+ الرابط بيجي جاهز من التطبيق («أدوات مُذكّر») ومعه رمز الأداة ‎?k=…‎ حتى يبيّن الورد.
+ خيارات الرابط: ‎bg=night|black|emerald‎ (الخلفية) و ‎pos=right|left|center‎ (مكان الأداة)
+ ===================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200..600&family=Amiri:wght@400;700&display=swap">
+<style>
+  :root { --ink:#efe9da; --muted:rgba(239,233,218,.7); --gold:#e6c879; --line:#e6d3a0; --track:rgba(255,255,255,.18); }
+  html, body { height:100%; margin:0; }
+  body { overflow:hidden; color:var(--ink); font-family:"Readex Pro", "Segoe UI", Tahoma, sans-serif; -webkit-user-select:none; user-select:none; cursor:default; }
+  body, body[data-bg="night"] { background:radial-gradient(120% 120% at 85% 8%, #17404d 0%, #0b1d24 42%, #05080a 100%); }
+  body[data-bg="black"] { background:#000; }
+  body[data-bg="emerald"] { background:radial-gradient(120% 90% at 100% 0%, #1d6b55 0%, transparent 55%), linear-gradient(160deg, #0f3d31, #061d17); }
+  /* مشربية خفيفة بالزاوية (إلا الأسود) */
+  body:not([data-bg="black"])::before {
+    content:""; position:fixed; bottom:-6vmin; left:-6vmin; width:46vmin; height:46vmin; opacity:.28; pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%231d4f5c'/%3E%3Cg fill='%2306131a'%3E%3Ccircle cx='18' cy='18' r='9'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='36' cy='0' r='6'/%3E%3Ccircle cx='0' cy='36' r='6'/%3E%3Ccircle cx='36' cy='36' r='6'/%3E%3C/g%3E%3Ccircle cx='18' cy='18' r='2' fill='%23c9a45c'/%3E%3C/svg%3E") 0 0 / clamp(30px, 4.6vmin, 56px);
+    -webkit-mask-image:radial-gradient(100% 100% at 0 100%, #000 25%, transparent 70%); mask-image:radial-gradient(100% 100% at 0 100%, #000 25%, transparent 70%);
+  }
+  body[data-bg="emerald"]::before { opacity:.45; filter:hue-rotate(-25deg); }
+  .pos { position:fixed; top:7vh; right:5vw; }
+  body[data-pos="left"] .pos { right:auto; left:5vw; }
+  body[data-pos="center"] .pos { top:50%; right:50%; transform:translate(50%, -50%); }
+  .w { display:flex; flex-direction:column; align-items:flex-start; gap:.8vh; text-shadow:0 2px 14px rgba(0,0,0,.35); transition:transform 1.2s ease; }
+  body[data-pos="center"] .w { align-items:center; text-align:center; }
+  .clock { display:inline-flex; align-items:baseline; gap:.16em; font:200 clamp(64px, 11vw, 230px)/1 "Readex Pro", "Segoe UI", sans-serif; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .clock small { font-size:.27em; font-weight:400; opacity:.78; }
+  .date { font-size:clamp(14px, 1.55vw, 28px); color:var(--muted); }
+  .line { margin-top:1.4vh; max-width:min(46vw, 30ch); min-height:3.6em; font:400 clamp(18px, 2.1vw, 38px)/1.8 "Amiri", "Traditional Arabic", serif; color:var(--line); text-wrap:balance; transition:opacity .6s ease; }
+  body[data-pos="center"] .line { max-width:min(70vw, 40ch); }
+  .line.is-fading { opacity:0; }
+  .wl { display:flex; align-items:center; gap:1vw; margin-top:.6vh; font-size:clamp(12px, 1.25vw, 22px); color:var(--muted); }
+  .wl[hidden] { display:none; }
+  .bar { width:clamp(110px, 13vw, 260px); height:clamp(4px, .45vw, 8px); border-radius:8px; background:var(--track); overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; border-radius:inherit; background:var(--gold); transition:width .6s ease; }
+  @media (prefers-reduced-motion: reduce) { .w, .line, .bar i { transition:none; } }
+</style>
+</head>
+<body>
+<div class="pos"><div class="w" id="w">
+  <span class="clock" id="clock"><span id="time">–</span><small id="period"></small></span>
+  <span class="date" id="date"></span>
+  <p class="line" id="line" aria-live="off"></p>
+  <span class="wl" id="wl" hidden>ورد اليوم <span class="bar"><i id="bar"></i></span> <span id="pct"></span></span>
+</div></div>
+<script src="common.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const q = MdkWidget.q;
+  document.body.dataset.bg = ['night', 'black', 'emerald'].includes(q.get('bg')) ? q.get('bg') : 'night';
+  document.body.dataset.pos = ['right', 'left', 'center'].includes(q.get('pos')) ? q.get('pos') : 'right';
+  let data = null;
+  const tick = () => { const c = MdkWidget.clock(); $('time').textContent = c.time; $('period').textContent = c.period; };
+  function render(d) {
+    data = d;
+    $('date').textContent = d.hijri ? `${d.greg} – ${d.hijri}` : d.greg;
+    const w = d.wird;
+    $('wl').hidden = !w;
+    if (w) {
+      $('bar').style.width = w.pct + '%';
+      $('pct').textContent = w.complete ? 'الختمة كاملة' : w.done ? 'تمّ، تقبّل الله' : `${MdkWidget.AR(w.pct)}٪`;
+    }
+    if (!$('line').textContent) $('line').textContent = lines()[0] || '';
+  }
+  // السطر الهادئ: ذكر الوقت، وآية أو حديث اليوم
+  const lines = () => (data ? [data.dhikr && data.dhikr.t, data.daily && `${data.daily.t} (${data.daily.s})`] : []);
+  MdkWidget.start(render, tick);
+  MdkWidget.rotate($('line'), lines, 14000);
+  MdkWidget.antiBurn($('w'));
+})();
+</script>
+</body>
+</html>

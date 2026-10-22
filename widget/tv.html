@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b3d31">
+<title>لوحة مُذكّر</title>
+<!-- =====================================================================
+ مُذكّر — widget/tv.html  (الإصدار ١٧، معرض ١٠: ت١ «شاشة توقف مُذكّر»، بنمط س١ «لوحة التلفزيون»)
+ الساعة، والتاريخين، وآية أو حديث اليوم، وورد اليوم، وذكر الوقت — على شاشة التلفزيون كلها.
+ هي الصفحة يلي بتعرضها شاشة التوقف بتطبيق أندرويد TV، وبتنفتح كمان من متصفح أي تلفزيون.
+ الرابط بيجي جاهز من التطبيق («أدوات مُذكّر») ومعه رمز الأداة ‎?k=…‎ حتى يبيّن الورد.
+ ===================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300..700&family=Amiri+Quran&family=Amiri:wght@400;700&display=swap">
+<style>
+  html, body { height:100%; margin:0; }
+  body {
+    overflow:hidden; color:#f2efe6; font-family:"Readex Pro", "Segoe UI", Tahoma, sans-serif; -webkit-user-select:none; user-select:none; cursor:none;
+    background:radial-gradient(120% 90% at 100% 0%, #1d6b55 0%, transparent 55%), linear-gradient(160deg, #0f3d31, #061d17);
+  }
+  body::before {
+    content:""; position:fixed; top:-3vmin; left:-6vmin; width:48vmin; height:48vmin; opacity:.5; pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' fill='%231d6b55'/%3E%3Cg fill='%230b2a21'%3E%3Ccircle cx='18' cy='18' r='9'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='36' cy='0' r='6'/%3E%3Ccircle cx='0' cy='36' r='6'/%3E%3Ccircle cx='36' cy='36' r='6'/%3E%3C/g%3E%3Ccircle cx='18' cy='18' r='2' fill='%23c9a45c'/%3E%3C/svg%3E") 0 0 / clamp(28px, 4.6vmin, 56px);
+    -webkit-mask-image:radial-gradient(120% 90% at 0 0, #000 35%, transparent 72%); mask-image:radial-gradient(120% 90% at 0 0, #000 35%, transparent 72%);
+  }
+  .b {
+    position:fixed; inset:0; box-sizing:border-box; padding:clamp(18px, 4vmin, 64px); display:grid; gap:clamp(12px, 2vmin, 28px);
+    grid-template-columns:1.1fr 1fr; grid-template-rows:auto 1fr auto; transition:transform 1.2s ease;
+  }
+  .top { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:clamp(14px, 2.1vmin, 26px); opacity:.88; }
+  .brand { font-weight:700; color:#e6c879; }
+  .clock { align-self:center; display:inline-flex; align-items:baseline; gap:.16em; font:300 clamp(64px, 19vmin, 240px)/1 "Readex Pro", sans-serif; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .clock small { font-size:.28em; font-weight:400; opacity:.75; }
+  .card { min-width:0; min-height:0; overflow:hidden; display:flex; flex-direction:column; gap:clamp(4px, .9vmin, 12px); padding:clamp(14px, 2.8vmin, 34px); border-radius:clamp(16px, 2.6vmin, 32px); }
+  .daily { align-self:center; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.08); }
+  .row { grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:inherit; }
+  .row .card { background:rgba(0,0,0,.24); border:1px solid rgba(255,255,255,.06); }
+  .row.one { grid-template-columns:1fr; }
+  .k { font-size:clamp(12px, 1.8vmin, 21px); color:#e6c879; }
+  .src { font-size:clamp(12px, 1.7vmin, 20px); opacity:.72; }
+  .txt { margin:0; font:400 clamp(18px, 3.4vmin, 44px)/1.9 "Amiri", serif; text-wrap:balance; }
+  .txt.q { font-family:"Amiri Quran", "Amiri", serif; }
+  .txt.d { font-size:clamp(16px, 2.8vmin, 34px); }
+  .big { font-size:clamp(16px, 2.9vmin, 34px); font-weight:600; line-height:1.4; }
+  .bar { display:block; height:clamp(5px, .8vmin, 10px); border-radius:9px; background:rgba(255,255,255,.14); overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; border-radius:inherit; background:#e6c879; transition:width .6s ease; }
+  [hidden] { display:none !important; }
+  @media (max-aspect-ratio: 1/1) { .b { grid-template-columns:1fr; grid-template-rows:auto auto 1fr auto; } .row { grid-template-columns:1fr; } }
+  @media (prefers-reduced-motion: reduce) { .b, .bar i { transition:none; } }
+</style>
+</head>
+<body>
+<main class="b" id="b">
+  <div class="top"><span id="date"></span><span class="brand">مُذكّر</span></div>
+  <div class="clock"><span id="time">–</span><small id="period"></small></div>
+  <section class="card daily"><span class="k" id="dk">آية اليوم</span><p class="txt" id="dt"></p><span class="src" id="ds"></span></section>
+  <div class="row" id="row">
+    <section class="card" id="wird" hidden><span class="k" id="wk">ورد اليوم</span><b class="big" id="wb"></b><span class="bar"><i id="bar"></i></span><span class="src" id="ws"></span></section>
+    <section class="card"><span class="k" id="hk">ذكر الوقت</span><p class="txt d" id="ht"></p></section>
+  </div>
+</main>
+<script src="common.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const AR = MdkWidget.AR;
+  const times = n => (n === 2 ? 'مرتين' : `${AR(n)} ${n <= 10 ? 'مرات' : 'مرة'}`);
+  const tick = () => { const c = MdkWidget.clock(); $('time').textContent = c.time; $('period').textContent = c.period; };
+  function render(d) {
+    $('date').textContent = d.hijri ? `${d.greg} – ${d.hijri}` : d.greg;
+    if (d.daily) { $('dk').textContent = d.daily.k; $('dt').textContent = d.daily.t; $('dt').classList.toggle('q', !!d.daily.q); $('ds').textContent = d.daily.s; }
+    if (d.dhikr) { $('hk').textContent = d.dhikr.k + (d.dhikr.n > 1 ? `، ${times(d.dhikr.n)}` : ''); $('ht').textContent = d.dhikr.t; }
+    const w = d.wird;
+    $('wird').hidden = !w; $('row').classList.toggle('one', !w);
+    if (w) {
+      $('wk').textContent = 'ورد اليوم' + (w.title ? '، ' + w.title : '');
+      $('wb').textContent = w.complete ? 'الختمة كاملة، تقبّل الله' : w.done ? 'تمّ، تقبّل الله' : w.range || w.line;
+      $('bar').style.width = w.pct + '%';
+      $('ws').textContent = `أنجزت ${AR(w.pct)}٪، ${w.streak}`;
+    }
+  }
+  MdkWidget.start(render, tick);
+  MdkWidget.antiBurn($('b'), 8);
+})();
+</script>
+</body>
+</html>
