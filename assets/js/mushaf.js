@@ -185,12 +185,13 @@ const Mushaf = (() => {
         const theme = root.closest('.reader')?.dataset.theme || 'light';
         const P = BANNER[theme] || BANNER.light;
         root.querySelectorAll('.qp-surah').forEach(b => {
-            const r = b.getBoundingClientRect();
-            if (r.width < 40 || r.height < 8) return;
-            const key = `${theme}:${Math.round(r.width)}x${Math.round(r.height)}`;
+            // القياس الحقيقي (offset) مو يلي عالشاشة: وقت حركة قلب الورقة الصفحة مايلة، فـ getBoundingClientRect بيعطي قياس غلط
+            const w = b.offsetWidth, h = b.offsetHeight;
+            if (w < 40 || h < 8) return;
+            const key = `${theme}:${w}x${h}`;
             if (b.dataset.drawn === key) return;
             b.dataset.drawn = key;
-            b.style.backgroundImage = bannerSVG(Math.round(r.width), Math.round(r.height), P);
+            b.style.backgroundImage = bannerSVG(w, h, P);
             b.style.setProperty('--ban-ink', P.ink);
         });
     }
@@ -261,7 +262,9 @@ const Mushaf = (() => {
         card.style.setProperty('--qfs', '20px');
         body.classList.add('is-measuring');
         const ins = [...body.querySelectorAll('.qp-line:not(.is-banner):not(.is-basmala) > .qp-in')];
-        const widths = ins.map(x => x.getBoundingClientRect().width);
+        // عرض كل سطر بالقياس الحقيقي (offsetWidth)، مو getBoundingClientRect: هاد بيتأثر بحركة قلب الورقة
+        // (الصفحة بتكون مايلة rotateY وقت الرسم) فكانت السطور تطلع أعرض من الشاشة بعد التقليب. +١ احتياط للتقريب
+        const widths = ins.map(x => x.offsetWidth + 1);
         body.classList.remove('is-measuring');
         const longest = Math.max(1, ...widths), maxW = Math.max(longest / 20, 13.2);
         const padX = Math.min(26, Math.max(12, boxW * .035));
