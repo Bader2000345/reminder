@@ -160,7 +160,8 @@ const WeekLog = (() => {
 
 const Backup = (() => {
     const $ = id => document.getElementById(id);
-    const SKIP = /^mudhakkir-(qp1-|push-sent|update-dismissed|mushaf-offline)/; // صفحات المصحف المخزنة (بتتنزّل من جديد) وحالات مؤقتة
+    // صفحات المصحف المخزنة (بتتنزّل من جديد) وحالات مؤقتة، ورمز وضع المطوّر (ما بيطلع بأي نسخة احتياطية)
+    const SKIP = /^mudhakkir-(qp1-|push-sent|update-dismissed|mushaf-offline|dev-)/;
     const keys = () => { try { return Object.keys(localStorage).filter(k => k.startsWith('mudhakkir-') && !SKIP.test(k)); } catch (e) { return []; } };
     async function save() {
         const data = {};
@@ -214,7 +215,8 @@ const Shortcuts = (() => {
             'tasbih-mode': () => { navigateTo('tasbih'); setTimeout(() => Tasbih.openMode(), 350); },
             morning: () => { navigateTo('adhkar'); setTimeout(() => AdhkarViewer.open('morning'), 300); },
             evening: () => { navigateTo('adhkar'); setTimeout(() => AdhkarViewer.open('evening'), 300); },
-            screen: () => MdkScreen.open()
+            screen: () => MdkScreen.open(),
+            inbox: () => navigateTo('feedback') // إشعار «رسالة جديدة» على جهاز المطوّر
         }[open];
         if (!act) return;
         history.replaceState(history.state, '', location.pathname);

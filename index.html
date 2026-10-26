@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="assets/css/16-layout.css">
     <link rel="stylesheet" href="assets/css/17-mushaf.css">
     <link rel="stylesheet" href="assets/css/18-screen.css">
+    <link rel="stylesheet" href="assets/css/19-feedback.css">
 </head>
 <body>
 
@@ -83,6 +84,9 @@
                     </button>
                 </div>
             </header>
+
+            <!-- ر٢ «وصلك رد على ملاحظتك» وع١ إعلان من المطوّر (feedback.js) -->
+            <div class="home-notes" id="home-notes" hidden></div>
 
             <section class="home-dashboard" aria-label="لوحة التحكم اليومية">
                 <article class="home-card dhikr-card">
@@ -509,6 +513,16 @@
                     </div>
                     <button class="ghost-button" type="button" id="check-update-btn">فحص التحديث</button>
                 </article>
+                <!-- ل١ ملاحظات وشكاوي (feedback.js): بتوصل للمطوّر. على جهاز المطوّر بتفتح صندوق الرسائل (dev.js) -->
+                <article class="setting-card fb-setting" id="fb-setting">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10.5H10l-5 4v-4H4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>ملاحظات وشكاوي</h2>
+                        <p id="fb-setting-status">شكوى أو اقتراح أو خطأ لاحظته، بتوصل للمطوّر مباشرة</p>
+                    </div>
+                    <span class="fb-pill" id="fb-setting-new" hidden>جديد</span>
+                    <button class="ghost-button" type="button" data-target="feedback">افتح</button>
+                </article>
                 <article class="setting-card install-setting" data-install-box>
                     <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3M10.5 18.5h3"/></svg></div>
                     <div style="flex:1;">
@@ -522,8 +536,65 @@
                     </div>
                     <p class="ic-note" data-install-note hidden></p>
                 </article>
+                <!-- للمطوّرين (dev.js): بيبين بس على جهاز المطوّر. أول مرة على أي جهاز: ٧ كبسات ورا بعض على «التحديثات» -->
+                <button class="dev-link" id="dev-link" type="button" data-target="dev" hidden>للمطوّرين</button>
             </section>
             <footer><span>مُذكّر</span><span>إعداداتك محفوظة تلقائيًا</span></footer>
+        </section>
+
+        <!-- ملاحظات وشكاوي (feedback.js، ل١): النموذج ورسائلك والردود. على جهاز المطوّر بتصير صندوق الرسائل (dev.js، ص١) -->
+        <section id="page-feedback" class="page-view">
+            <button class="fb-back" type="button" data-target="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg>الإعدادات</button>
+            <header class="page-header">
+                <div><h1 id="fb-title">ملاحظات وشكاوي</h1><p class="page-lead" id="fb-lead">بتوصل للمطوّر مباشرة، ومنقرا كل رسالة</p></div>
+            </header>
+            <div class="fb-user" id="fb-user">
+                <form class="fb-card" id="fb-form" novalidate>
+                    <span class="fb-label" id="fb-type-label">نوع الرسالة</span>
+                    <div class="fb-chips" id="fb-types" role="radiogroup" aria-labelledby="fb-type-label">
+                        <button type="button" role="radio" aria-checked="false" data-type="complaint" data-t="complaint"><i aria-hidden="true"></i>شكوى</button>
+                        <button type="button" role="radio" aria-checked="false" data-type="idea" data-t="idea"><i aria-hidden="true"></i>اقتراح</button>
+                        <button type="button" role="radio" aria-checked="false" data-type="bug" data-t="bug"><i aria-hidden="true"></i>خطأ بالتطبيق</button>
+                        <button type="button" role="radio" aria-checked="false" data-type="thanks" data-t="thanks"><i aria-hidden="true"></i>شكر</button>
+                    </div>
+                    <span class="fb-label" id="fb-stars-label">قدّيش راضي عن مُذكّر؟ <small>(اختياري)</small></span>
+                    <div class="fb-stars" id="fb-stars" role="radiogroup" aria-labelledby="fb-stars-label">
+                        <button type="button" role="radio" aria-checked="false" data-star="1" aria-label="نجمة وحدة">★</button>
+                        <button type="button" role="radio" aria-checked="false" data-star="2" aria-label="نجمتين">★</button>
+                        <button type="button" role="radio" aria-checked="false" data-star="3" aria-label="٣ نجوم">★</button>
+                        <button type="button" role="radio" aria-checked="false" data-star="4" aria-label="٤ نجوم">★</button>
+                        <button type="button" role="radio" aria-checked="false" data-star="5" aria-label="٥ نجوم">★</button>
+                    </div>
+                    <textarea id="fb-text" rows="5" maxlength="1500" placeholder="اكتب ملاحظتك هون…" aria-label="ملاحظتك"></textarea>
+                    <p class="fb-note">بنبعت معها نسخة التطبيق ونوع جهازك بس، حتى نصلّح الأخطاء أسرع. بلا اسم ولا رقم.</p>
+                    <p class="fb-error" id="fb-error" role="alert" hidden></p>
+                    <button class="primary-button" type="submit" id="fb-send">إرسال</button>
+                    <p class="fb-ok" id="fb-ok" role="status" hidden>وصلت رسالتك، شكرًا إلك. إذا رد المطوّر بيطلعلك الرد هون.</p>
+                </form>
+                <h2 class="fb-sec-t" id="fb-mine-title" hidden>رسائلك</h2>
+                <div class="fb-mine" id="fb-mine"></div>
+            </div>
+            <div class="fb-inbox" id="fb-inbox" hidden></div>
+        </section>
+
+        <!-- للمطوّرين (dev.js): ق٢ صفحة قفل بكلمة السر كل ما ينفتح التطبيق، وط٣ قائمة أقسام. ما بتبين إلا على جهاز المطوّر -->
+        <section id="page-dev" class="page-view">
+            <button class="fb-back" type="button" data-target="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg>الإعدادات</button>
+            <div class="dv-lock" id="dv-lock">
+                <span class="dv-lock-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+                <h1>للمطوّرين</h1>
+                <p>هالصفحة لصاحب التطبيق بس.</p>
+                <form class="dv-lock-form" id="dv-lock-form" novalidate>
+                    <div class="dv-pw">
+                        <input id="dv-key" type="password" autocomplete="current-password" aria-label="كلمة السر" placeholder="كلمة السر" maxlength="200" enterkeyhint="go">
+                        <button type="button" class="dv-eye" id="dv-eye" aria-label="إظهار كلمة السر" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    </div>
+                    <p class="fb-error" id="dv-lock-error" role="alert" hidden></p>
+                    <button class="primary-button" type="submit" id="dv-open">فتح</button>
+                    <p class="dv-hint">بعد ٥ محاولات غلط بيتقفل ربع ساعة.</p>
+                </form>
+            </div>
+            <div class="dv-main" id="dv-main" hidden></div>
         </section>
 
     </main>
@@ -871,6 +942,8 @@
 <script src="assets/js/extras.js" defer></script>
 <script src="assets/js/screen.js" defer></script>
 <script src="assets/js/widgets.js" defer></script>
+<script src="assets/js/feedback.js" defer></script>
+<script src="assets/js/dev.js" defer></script>
 <script src="assets/js/time-context.js" defer></script>
 <script src="assets/js/atmosphere.js" defer></script>
 <script src="assets/js/motion.js" defer></script>

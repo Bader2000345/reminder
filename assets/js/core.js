@@ -133,9 +133,11 @@ const QuranTabs = (() => {
 })();
 
 // 1. Navigation SPA
-const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings'];
+const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings', 'feedback', 'dev'];
 // صفحات قديمة صارت جزء من صفحة القرآن: «القراءة الحرة» = زر «افتح المصحف» (روابط المساعد وإشعار الكهف القديمة تبقى شغّالة)
 const PAGE_ALIAS = { 'free-reading': ['quran', 'mushaf'], wird: ['quran', 'wird'] };
+// صفحات بتنفتح من الإعدادات (الإصدار ٢٠): زر «الإعدادات» بالشريط بيضل مفعّل عليها
+const NAV_PARENT = { feedback: 'settings', dev: 'settings' };
 function navigateTo(pageId, tab) {
     if (PAGE_ALIAS[pageId]) [pageId, tab] = PAGE_ALIAS[pageId];
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -146,8 +148,9 @@ function navigateTo(pageId, tab) {
         const targetPage = document.getElementById('page-' + pageId);
         if (targetPage) targetPage.classList.add('active-page');
 
+        const navId = NAV_PARENT[pageId] || pageId;
         document.querySelectorAll('.side-link').forEach(link => {
-            if (link.getAttribute('data-target') === pageId) link.classList.add('active');
+            if (link.getAttribute('data-target') === navId) link.classList.add('active');
             else link.classList.remove('active');
         });
         updateNavPill();

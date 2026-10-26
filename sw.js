@@ -15,11 +15,11 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v32';
+const CACHE = 'mudhakkir-v33';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
-const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion', '14-performance', '15-look', '16-layout', '17-mushaf', '18-screen'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'offline', 'mushaf', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'screen', 'widgets', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
+const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion', '14-performance', '15-look', '16-layout', '17-mushaf', '18-screen', '19-feedback'].map(n => `./assets/css/${n}.css`);
+const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'offline', 'mushaf', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'screen', 'widgets', 'feedback', 'dev', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
 // محتوى «شاشة مُذكّر» (نفس محتوى الأدوات برّا التطبيق): بيتخزّن متل ملفات التطبيق حتى تشتغل الشاشة بلا نت
 const DATA_FILES = ['./assets/data/widget-content.json'];
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES, ...DATA_FILES,
@@ -306,6 +306,7 @@ self.addEventListener('notificationclick', event => {
         if (action === 'ask' && typeof event.reply === 'string' && event.reply.trim()) return answerFromNotification(event.reply);
         if (action === 'ask' || action === 'open-ask' || data.kind === 'ask-answer') return focusApp({ type: 'mdk-open-ask' }, './?ask=1');
         if (action === 'kahf' || data.open === 'kahf') return focusApp({ type: 'mdk-open-kahf' }, './?open=kahf');
+        if (data.kind === 'message') return data.url === './?open=inbox' ? focusApp({ type: 'mdk-open-inbox' }, './?open=inbox') : focusApp({ type: 'mdk-focus' }, './');
         const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
         if (data.url) {
             const url = new URL(data.url, self.registration.scope).href;
@@ -348,6 +349,17 @@ async function checkUpdateNotice() {
 // ← الإصدار ١٣: كل نبضة لازم يطلع منها إشعار، حتى والتطبيق مفتوح. على الآيفون النبضة «الصامتة» بتخلّي Safari
 //   يلغي اشتراك الموقع بعد كم مرة، فبتوقف كل الإشعارات والسيرفر لسا مفكّر حاله عم يبعت.
 self.addEventListener('push', event => {
+    // الإصدار ٢٠: إشعار فيه نص من السيرفر (رسالة جديدة بصندوق المطوّر، إعلان من المطوّر، تجربة إشعار المطوّر).
+    // التذكيرات والأذكار بتضل نبضة بلا محتوى، ونحن منقرر شو نعرض تحت.
+    let msg = null;
+    try { msg = event.data ? event.data.json() : null; } catch (e) {}
+    if (msg && msg.mdk === 1 && msg.title) {
+        event.waitUntil(self.registration.showNotification(String(msg.title).slice(0, 80), {
+            body: String(msg.body || '').slice(0, 400), tag: String(msg.tag || 'mdk-msg').slice(0, 40), renotify: true,
+            lang: 'ar', dir: 'rtl', icon: ICON, badge: BADGE, data: { kind: 'message', url: typeof msg.url === 'string' && msg.url.startsWith('./') ? msg.url : './' }
+        }));
+        return;
+    }
     event.waitUntil(serial(async () => {
         const now = Date.now();
         // إشعار تجربة من «فحص الإشعارات»

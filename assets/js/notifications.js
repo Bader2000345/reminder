@@ -149,7 +149,9 @@ const PushSync = (() => {
         const reminders = allReminders().filter(r => r.on && Sched.next(r))
             .concat(Array.isArray(snoozes) ? snoozes.filter(s => s && s.at > Date.now() - 60000) : [])
             .map(({ id, time, repeat, days, date }) => ({ id, time, repeat, days, date }));
-        const need = Notifier.permission() === 'granted' && (general || reminders.length > 0);
+        // جهاز المطوّر بيضل مشترك حتى بلا تذكيرات، كرمال إشعار «رسالة جديدة» (dev.js)
+        const devPush = (() => { try { return localStorage.getItem('mudhakkir-dev-push') === '1' && !!localStorage.getItem('mudhakkir-dev-device'); } catch (e) { return false; } })();
+        const need = Notifier.permission() === 'granted' && (general || reminders.length > 0 || devPush);
         try {
             const reg = await navigator.serviceWorker.ready;
             let sub = await reg.pushManager.getSubscription();
