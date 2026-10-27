@@ -1,16 +1,17 @@
 /* =====================================================================
  * مُذكّر — dev.js  (الإصدار ٢٠، معرض ٩)
- * وضع المطوّر، ما بيبين لحدا غير صاحب التطبيق:
- *   • أول مرة على أي جهاز: ٧ كبسات ورا بعض على «التحديثات» بالإعدادات ← صفحة القفل (ق٢) ← كلمة السر.
+ * وضع المطوّر، ما بيبين لحدا غير صاحب التطبيق، وعلى جواله ولابتوبه بس (السيرفر بيقبل جهازين):
+ *   • أول مرة على الجهاز: ٥ كبسات ورا بعض على زر «مُذكّر، الإصدار…» بآخر الإعدادات ← صفحة القفل (ق٢) ← كلمة السر.
  *   • بعدها الجهاز بيتذكّر (رمز موقّع لسنة: mudhakkir-dev-device، وما بيطلع بالنسخة الاحتياطية):
- *     بيبين «للمطوّرين» بآخر الإعدادات، و«ملاحظات وشكاوي» بتصير صندوق الرسائل (ص١) بلا كلمة سر.
+ *     بيبين «للمطوّرين» بآخر الإعدادات، و«ملاحظات وشكاوي» بتصير صندوق الرسائل (ص١) بلا كلمة سر،
+ *     وبطاقة «صندوق الرسائل» بأول الرئيسية لما يكون في رسائل جديدة.
  *   • صفحة المطوّرين (ط٣) بتطلب كلمة السر كل ما ينفتح التطبيق (رمز الجلسة بالذاكرة بس، ١٢ ساعة بالأكتر).
  * كلمة السر نفسها بـ Cloudflare (Secret اسمه DEV_KEY)، ما بتنكتب بأي ملف ولا بتنحفظ عالجهاز.
  * يعتمد على Feedback (feedback.js) و PUSH_SERVER و PushSync و Notifier (notifications.js) و Toast و navigateTo.
  * ===================================================================== */
 const Dev = (() => {
     const $ = id => document.getElementById(id);
-    const KEY_DEVICE = 'mudhakkir-dev-device', KEY_PUSH = 'mudhakkir-dev-push', KEY_PUSH_AT = 'mudhakkir-dev-push-at';
+    const KEY_DEVICE = 'mudhakkir-dev-device', KEY_PUSH = 'mudhakkir-dev-push', KEY_PUSH_AT = 'mudhakkir-dev-push-at', KEY_ID = 'mudhakkir-dev-id';
     const F = Feedback, ar = Feedback.ar, esc = Feedback.esc;
     const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
     const ICON = {
@@ -19,10 +20,11 @@ const Dev = (() => {
         mega: svg('<path d="M4 10v4h3l7 4.5v-13L7 10z"/><path d="M17.5 9a4 4 0 0 1 0 6"/>'),
         pulse: svg('<path d="M3 12h4l2.5-6 5 12 2.5-6h4"/>'),
         bell: svg('<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'),
+        devices: svg('<rect x="2.5" y="5" width="13" height="9.5" rx="1.5"/><path d="M1.5 17.5h15"/><rect x="17" y="8" width="5.5" height="11" rx="1.3"/>'),
         back: svg('<path d="M9.5 6l6 6-6 6"/>'),
         go: svg('<path d="M14.5 6l-6 6 6 6"/>')
     };
-    const TITLES = { nums: 'الأرقام', ann: 'إعلان لكل المستخدمين', tools: 'أدوات الفحص' };
+    const TITLES = { nums: 'الأرقام', ann: 'إعلان لكل المستخدمين', tools: 'أدوات الفحص', devices: 'الأجهزة المسموحة' };
     const TZ = { 'Asia/Damascus': 'دمشق', 'Asia/Riyadh': 'الرياض', 'Asia/Amman': 'عمّان', 'Asia/Beirut': 'بيروت', 'Asia/Baghdad': 'بغداد', 'Asia/Kuwait': 'الكويت', 'Asia/Qatar': 'الدوحة', 'Asia/Dubai': 'دبي', 'Asia/Bahrain': 'البحرين', 'Asia/Muscat': 'مسقط', 'Asia/Aden': 'عدن', 'Asia/Gaza': 'غزة', 'Asia/Hebron': 'الخليل', 'Africa/Cairo': 'القاهرة', 'Africa/Tripoli': 'طرابلس', 'Africa/Tunis': 'تونس', 'Africa/Algiers': 'الجزائر', 'Africa/Casablanca': 'الدار البيضاء', 'Africa/Khartoum': 'الخرطوم', 'Europe/Istanbul': 'إسطنبول', 'Europe/Berlin': 'برلين', 'Europe/Amsterdam': 'أمستردام', 'Europe/Stockholm': 'ستوكهولم', 'Europe/London': 'لندن', 'Europe/Paris': 'باريس', 'Europe/Vienna': 'فيينا', 'America/New_York': 'نيويورك', 'America/Toronto': 'تورنتو', UTC: 'UTC' };
     const tzName = t => TZ[t] || String(t).split('/').pop().replace(/_/g, ' ');
     const msgs = n => (n === 1 ? 'رسالة جديدة' : n === 2 ? 'رسالتين جداد' : `${ar(n)} ${n <= 10 ? 'رسائل جديدة' : 'رسالة جديدة'}`);
@@ -34,7 +36,21 @@ const Dev = (() => {
     const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let session = '';  // بالذاكرة بس: بينمسح كل ما يتسكّر التطبيق
-    let stats = null, health = null, view = 'list', confirmPush = false;
+    let stats = null, health = null, devs = null, view = 'list', confirmPush = false;
+    // رمز عشوائي لهالجهاز، حتى يعرف السيرفر إذا هو من جهازي المطوّر المسموحين
+    function deviceId() {
+        let id = '';
+        try { id = localStorage.getItem(KEY_ID) || ''; } catch (e) {}
+        if (!/^[a-z0-9]{20,40}$/.test(id)) {
+            id = [...crypto.getRandomValues(new Uint8Array(16))].map(b => (b % 36).toString(36)).join('') + Date.now().toString(36);
+            try { localStorage.setItem(KEY_ID, id); } catch (e) {}
+        }
+        return id;
+    }
+    function deviceLabel() {
+        const i = F.deviceInfo();
+        return [INFO.platform[i.platform] || i.os, i.browser, i.installed ? 'التطبيق المثبّت' : ''].filter(Boolean).join('، ').slice(0, 40);
+    }
     const box = { items: [], counts: null, avg: 0, filter: 'all', archived: false, open: '', state: 'idle' };
 
     async function api(path, body) {
@@ -54,9 +70,18 @@ const Dev = (() => {
     function paint() {
         const dev = isDevice();
         $('dev-link').hidden = !dev;
+        const unread = box.counts ? box.counts.unread : 0;
         const st = $('fb-setting-status');
         if (st) st.textContent = !dev ? 'شكوى أو اقتراح أو خطأ لاحظته، بتوصل للمطوّر مباشرة'
-            : box.counts ? `صندوق الرسائل: ${box.counts.unread ? msgs(box.counts.unread) : 'ما في رسائل جديدة'}` : 'صندوق الرسائل';
+            : box.counts ? `صندوق الرسائل: ${unread ? msgs(unread) : 'ما في رسائل جديدة'}` : 'صندوق الرسائل';
+        $('dev-link-sub').textContent = unread ? `صندوق الرسائل: ${msgs(unread)}` : 'صندوق الرسائل والأرقام والإعلان';
+        F.renderHome();
+    }
+    // بطاقة بأول الرئيسية على جهاز المطوّر لما يكون في رسائل جديدة (feedback.js بيعرضها)
+    function homeCard() {
+        const unread = isDevice() && box.counts ? box.counts.unread : 0;
+        if (!unread) return '';
+        return `<button type="button" class="hn-card hn-reply hn-inbox" data-hn="inbox"><span class="hn-ic" aria-hidden="true">${ICON.fb}</span><span class="hn-body"><b>صندوق الرسائل: ${msgs(unread)}</b><small>اكبس لتقراها وترد</small></span><span class="hn-go" aria-hidden="true">${ICON.go}</span></button>`;
     }
     async function currentSub() {
         try {
@@ -218,7 +243,7 @@ const Dev = (() => {
         const fail = text => { err.textContent = text; err.hidden = false; input.focus(); };
         if (!key) return fail('اكتب كلمة السر.');
         btn.disabled = true; btn.textContent = 'جارٍ الفتح…';
-        const r = await api('/dev/login', { key });
+        const r = await api('/dev/login', { key, dev: deviceId(), label: deviceLabel() });
         input.value = ''; // ما منخلّي كلمة السر بالصفحة
         btn.disabled = false; btn.textContent = 'فتح';
         if (r.ok && r.data.device && r.data.session) {
@@ -229,6 +254,7 @@ const Dev = (() => {
             showMain('list');
             return;
         }
+        if (r.status === 403 && r.data.error === 'device') return fail('هالجهاز مو من جهازيك المسموحين. افتح صفحة المطوّرين على جوالك أو لابتوبك، ومن «الأجهزة المسموحة» شيل جهاز لتضيف هاد.');
         if (r.status === 403) return fail(r.data.left ? `كلمة السر غلط. باقيلك ${tries(r.data.left)}.` : 'كلمة السر غلط. تقفلت ربع ساعة.');
         if (r.status === 429) return fail('تقفلت بعد محاولات غلط كتير. جرّب بعد ربع ساعة.');
         if (r.status === 503) return fail('لسا ما انحطّت كلمة السر بـ Cloudflare (DEV_KEY).');
@@ -242,9 +268,23 @@ const Dev = (() => {
         view = v; confirmPush = false;
         renderMain(true);
         window.scrollTo({ top: 0, behavior: 'auto' });
-        if (v !== 'tools') loadStats();
+        if (v !== 'tools' && v !== 'devices') loadStats();
         if (v === 'tools' || v === 'list') loadHealth();
+        if (v === 'devices' || v === 'list') loadDevices();
         if (v === 'list' && !box.counts) loadInbox();
+    }
+    async function loadDevices(remove) {
+        const r = await api('/dev/devices', remove ? { tok: session, remove } : { tok: session });
+        if (r.status === 401) return sessionOver();
+        if (r.ok) { devs = r.data; if (!$('dv-main').hidden) renderMain(); }
+    }
+    function devicesHTML() {
+        if (!devs) return '<p class="dv-wait">جارٍ التحميل…</p>';
+        const rows = devs.devices.map(d => `<div class="dv-row"><span class="dv-ic">${ICON.devices}</span><span class="dv-row-t"><b>${esc(d.label)}${d.me ? ' <span class="dv-badge is-ok">هالجهاز</span>' : ''}</b><small>آخر فتح ${F.when(d.last || d.at)}</small></span><button type="button" class="ghost-button dv-out" data-dv="dev-remove" data-id="${esc(d.id)}">شيل</button></div>`);
+        const free = devs.max - devs.devices.length;
+        return `<div class="dv-rows">${rows.join('')}</div>
+            <p class="dv-note">${free > 0 ? `في ${free === 1 ? 'مكان واحد فاضي' : ar(free) + ' أماكن فاضية'}: أول جهاز بيفتح بكلمة السر بيتسجّل.` : 'الجهازين محجوزين: أي جهاز تالت بيترفض حتى لو كلمة السر صح. شيل واحد لتضيف غيره.'}
+            إذا ضاع جوالك: غيّر كلمة السر (DEV_KEY) بـ Cloudflare، وبتنمسح القائمة كلها.</p>`;
     }
     async function loadStats() {
         const r = await api('/dev/stats', { tok: session });
@@ -270,7 +310,8 @@ const Dev = (() => {
             ['inbox', ICON.fb, 'صندوق الرسائل', c ? (c.unread ? msgs(c.unread) : 'ما في رسائل جديدة') : '…'],
             ['nums', ICON.chart, 'الأرقام', s ? `${s.subscribers ? ar(s.subscribers) + ' مشترك بالإشعارات' : 'لسا ما في مشتركين بالإشعارات'}، ${fb && fb.avg ? 'والتقييم ' + ar(fb.avg) + ' من ٥' : 'ولسا ما في تقييم'}` : '…'],
             ['ann', ICON.mega, 'إعلان لكل المستخدمين', s ? (s.announce ? `شغّال: «${s.announce.title}»` : 'ما في إعلان شغّال هلّق') : '…'],
-            ['tools', ICON.pulse, 'أدوات الفحص', health ? ({ 0: 'كلشي شغّال', 1: 'في شي بدّو انتباه', 2: 'في شغلتين بدهن انتباه' }[problems().length] || `في ${ar(problems().length)} شغلات بدها انتباه`) : '…']
+            ['tools', ICON.pulse, 'أدوات الفحص', health ? ({ 0: 'كلشي شغّال', 1: 'في شي بدّو انتباه', 2: 'في شغلتين بدهن انتباه' }[problems().length] || `في ${ar(problems().length)} شغلات بدها انتباه`) : '…'],
+            ['devices', ICON.devices, 'الأجهزة المسموحة', devs ? devs.devices.map(d => d.label).join('، ') || 'ما في أجهزة' : '…']
         ];
         return `<header class="page-header"><div><h1>للمطوّرين</h1><p class="page-lead">أرقام بلا أي بيانات شخصية</p></div></header>
             <span class="dv-badge is-ok">مفتوح على هالجهاز</span>
@@ -339,7 +380,7 @@ const Dev = (() => {
             return;
         }
         root.innerHTML = view === 'list' ? listHTML()
-            : `<button type="button" class="fb-back" data-dv="list">${ICON.back}للمطوّرين</button><header class="page-header"><div><h1>${TITLES[view]}</h1></div></header>${view === 'nums' ? numsHTML() : view === 'ann' ? annHTML() : toolsHTML()}`;
+            : `<button type="button" class="fb-back" data-dv="list">${ICON.back}للمطوّرين</button><header class="page-header"><div><h1>${TITLES[view]}</h1></div></header>${view === 'nums' ? numsHTML() : view === 'ann' ? annHTML() : view === 'devices' ? devicesHTML() : toolsHTML()}`;
         if (view === 'ann') $('dv-ann-form').addEventListener('submit', publish);
     }
     async function publish(e) {
@@ -416,7 +457,7 @@ const Dev = (() => {
     async function logout() {
         if (pushOn()) { const sub = await currentSub(); if (sub) await api('/dev/notify', { tok: deviceTok(), endpoint: sub.endpoint, on: false }); }
         try { [KEY_DEVICE, KEY_PUSH, KEY_PUSH_AT].forEach(k => localStorage.removeItem(k)); } catch (e) {}
-        session = ''; stats = null; health = null; box.items = []; box.counts = null;
+        session = ''; stats = null; health = null; devs = null; box.items = []; box.counts = null;
         paint();
         PushSync.sync();
         navigateTo('settings');
@@ -435,7 +476,14 @@ const Dev = (() => {
         if (!b) return;
         const act = b.dataset.dv;
         if (act === 'inbox') navigateTo('feedback');
-        else if (act === 'list' || act === 'nums' || act === 'ann' || act === 'tools') showMain(act);
+        else if (act === 'list' || act === 'nums' || act === 'ann' || act === 'tools' || act === 'devices') showMain(act);
+        else if (act === 'dev-remove') {
+            // تأكيد بكبسة تانية: شيل هالجهاز بيسكّر وضع المطوّر عليه فورًا
+            if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'متأكد؟'; return; }
+            b.disabled = true;
+            const me = devs && devs.devices.find(d => d.id === b.dataset.id && d.me);
+            loadDevices(b.dataset.id).then(() => { if (me) { deviceExpired(); navigateTo('settings'); } });
+        }
         else if (act === 'push') setPush(b.getAttribute('aria-checked') !== 'true', b);
         else if (act === 'logout') logout();
         else if (act === 'test') testPush(b);
@@ -443,17 +491,18 @@ const Dev = (() => {
         else if (act === 'ann-clear') clearAnnouncement(b);
     }
 
-    // ٧ كبسات ورا بعض على «التحديثات» بالإعدادات بتفتح صفحة القفل (متل خيارات المطوّر بالأندرويد)
+    // ٥ كبسات ورا بعض على زر «مُذكّر، الإصدار…» بآخر الإعدادات بتفتح صفحة القفل (متل خيارات المطوّر بالأندرويد).
+    // زر حقيقي مو نص: الآيفون كان يفهم الكبس السريع عالنص تكبير أو تحديد، فما كانت تنحسب الكبسات.
     function bindTaps() {
-        const card = $('app-version-label')?.closest('.setting-card');
-        if (!card) return;
+        const chip = $('ver-chip');
+        if (!chip) return;
+        chip.textContent = `مُذكّر، الإصدار ${ar(typeof APP_BUILD !== 'undefined' ? APP_BUILD : 0)}`;
         let n = 0, last = 0;
-        card.addEventListener('click', e => {
-            if (e.target.closest('button, a')) return;
+        chip.addEventListener('click', () => {
             const now = Date.now();
-            n = now - last < 700 ? n + 1 : 1;
+            n = now - last < 1200 ? n + 1 : 1;
             last = now;
-            if (n >= 7) { n = 0; navigateTo('dev'); }
+            if (n >= 5) { n = 0; navigateTo('dev'); }
         });
     }
     // جهاز المطوّر: عدد الرسائل الجديدة، والتأكد إن اشتراك الإشعار لسا مسجّل (مرة باليوم)
@@ -492,5 +541,5 @@ const Dev = (() => {
         setTimeout(refreshDevice, 6000);
         if (typeof SW_OK !== 'undefined' && SW_OK) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'mdk-open-inbox') navigateTo('feedback'); });
     }
-    return { init, isDevice, showInbox, showUser };
+    return { init, isDevice, showInbox, showUser, homeCard };
 })();

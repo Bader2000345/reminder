@@ -536,8 +536,14 @@
                     </div>
                     <p class="ic-note" data-install-note hidden></p>
                 </article>
-                <!-- للمطوّرين (dev.js): بيبين بس على جهاز المطوّر. أول مرة على أي جهاز: ٧ كبسات ورا بعض على «التحديثات» -->
-                <button class="dev-link" id="dev-link" type="button" data-target="dev" hidden>للمطوّرين</button>
+                <!-- للمطوّرين (dev.js): بيبين بس على جوال ولابتوب المطوّر المسجّلين -->
+                <button class="dev-row" id="dev-link" type="button" data-target="dev" hidden>
+                    <span class="dev-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+                    <span class="dev-row-t"><b>للمطوّرين</b><small id="dev-link-sub">صندوق الرسائل والأرقام والإعلان</small></span>
+                    <span class="dev-row-go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6l-6 6 6 6"/></svg></span>
+                </button>
+                <!-- رقم الإصدار (dev.js): ٥ كبسات ورا بعض عليه بتفتح صفحة القفل، أول مرة على جوال أو لابتوب المطوّر -->
+                <button class="ver-chip" id="ver-chip" type="button">مُذكّر، الإصدار</button>
             </section>
             <footer><span>مُذكّر</span><span>إعداداتك محفوظة تلقائيًا</span></footer>
         </section>

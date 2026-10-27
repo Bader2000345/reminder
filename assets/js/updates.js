@@ -9,10 +9,10 @@
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
-const APP_BUILD = 20;
+const APP_BUILD = 21;
 // تاريخ النشر: نفس الرقم انتشر قبل (١٤)، فـ«ما الجديد» وإشعار التحديث بيعتمدوا كمان على هالتاريخ
 // ← عند كل نشر: غيّره (ومعه release في version.json)
-const APP_RELEASE = '2026-10-26';
+const APP_RELEASE = '2026-10-27';
 const SITE_URL = 'https://bader2000345.github.io/reminder/';
 const UpdateNotice = (() => {
     const $ = id => document.getElementById(id);

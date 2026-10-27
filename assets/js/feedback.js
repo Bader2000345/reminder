@@ -174,6 +174,8 @@ const Feedback = (() => {
         const box = $('home-notes');
         if (!box) return;
         const cards = [];
+        const inbox = isDev() ? Dev.homeCard() : ''; // جهاز المطوّر: «صندوق الرسائل: ٣ رسائل جديدة»
+        if (inbox) cards.push(inbox);
         if (hasNew()) {
             const m = read(KEY_MINE, []).filter(x => x.replyAt).sort((a, b) => b.replyAt - a.replyAt)[0];
             cards.push(`<button type="button" class="hn-card hn-reply" data-hn="reply"><span class="hn-ic" aria-hidden="true">${ICON_FB}</span><span class="hn-body"><b>وصلك رد على ملاحظتك</b><small>من المطوّر · ${when(m.replyAt)}</small></span><span class="hn-go" aria-hidden="true">${ICON_GO}</span></button>`);
@@ -205,6 +207,7 @@ const Feedback = (() => {
             return;
         }
         navigateTo('feedback');
+        if (b.dataset.hn === 'inbox') return;
         setTimeout(() => {
             const card = document.querySelector('#fb-mine .fb-msg.is-new');
             card?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -245,5 +248,5 @@ const Feedback = (() => {
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { syncMine(); syncAnnouncement(); } });
         addEventListener('online', () => { syncMine(); syncAnnouncement(); });
     }
-    return { init, when, esc, ar, TYPES, starsHTML, tagHTML, syncAnnouncement, renderHome };
+    return { init, when, esc, ar, TYPES, starsHTML, tagHTML, deviceInfo, syncAnnouncement, renderHome };
 })();
