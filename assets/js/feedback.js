@@ -214,6 +214,23 @@ const Feedback = (() => {
         }, 350);
     }
 
+    // ---------- عدد المستخدمين (الإصدار ٢٢) ----------
+    // رمز عشوائي (مو نفس رمز الرسائل، فما بينربطوا ببعض) بينبعت مرة بالأسبوع، حتى يعرف المطوّر كم واحد عم يستعمل مُذكّر
+    async function hello() {
+        if (!server() || !navigator.onLine) return;
+        if (Date.now() - read('mudhakkir-uid-at', 0) < 7 * 864e5) return;
+        let id = '';
+        try { id = localStorage.getItem('mudhakkir-uid') || ''; } catch (e) {}
+        if (!/^[a-z0-9]{20,40}$/.test(id)) {
+            id = [...crypto.getRandomValues(new Uint8Array(16))].map(b => (b % 36).toString(36)).join('') + Date.now().toString(36);
+            try { localStorage.setItem('mudhakkir-uid', id); } catch (e) {}
+        }
+        try {
+            const res = await fetch(server() + '/hello', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+            if (res.ok) write('mudhakkir-uid-at', Date.now());
+        } catch (e) {}
+    }
+
     // ---------- فتح الصفحة ----------
     function onShow() {
         if (isDev()) { Dev.showInbox(); return; }
@@ -244,7 +261,7 @@ const Feedback = (() => {
         }).observe(page, { attributes: true, attributeFilter: ['class'] });
         renderMine();
         paintNotice();
-        setTimeout(() => { syncMine(); syncAnnouncement(); }, 4000);
+        setTimeout(() => { syncMine(); syncAnnouncement(); hello(); }, 4000);
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { syncMine(); syncAnnouncement(); } });
         addEventListener('online', () => { syncMine(); syncAnnouncement(); });
     }

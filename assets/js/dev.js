@@ -308,7 +308,7 @@ const Dev = (() => {
         const s = stats, fb = s && s.feedback, c = box.counts || fb;
         const rows = [
             ['inbox', ICON.fb, 'صندوق الرسائل', c ? (c.unread ? msgs(c.unread) : 'ما في رسائل جديدة') : '…'],
-            ['nums', ICON.chart, 'الأرقام', s ? `${s.subscribers ? ar(s.subscribers) + ' مشترك بالإشعارات' : 'لسا ما في مشتركين بالإشعارات'}، ${fb && fb.avg ? 'والتقييم ' + ar(fb.avg) + ' من ٥' : 'ولسا ما في تقييم'}` : '…'],
+            ['nums', ICON.chart, 'الأرقام', s ? `${s.users ? ar(s.users) + ' مستخدم بالمجموع' : 'لسا عم ينعدّوا المستخدمين'}، ${fb && fb.avg ? 'والتقييم ' + ar(fb.avg) + ' من ٥' : 'ولسا ما في تقييم'}` : '…'],
             ['ann', ICON.mega, 'إعلان لكل المستخدمين', s ? (s.announce ? `شغّال: «${s.announce.title}»` : 'ما في إعلان شغّال هلّق') : '…'],
             ['tools', ICON.pulse, 'أدوات الفحص', health ? ({ 0: 'كلشي شغّال', 1: 'في شي بدّو انتباه', 2: 'في شغلتين بدهن انتباه' }[problems().length] || `في ${ar(problems().length)} شغلات بدها انتباه`) : '…'],
             ['devices', ICON.devices, 'الأجهزة المسموحة', devs ? devs.devices.map(d => d.label).join('، ') || 'ما في أجهزة' : '…']
@@ -324,12 +324,13 @@ const Dev = (() => {
         const s = stats;
         if (!s) return '<p class="dv-wait">جارٍ التحميل…</p>';
         const fb = s.feedback || {};
-        const tiles = [[ar(s.subscribers), 'مشترك بالإشعارات'], [ar(s.withReminders), 'عندهم تذكيرات'], [ar(fb.unread || 0), 'رسائل جديدة'],
+        const tiles = [[ar(s.users || 0), 'مستخدم بالمجموع'], [ar(s.active30 || 0), 'فتحوه آخر ٣٠ يوم'],
+            [ar(s.subscribers), 'مشترك بالإشعارات'], [ar(s.withReminders), 'عندهم تذكيرات'], [ar(fb.unread || 0), 'رسائل جديدة'],
             [fb.avg ? ar(fb.avg) : '—', 'متوسط التقييم'], [ar(s.widgets || 0), 'أدوات برّا التطبيق'], [s.lastRun ? F.when(Date.parse(s.lastRun)) : '—', 'آخر إرسال إشعارات']];
         const tz = s.timezones || [], max = Math.max(1, ...tz.map(t => t.n));
         return `<div class="dv-tiles">${tiles.map(([v, l]) => `<div class="dv-tile"><b>${esc(v)}</b><small>${l}</small></div>`).join('')}</div>
             ${tz.length ? `<section class="fb-card dv-tz"><h2>وين الناس <small>حسب المنطقة الزمنية</small></h2>${tz.map(t => `<div class="dv-bar"><span>${esc(tzName(t.tz))}</span><span class="dv-trk"><i style="width:${Math.round(t.n / max * 100)}%"></i></span><span>${ar(t.n)}</span></div>`).join('')}</section>` : ''}
-            <p class="dv-note">الأرقام من سيرفر مُذكّر، بلا أسماء ولا إيميلات ولا أي شي بيعرّف الشخص.</p>`;
+            <p class="dv-note">الأرقام من سيرفر مُذكّر، بلا أسماء ولا إيميلات ولا أي شي بيعرّف الشخص. عدّ المستخدمين بلّش من الإصدار ٢٢: كل جهاز بيتحسب أول ما يفتح التطبيق بعد التحديث، فالرقم رح يكبر خلال كم يوم.</p>`;
     }
     function curAnnHTML(a) {
         if (!a) return '';

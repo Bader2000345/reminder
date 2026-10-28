@@ -84,6 +84,22 @@ html, body { max-width:100%; overflow-x:hidden; }
 .modal-card { transform:translateZ(0); overscroll-behavior:contain; }
 body.modal-open { overflow:hidden; }
 button, input, select, textarea { touch-action:manipulation; }
+/* الإصدار ٢٢: الشاشة كانت تكبر وتصغر لحالها عالآيفون:
+   - الكبس مرتين ورا بعض بأي مكان بيعمل تكبير ← manipulation على كل الصفحة (التكبير بإصبعين بيضل شغّال)
+   - أي خانة كتابة خطها أصغر من ١٦px بيكبّر عليها الآيفون وبيضل مكبّر ← ١٦px على شاشات اللمس
+   - الخط بيكبر لحاله لما تقلب الجوال بالعرض ← text-size-adjust */
+html, body { touch-action:manipulation; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+/* الإصدار ٢٢: شريط التمرير الرمادي العريض عاللابتوب ← الصفحة بلا شريط (التمرير بالعجلة واللمس بيضل شغّال)،
+   وأي شريط جوّا نافذة أو لوحة رفيع وبلون التطبيق */
+* { scrollbar-width:thin; scrollbar-color:color-mix(in srgb, var(--gold) 50%, transparent) transparent; }
+*::-webkit-scrollbar { width:6px; height:6px; }
+*::-webkit-scrollbar-track { background:transparent; }
+*::-webkit-scrollbar-thumb { background:color-mix(in srgb, var(--gold) 50%, transparent); border-radius:6px; }
+html { scrollbar-width:none; }
+html::-webkit-scrollbar { display:none; }
+@media (hover:none) and (pointer:coarse) {
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]), textarea, select { font-size:16px !important; }
+}
 @media (min-width:701px) { .main-content { width:auto; flex:1 1 auto; margin-right:200px; } }
 @media (max-width:700px) {
   .modal { padding:12px; }
