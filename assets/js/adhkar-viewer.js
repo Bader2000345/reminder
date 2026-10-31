@@ -232,6 +232,8 @@ const AdhkarViewer = (() => {
         paint('');
         QSheet.open('أذكار المناسبات', box);
     }
+    // الذكر المفتوح هلّق («صنع بطاقة» بـ cards.js)
+    const current = () => (group && items[idx] ? { item: items[idx], title: group.title } : null);
     function close(fromPop = false) {
         const root = $('adhkar-detail');
         if (root.hidden) return;
@@ -280,7 +282,7 @@ const AdhkarViewer = (() => {
         });
         stage.addEventListener('pointercancel', () => { tracking = false; });
     }
-    return { init, open, close, openSituations };
+    return { init, open, close, openSituations, current };
 })();
 
 // البحث الفوري في الأذكار

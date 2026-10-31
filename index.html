@@ -40,6 +40,7 @@
     <link rel="stylesheet" href="assets/css/17-mushaf.css">
     <link rel="stylesheet" href="assets/css/18-screen.css">
     <link rel="stylesheet" href="assets/css/19-feedback.css">
+    <link rel="stylesheet" href="assets/css/20-cards.css">
 </head>
 <body>
 
@@ -207,7 +208,11 @@
                 <div class="dk-head">
                     <button class="dk-back" type="button" id="adhkar-back" aria-label="العودة للأقسام"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><span>الأقسام</span></button>
                     <h2 id="adhkar-detail-title">أذكار الصباح</h2>
-                    <span class="dk-pager" id="dk-pager" aria-live="polite">١ / ١</span>
+                    <div class="dk-end">
+                        <!-- صنع بطاقة من الذكر المفتوح (cards.js) -->
+                        <button class="dk-card" type="button" id="dk-card" aria-label="صنع بطاقة من هالذكر" title="صنع بطاقة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/></svg></button>
+                        <span class="dk-pager" id="dk-pager" aria-live="polite">١ / ١</span>
+                    </div>
                     <div class="dk-progress" aria-hidden="true"><span id="dk-progress"></span></div>
                 </div>
                 <div class="dk-stage" id="dk-stage">
@@ -473,6 +478,15 @@
                     </div>
                     <button class="ghost-button" type="button" data-open-widgets>إعداد الأدوات</button>
                 </article>
+                <!-- د٣ صنع بطاقة (cards.js، الإصدار ٢٣): خلفية للجهاز أو بطاقة لآية أو ذكر -->
+                <article class="setting-card cards-setting">
+                    <div class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/></svg></div>
+                    <div style="flex:1;">
+                        <h2>صنع بطاقة</h2>
+                        <p>خلفية لجوالك أو لابتوبك، أو بطاقة لآية أو ذكر تشاركها</p>
+                    </div>
+                    <button class="ghost-button" type="button" data-target="cards">افتح</button>
+                </article>
                 <article class="setting-card">
                     <div style="flex:1;">
                         <h2>التذكيرات والإشعارات</h2>
@@ -603,6 +617,23 @@
             <div class="dv-main" id="dv-main" hidden></div>
         </section>
 
+        <!-- ق١ صنع بطاقة (cards.js): آياتي، ورد اليوم، الأذكار ← شاشة الصنع -->
+        <section id="page-cards" class="page-view">
+            <button class="fb-back" type="button" data-target="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg>الإعدادات</button>
+            <header class="page-header">
+                <div><h1>صنع بطاقة</h1><p class="page-lead">اختار آية أو ذكر، وصمّم البطاقة بضغطة</p></div>
+            </header>
+            <div class="cd-wrap">
+                <button class="cd-bare" id="cd-bare" type="button"><span class="cd-bare-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/></svg></span><span class="cd-bare-t"><b>خلفية لجهازك بلا كتابة</b><small>منظر مرسوم بمقاس شاشتك بالضبط</small></span></button>
+                <div class="cd-tabs" id="cd-tabs" role="tablist" aria-label="من وين البطاقة">
+                    <button type="button" role="tab" data-cd="mine" aria-selected="true" aria-controls="cd-list">آياتي</button>
+                    <button type="button" role="tab" data-cd="wird" aria-selected="false" aria-controls="cd-list">ورد اليوم</button>
+                    <button type="button" role="tab" data-cd="adhkar" aria-selected="false" aria-controls="cd-list">الأذكار</button>
+                </div>
+                <div class="cd-list" id="cd-list" role="tabpanel"></div>
+            </div>
+        </section>
+
     </main>
 </div>
 
@@ -730,6 +761,28 @@
     </div>
 </div>
 
+<!-- ص١ شاشة صنع البطاقة (cards.js، 20-cards.css): البطاقة كبيرة، وتحتها الخلفيات والمقاسات وحفظ ومشاركة -->
+<section class="card-maker" id="card-maker" role="dialog" aria-modal="true" aria-labelledby="cm-title" hidden>
+    <div class="cm-top">
+        <button class="cm-x" id="cm-close" type="button" aria-label="إغلاق">×</button>
+        <b id="cm-title">صنع بطاقة</b>
+        <button class="cm-again" id="cm-again" type="button" aria-label="رسمة تانية للخلفية" title="رسمة تانية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button>
+    </div>
+    <div class="cm-stage" id="cm-stage"><canvas id="cm-canvas" role="img" aria-label="معاينة البطاقة"></canvas></div>
+    <div class="cm-tools">
+        <div class="cm-thumbs" id="cm-thumbs" role="radiogroup" aria-label="الخلفية"></div>
+        <div class="cm-row">
+            <div class="cm-sizes" id="cm-sizes" role="radiogroup" aria-label="المقاس">
+                <button type="button" role="radio" data-size="device" aria-checked="true">خلفية لجهازي</button>
+                <button type="button" role="radio" data-size="story" aria-checked="false">ستوري</button>
+                <button type="button" role="radio" data-size="square" aria-checked="false">مربّع</button>
+            </div>
+            <button type="button" class="cm-chip" id="cm-bare" aria-pressed="false">بلا كتابة</button>
+        </div>
+        <div class="cm-actions"><button type="button" class="cm-save" id="cm-save">حفظ</button><button type="button" class="cm-share" id="cm-share">مشاركة</button></div>
+    </div>
+</section>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div class="wird-float-plus" id="wird-float-plus" aria-hidden="true">+١ آية</div>
@@ -740,6 +793,7 @@
             <button type="button" class="focus-tool" id="focus-tafsir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h11a3 3 0 0 1 3 3v12H7a3 3 0 0 1-3-3z"/><path d="M8 9h6M8 13h6"/></svg>التفسير</button>
             <button type="button" class="focus-tool focus-zoom" data-verse-zoom="-1" aria-label="تصغير خط الآية">أ−</button>
             <button type="button" class="focus-tool focus-zoom" data-verse-zoom="1" aria-label="تكبير خط الآية">أ+</button>
+            <button type="button" class="focus-tool" id="focus-card" aria-label="صنع بطاقة من هالآية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/></svg>بطاقة</button>
         </div>
         <button class="primary-button wird-complete-btn" id="focus-complete-btn" type="button">أتممت هذه الآية · التالية</button></div>
 </div>
@@ -950,6 +1004,8 @@
 <script src="assets/js/widgets.js" defer></script>
 <script src="assets/js/feedback.js" defer></script>
 <script src="assets/js/dev.js" defer></script>
+<script src="assets/js/cardart.js" defer></script>
+<script src="assets/js/cards.js" defer></script>
 <script src="assets/js/time-context.js" defer></script>
 <script src="assets/js/atmosphere.js" defer></script>
 <script src="assets/js/motion.js" defer></script>

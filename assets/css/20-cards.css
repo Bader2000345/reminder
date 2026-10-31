@@ -1,0 +1,74 @@
+/* =====================================================================
+ * مُذكّر — 20-cards.css  (الإصدار ٢٣، معرض ١٠: ص١ ق١ د٣)
+ * «صنع بطاقة» (cards.js): شاشة الصنع بملء الشاشة (داكنة دايمًا حتى تبين ألوان البطاقة)، وصفحة «صنع بطاقة»،
+ * وزر البطاقة بعارض الأذكار. فوق المصحف ووضع التركيز واللوحة المنبثقة (٩٦)، وتحت التنبيهات (٣٠٠).
+ * ===================================================================== */
+
+/* ---------- ص١ شاشة الصنع ---------- */
+body.cm-open { overflow:hidden; }
+.card-maker { position:fixed; inset:0; z-index:200; display:flex; flex-direction:column; direction:rtl; background:#0b0f0d; color:#f2efe6; font-family:var(--font-main);
+  padding-top:env(safe-area-inset-top, 0px); padding-bottom:env(safe-area-inset-bottom, 0px); animation:cm-in var(--m-200, 200ms) var(--ease-out, ease-out); }
+.card-maker[hidden] { display:none; }
+@keyframes cm-in { from { opacity:0; } }
+.cm-top { flex:none; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px max(14px, env(safe-area-inset-right, 0px)) 6px max(14px, env(safe-area-inset-left, 0px)); }
+.cm-top b { font-size:16px; font-weight:600; }
+.cm-x, .cm-again { width:44px; height:44px; flex:none; display:grid; place-items:center; padding:0; border-radius:12px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06);
+  color:#fff; font:400 24px/1 var(--font-main); cursor:pointer; }
+.cm-again svg { width:20px; height:20px; }
+.cm-stage { flex:1; min-height:0; display:grid; place-items:center; padding:6px 16px; }
+#cm-canvas { display:block; max-width:100%; max-height:100%; border-radius:14px; background:#151a17; box-shadow:0 22px 50px -22px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.06); }
+.cm-tools { flex:none; width:100%; max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:10px; padding:8px max(14px, env(safe-area-inset-right, 0px)) 14px max(14px, env(safe-area-inset-left, 0px)); }
+.cm-thumbs { display:flex; gap:8px; overflow-x:auto; padding:3px 2px; scrollbar-width:none; overscroll-behavior-x:contain; }
+.cm-thumbs::-webkit-scrollbar { display:none; }
+.cm-thumbs button { flex:none; width:52px; height:88px; padding:0; border-radius:10px; border:2px solid transparent; overflow:hidden; background:#1b211e; cursor:pointer; transition:transform var(--m-150, 150ms) ease, border-color var(--m-150, 150ms) ease; }
+.cm-thumbs button[aria-checked="true"] { border-color:#e9c46a; transform:translateY(-2px); }
+.cm-thumbs canvas { display:block; width:100%; height:100%; }
+.cm-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.cm-sizes { display:flex; gap:2px; padding:3px; border-radius:12px; background:rgba(255,255,255,.08); }
+.cm-sizes button { min-height:40px; padding:0 12px; border:0; border-radius:9px; background:transparent; color:rgba(255,255,255,.82); font:600 13px var(--font-main); cursor:pointer; }
+.cm-sizes button[aria-checked="true"] { background:#f2efe6; color:#0b2a21; }
+.cm-chip { min-height:40px; margin-inline-start:auto; padding:0 14px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:transparent; color:#f2efe6; font:500 13px var(--font-main); cursor:pointer; }
+.cm-chip[aria-pressed="true"] { background:rgba(233,196,106,.18); border-color:#e9c46a; }
+.cm-chip:disabled { opacity:.45; cursor:default; }
+.cm-actions { display:flex; gap:10px; }
+.cm-save, .cm-share { flex:1; min-height:50px; border-radius:14px; font:600 15px var(--font-main); cursor:pointer; }
+.cm-save { border:1px solid rgba(255,255,255,.24); background:transparent; color:#f2efe6; }
+.cm-share { border:0; background:linear-gradient(180deg, #1f7a5f, #0f5c48); color:#fff; box-shadow:0 10px 24px -14px rgba(15,92,72,.9); }
+.cm-save:disabled, .cm-share:disabled { opacity:.6; }
+.card-maker button:focus-visible { outline:2px solid #e9c46a; outline-offset:2px; }
+@media (min-width:900px) and (min-height:600px) { .cm-stage { padding:10px 24px; } }
+
+/* زر البطاقة بعارض الأذكار وبوضع التركيز */
+.adhkar-detail .dk-end { display:flex; align-items:center; gap:8px; }
+.dk-card { width:38px; height:38px; flex:none; display:grid; place-items:center; padding:0; border-radius:12px; border:1px solid var(--line); background:var(--paper); color:var(--olive); cursor:pointer; box-shadow:var(--edge); }
+body.dark-mode .dk-card { color:var(--olive-dark); }
+.dk-card svg { width:19px; height:19px; }
+
+/* ---------- ق١ صفحة «صنع بطاقة» ---------- */
+#page-cards { max-width:680px; margin-inline:auto; }
+@media (max-width:700px) { #page-cards { padding-bottom:150px; } }
+.cd-wrap { display:flex; flex-direction:column; gap:12px; }
+.cd-bare { display:flex; align-items:center; gap:12px; width:100%; padding:13px 14px; border-radius:18px; border:1px solid color-mix(in srgb, var(--gold) 55%, transparent); background:var(--gold-light);
+  color:var(--ink); font:inherit; text-align:right; cursor:pointer; box-shadow:var(--shadow); }
+.cd-bare:active { transform:scale(.99); }
+.cd-bare-ic { width:42px; height:42px; flex:none; display:grid; place-items:center; border-radius:12px; background:var(--paper); color:var(--gold-ink); }
+.cd-bare-ic svg { width:22px; height:22px; }
+.cd-bare-t { display:flex; flex-direction:column; }
+.cd-bare-t b { font-size:15px; }
+.cd-bare-t small { font-size:12.5px; color:var(--muted); }
+.cd-tabs { display:flex; gap:2px; padding:3px; border-radius:13px; background:var(--surface-2); }
+.cd-tabs button { flex:1; min-height:42px; border:0; border-radius:10px; background:transparent; color:var(--muted); font:600 14px var(--font-main); cursor:pointer; }
+.cd-tabs button[aria-selected="true"] { background:var(--paper); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.cd-rows { display:flex; flex-direction:column; background:var(--paper); border:1px solid var(--card-line); border-radius:18px; overflow:hidden; box-shadow:var(--shadow); }
+.cd-row { display:flex; flex-direction:column; gap:2px; width:100%; padding:12px 14px; border:0; border-bottom:1px solid var(--row-line, var(--line)); background:none; color:var(--ink); font:inherit; text-align:right; cursor:pointer;
+  transition:background-color var(--m-150, 150ms) ease; }
+.cd-row:last-child { border-bottom:0; }
+.cd-row:hover { background:color-mix(in srgb, var(--ink) 3%, transparent); }
+.cd-text { font:400 18px/1.9 "Amiri", serif; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.cd-text.is-ayah { font-family:"Amiri Quran", "Amiri", serif; }
+.cd-row small { font-size:12px; color:var(--muted); }
+.cd-note { margin:4px 2px 0; font-size:12.5px; color:var(--muted); }
+.cd-empty { display:flex; flex-direction:column; align-items:center; gap:10px; padding:26px 18px; text-align:center; background:var(--paper); border:1px solid var(--card-line); border-radius:18px; }
+.cd-empty p { margin:0; max-width:44ch; font-size:14px; line-height:1.8; color:var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { .card-maker { animation:none; } .cm-thumbs button { transition:none; } }

@@ -25,7 +25,8 @@ const ICONS = {
     highlight: '<path d="M4 20h7"/><path d="M14.5 4.5l5 5L10 19l-5 1 1-5z"/>',
     note: '<path d="M5 4h14v12l-4 4H5z"/><path d="M15 20v-4h4M8 9h8M8 13h5"/>',
     ask: '<path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.5l.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8z"/>',
-    image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8 8.5"/>'
+    image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8 8.5"/>',
+    card: '<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/>'
 };
 const svgIcon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 
@@ -323,6 +324,8 @@ const AyahSheet = (() => {
         });
         // صورة الآية بإطار المصحف للمشاركة (share.js)
         if (typeof Share !== 'undefined') add('image', 'صورة', () => { QSheet.close(); setTimeout(() => Share.openAyah(ayah), 200); });
+        // صنع بطاقة (cards.js): خلفية للجهاز أو بطاقة للمشاركة بالخلفيات المرسومة
+        if (typeof Cards !== 'undefined') add('card', 'صنع بطاقة', () => { QSheet.close(); setTimeout(() => Cards.open({ kind: 'ayah', text: ayah.text, ref: `[${surahName(ayah.s)}: ${qAr(ayah.a)}]` }), 200); });
         const bm = add('bookmark', AyahStore.isBookmarked(k) ? 'إزالة العلامة' : 'علامة مرجعية', () => {
             const on = AyahStore.toggleBookmark(k, ayah.page);
             bm.querySelector('span').textContent = on ? 'إزالة العلامة' : 'علامة مرجعية';
@@ -513,5 +516,5 @@ const FocusTools = (() => {
         });
         $('focus-tajweed')?.setAttribute('aria-pressed', String(on));
     }
-    return { init, update };
+    return { init, update, current: () => current };
 })();

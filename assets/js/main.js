@@ -48,6 +48,7 @@ MdkScreen.init();
 Widgets.init();
 Feedback.init();
 Dev.init();
+Cards.init();
 FocusTools.init();
 Reader.setAdvanceHook(Wird.onReaderAdvance);
 Share.init();

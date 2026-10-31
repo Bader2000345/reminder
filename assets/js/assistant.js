@@ -99,6 +99,7 @@ const Assistant = (() => {
         screen: () => later(() => MdkScreen.open(), 350),
         widgets: () => { navigateTo('settings'); later(() => Widgets.open(), 350); },
         feedback: () => navigateTo('feedback'),
+        cards: () => navigateTo('cards'),
         home: () => navigateTo('home'),
         settings: () => navigateTo('settings'),
         name: () => { navigateTo('settings'); later(() => { $('name-setting')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); $('name-input')?.focus({ preventScroll: true }); }, 350); }
