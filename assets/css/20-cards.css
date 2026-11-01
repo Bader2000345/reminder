@@ -1,5 +1,5 @@
 /* =====================================================================
- * مُذكّر — 20-cards.css  (الإصدار ٢٣، معرض ١٠: ص١ ق١ د٣)
+ * مُذكّر — 20-cards.css  (الإصدار ٢٣، معرض ١٠: ص١ ق١ د٣ · الإصدار ٢٤: زر فاتح/داكن ل١)
  * «صنع بطاقة» (cards.js): شاشة الصنع بملء الشاشة (داكنة دايمًا حتى تبين ألوان البطاقة)، وصفحة «صنع بطاقة»،
  * وزر البطاقة بعارض الأذكار. فوق المصحف ووضع التركيز واللوحة المنبثقة (٩٦)، وتحت التنبيهات (٣٠٠).
  * ===================================================================== */
@@ -18,11 +18,25 @@ body.cm-open { overflow:hidden; }
 .cm-stage { flex:1; min-height:0; display:grid; place-items:center; padding:6px 16px; }
 #cm-canvas { display:block; max-width:100%; max-height:100%; border-radius:14px; background:#151a17; box-shadow:0 22px 50px -22px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.06); }
 .cm-tools { flex:none; width:100%; max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:10px; padding:8px max(14px, env(safe-area-inset-right, 0px)) 14px max(14px, env(safe-area-inset-left, 0px)); }
+.cm-mode { align-self:center; display:flex; gap:2px; padding:3px; border-radius:999px; background:rgba(255,255,255,.08); }
+.cm-mode button { min-height:34px; padding:0 16px; border:0; border-radius:999px; background:transparent; color:rgba(255,255,255,.8); font:600 13px var(--font-main); cursor:pointer; }
+.cm-mode button[aria-checked="true"] { background:#f2efe6; color:#0b2a21; }
 .cm-thumbs { display:flex; gap:8px; overflow-x:auto; padding:3px 2px; scrollbar-width:none; overscroll-behavior-x:contain; }
 .cm-thumbs::-webkit-scrollbar { display:none; }
 .cm-thumbs button { flex:none; width:52px; height:88px; padding:0; border-radius:10px; border:2px solid transparent; overflow:hidden; background:#1b211e; cursor:pointer; transition:transform var(--m-150, 150ms) ease, border-color var(--m-150, 150ms) ease; }
 .cm-thumbs button[aria-checked="true"] { border-color:#e9c46a; transform:translateY(-2px); }
 .cm-thumbs canvas { display:block; width:100%; height:100%; }
+/* «أضف خلفية» (ض٣ ح١): زر الإضافة، وصورك قبل المرسومة بفاصل، وزر × لتشيل وحدة */
+.cm-thumbs button.cm-add { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:0 3px; border:1.5px dashed rgba(255,255,255,.45); background:transparent; color:#f2efe6; font:600 10.5px/1.3 var(--font-main); }
+.cm-add b { font-size:22px; font-weight:400; line-height:1; }
+.cm-mine { flex:none; display:flex; gap:8px; padding-inline-end:8px; border-inline-end:1px solid rgba(255,255,255,.16); }
+.cm-ph { position:relative; flex:none; }
+.cm-ph img { display:block; width:100%; height:100%; object-fit:cover; }
+.cm-thumbs button.cm-ph-x { position:absolute; top:4px; inset-inline-start:4px; width:22px; height:22px; display:grid; place-items:center; padding:0; border:0; border-radius:50%; background:rgba(0,0,0,.72); color:#fff; font:600 14px/1 var(--font-main); transform:none; }
+.card-maker.is-photo #cm-canvas { touch-action:none; cursor:grab; }
+.card-maker.is-photo #cm-canvas:active { cursor:grabbing; }
+.cm-again:disabled { opacity:.35; cursor:default; }
+.cm-file { position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; inset-inline-start:0; top:0; }
 .cm-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .cm-sizes { display:flex; gap:2px; padding:3px; border-radius:12px; background:rgba(255,255,255,.08); }
 .cm-sizes button { min-height:40px; padding:0 12px; border:0; border-radius:9px; background:transparent; color:rgba(255,255,255,.82); font:600 13px var(--font-main); cursor:pointer; }
@@ -51,6 +65,12 @@ body.dark-mode .dk-card { color:var(--olive-dark); }
 .cd-bare { display:flex; align-items:center; gap:12px; width:100%; padding:13px 14px; border-radius:18px; border:1px solid color-mix(in srgb, var(--gold) 55%, transparent); background:var(--gold-light);
   color:var(--ink); font:inherit; text-align:right; cursor:pointer; box-shadow:var(--shadow); }
 .cd-bare:active { transform:scale(.99); }
+.cd-photo { display:flex; align-items:center; gap:12px; width:100%; padding:13px 14px; border-radius:18px; border:1.5px dashed color-mix(in srgb, var(--olive) 45%, transparent); background:var(--paper);
+  color:var(--ink); font:inherit; text-align:right; cursor:pointer; }
+.cd-photo:active { transform:scale(.99); }
+.cd-photo .cd-bare-ic { background:var(--surface-2); color:var(--olive); }
+body.dark-mode .cd-photo { border-color:color-mix(in srgb, var(--olive-dark) 45%, transparent); }
+body.dark-mode .cd-photo .cd-bare-ic { color:var(--olive-dark); }
 .cd-bare-ic { width:42px; height:42px; flex:none; display:grid; place-items:center; border-radius:12px; background:var(--paper); color:var(--gold-ink); }
 .cd-bare-ic svg { width:22px; height:22px; }
 .cd-bare-t { display:flex; flex-direction:column; }
