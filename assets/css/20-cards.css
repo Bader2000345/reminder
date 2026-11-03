@@ -58,6 +58,12 @@ body.cm-open { overflow:hidden; }
 body.dark-mode .dk-card { color:var(--olive-dark); }
 .dk-card svg { width:19px; height:19px; }
 
+/* زر البطاقة تحت «نسخ» بكل ذكر من الأذكار العامة (الإصدار ٢٥) */
+.adhkar-acts { flex:none; display:flex; flex-direction:column; gap:6px; }
+.copy-button.gen-card { display:grid; place-items:center; color:var(--olive); }
+.gen-card svg { display:block; width:17px; height:17px; }
+body.dark-mode .copy-button.gen-card { color:var(--olive-dark); }
+
 /* ---------- ق١ صفحة «صنع بطاقة» ---------- */
 #page-cards { max-width:680px; margin-inline:auto; }
 @media (max-width:700px) { #page-cards { padding-bottom:150px; } }

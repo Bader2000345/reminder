@@ -72,7 +72,22 @@ function renderGeneralAdhkar(filterText = '') {
             }, 1500);
         });
 
-        article.append(num, p, btn);
+        // «صنع بطاقة» من هالذكر (cards.js)، متل زر البطاقة بعارض الأذكار
+        const acts = document.createElement('div');
+        acts.className = 'adhkar-acts';
+        acts.append(btn);
+        if (typeof Cards !== 'undefined') {
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.className = 'copy-button gen-card';
+            card.setAttribute('aria-label', 'صنع بطاقة من هالذكر');
+            card.title = 'صنع بطاقة';
+            card.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/></svg>';
+            card.addEventListener('click', () => Cards.open({ kind: text.includes('﴿') ? 'ayah' : 'dhikr', text, ref: '' }));
+            acts.append(card);
+        }
+
+        article.append(num, p, acts);
         container.appendChild(article);
     });
 }
