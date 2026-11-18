@@ -214,9 +214,11 @@ const Cards = (() => {
     const fileName = b => `mudhakkir-${size === 'device' ? 'wallpaper' : size}-${Date.now().toString(36)}.${b && b.type === 'image/png' ? 'png' : 'jpg'}`;
     function caption() {
         const url = typeof SITE_URL !== 'undefined' ? SITE_URL : location.href.split('#')[0];
-        if (!item) return `من تطبيق مُذكّر: ${url}`;
+        // «من تطبيق مُذكّر:» بالإنجليزي إذا اللغة إنجليزي (نص الذكر نفسو بيضل عربي)
+        const from = typeof I18n !== 'undefined' ? I18n.t('من تطبيق مُذكّر:') : 'من تطبيق مُذكّر:';
+        if (!item) return `${from} ${url}`;
         const t = item.kind === 'ayah' && !item.text.includes('﴿') ? `﴿${item.text}﴾` : item.text;
-        return `${t}${item.ref ? ' ' + item.ref : ''}\n\nمن تطبيق مُذكّر: ${url}`;
+        return `${t}${item.ref ? ' ' + item.ref : ''}\n\n${from} ${url}`;
     }
     function download(blob, name) {
         const a = document.createElement('a');

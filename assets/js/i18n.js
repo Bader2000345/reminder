@@ -98,7 +98,7 @@ const I18n = (() => {
         // أذكاري
         ['تذكيراتك، تصلك في وقتها', 'Your reminders, right on time'], ['اليوم', 'Today'], ['ما في تذكيرات اليوم. ضيف واحد، أو اختار من «جاهزة بضغطة» تحت.', 'No reminders today. Add one, or pick from “One-tap reminders” below.'],
         ['+ تذكير جديد', '+ New reminder'], ['＋ تذكير جديد', '＋ New reminder'], ['تذكيراتي', 'My reminders'], ['لا توجد تذكيرات شخصية بعد. أضف تذكيرًا، أو اختر واحدًا جاهزًا من الأسفل.', 'No personal reminders yet. Add one, or pick a ready one below.'],
-        ['تذكيرات ثابتة', 'Built-in reminders'], ['ذكر عام كل 15 دقيقة', 'A dhikr every 15 minutes'], ['جرّب إشعارًا الآن', 'Send a test notification'], ['تذكير الجمعة', 'Friday reminder'],
+        ['تذكيرات ثابتة', 'Built-in reminders'], ['ذكر عام كل 15 دقيقة', 'A dhikr every 15 minutes'], ['جرّب إشعارًا الآن', 'Test notification'], ['تذكير الجمعة', 'Friday reminder'],
         ['صباح الجمعة: سورة الكهف والصلاة على النبي ﷺ', 'Friday morning: Surat al-Kahf and salawat on the Prophet ﷺ'], ['تذكير الورد', 'Wird reminder'], ['كل يوم بالوقت يلي بتختاره', 'Every day at the time you choose'],
         ['جاهزة بضغطة', 'One-tap reminders'], ['لا تصلك الإشعارات؟', 'Not getting notifications?'], ['نفحص كل خطوة، ونرسل إشعار تجربة حقيقيًا من الخادم.', 'We check every step and send a real test notification from the server.'],
         ['افحص الإشعارات', 'Check notifications'], ['إصلاح الاشتراك', 'Repair subscription'], ['تذكيرك، بطريقتك', 'Your reminders, your way'],
@@ -109,7 +109,7 @@ const I18n = (() => {
         ['متوقف · فعّل المفتاح ليصلك هذا التذكير.', 'Off · turn it on to get this reminder.'], ['انتهى موعد هذا التذكير.', 'This reminder has passed.'],
         ['يصلك حتى والتطبيق مغلق ✓', 'Arrives even when the app is closed ✓'], ['جارٍ تفعيل الإشعار في الخلفية…', 'Turning on background notifications…'], ['تعذّر تفعيل الخلفية، يعمل والتطبيق مفتوح', 'Background failed, works while the app is open'],
         ['يعمل والتطبيق مفتوح', 'Works while the app is open'], ['يظهر داخل التطبيق فقط (المتصفح لا يدعم الإشعارات)', 'Shows inside the app only (browser has no notifications)'], ['الإشعارات محظورة، فعّلها من إعدادات المتصفح', 'Notifications are blocked, allow them in browser settings'],
-        ['اضغط «جرّب إشعارًا الآن» للسماح بالإشعارات', 'Tap “Send a test notification” to allow notifications'], ['مفعّل', 'On'],
+        ['اضغط «جرّب إشعارًا الآن» للسماح بالإشعارات', 'Tap “Test notification” to allow notifications'], ['مفعّل', 'On'],
         ['حان وقت أذكار الصباح، ابدأ يومك بذكر الله.', 'Time for the morning adhkar, start your day with the remembrance of Allah.'], ['حان وقت أذكار المساء، اختم نهارك بذكر الله.', 'Time for the evening adhkar, end your day with the remembrance of Allah.'],
         ['سورة الملك', 'Surat al-Mulk'], ['اقرأ سورة الملك قبل ما تنام.', 'Read Surat al-Mulk before you sleep.'], ['قبل ما تنام: آية الكرسي والمعوّذات وأذكار النوم.', 'Before sleep: Ayat al-Kursi, the Mu‘awwidhat and the sleep adhkar.'],
         ['يوم الجمعة: أكثر من الصلاة على النبي ﷺ. اللهم صلِّ وسلّم على نبينا محمد.', 'Friday: send plenty of salawat on the Prophet ﷺ.'], ['صيام الاثنين والخميس', 'Fasting Monday & Thursday'], ['بكرا يوم صيام سنّة، انوِ الصيام من الليلة إن استطعت.', 'Tomorrow is a sunnah fast, make your intention tonight if you can.'],
@@ -135,17 +135,17 @@ const I18n = (() => {
         ['التذكيرات والإشعارات', 'Reminders & notifications'], ['تذكير الجمعة والورد والأذكار العامة وتذكيراتك، وفحص الإشعارات', 'Friday, wird and general reminders, your own reminders, and a notification check'], ['أذكاري ←', 'My adhkar →'],
         ['بياناتك', 'Your data'], ['نسخ احتياطي ونقل لجهاز جديد', 'Backup & move to a new device'], ['احفظ ورودك وتذكيراتك وعلاماتك وتسبيحك وإعداداتك في ملف، واسترجعها على أي جهاز.', 'Save your wird, reminders, bookmarks, tasbih and settings to a file, and restore them on any device.'],
         ['حفظ نسخة', 'Save backup'], ['استرجاع نسخة', 'Restore backup'], ['التطبيق', 'App'], ['التحديثات', 'Updates'], ['الإصدار الحالي', 'Current version'], ['فحص التحديث', 'Check for updates'],
-        ['ملاحظات وشكاوي', 'Feedback'], ['شكوى أو اقتراح أو خطأ لاحظته، بتوصل للمطوّر مباشرة', 'A complaint, idea or bug you noticed, sent straight to the developer'], ['جديد', 'New'],
+        ['ملاحظات وشكاوي', 'Feedback'], ['شكوى أو اقتراح أو خطأ لاحظته، بتوصل لفريق مُذكّر مباشرة', 'A complaint, idea or bug you noticed, sent straight to the Mudhakkir team'], ['جديد', 'New'],
         ['ثبّته ليفتح بلمسة كأي تطبيق، ويعمل دون إنترنت', 'Install it to open with a tap like any app, and work offline'], ['تثبيت', 'Install'], ['للمطوّرين', 'For developers'], ['صندوق الرسائل والأرقام والإعلان', 'Inbox, numbers and announcement'],
         ['إعداداتك محفوظة تلقائيًا', 'Your settings are saved automatically'], ['اللغة', 'Language'], ['لغة التطبيق، والأذكار والقرآن بيضلّوا بالعربي', 'App language; adhkar and Quran stay in Arabic'],
         ['جارٍ التحديث…', 'Updating…'], ['جارٍ تنزيل التحديث… سيظهر زر «تحديث» عند اكتماله', 'Downloading the update… an “Update” button will appear when ready'], ['أنت على أحدث إصدار ✓', 'You’re on the latest version ✓'], ['تم تحديث مُذكّر إلى أحدث إصدار ✓', 'Mudhakkir is updated ✓'],
         ['حسب موقعك', 'By your location'], ['تعذّر تحديد موقعك، سنعتمد على الوقت (6ص – 6م)', 'Couldn’t get your location, using the clock (6 AM – 6 PM)'], ['حسب الوقت: داكن من 6 مساءً حتى 6 صباحًا (لم يُحدَّد موقعك)', 'By time: dark from 6 PM to 6 AM (location not set)'],
         // الملاحظات
-        ['بتوصل للمطوّر مباشرة، ومنقرا كل رسالة', 'Goes straight to the developer, and every message is read'], ['نوع الرسالة', 'Message type'], ['شكوى', 'Complaint'], ['اقتراح', 'Idea'], ['خطأ بالتطبيق', 'Bug'], ['شكر', 'Thanks'],
+        ['بتوصل لفريق مُذكّر مباشرة، ومنقرا كل رسالة', 'Goes straight to the Mudhakkir team, and every message is read'], ['نوع الرسالة', 'Message type'], ['شكوى', 'Complaint'], ['اقتراح', 'Idea'], ['خطأ بالتطبيق', 'Bug'], ['شكر', 'Thanks'],
         ['قدّيش راضي عن مُذكّر؟', 'How happy are you with Mudhakkir?'], ['(اختياري)', '(optional)'], ['بنبعت معها نسخة التطبيق ونوع جهازك بس، حتى نصلّح الأخطاء أسرع. بلا اسم ولا رقم.', 'Only the app version and device type are sent with it, to fix bugs faster. No name, no number.'],
-        ['إرسال', 'Send'], ['وصلت رسالتك، شكرًا إلك. إذا رد المطوّر بيطلعلك الرد هون.', 'Your message arrived, thank you. If the developer replies, you’ll see it here.'], ['رسائلك', 'Your messages'],
+        ['إرسال', 'Send'], ['وصلت رسالتك، شكرًا إلك. إذا ردّ فريق مُذكّر بيطلعلك الرد هون.', 'Your message arrived, thank you. If the Mudhakkir team replies, you’ll see it here.'], ['رسائلك', 'Your messages'],
         ['نجمة وحدة', '1 star'], ['نجمتين', '2 stars'], ['3 نجوم', '3 stars'], ['4 نجوم', '4 stars'], ['5 نجوم', '5 stars'], ['اكتب ملاحظتك هون…', 'Write your feedback here…'], ['ملاحظتك', 'Your feedback'],
-        ['وصلك رد على ملاحظتك', 'You got a reply to your feedback'], ['من المطوّر', 'From the developer'],
+        ['وصلك رد على ملاحظتك', 'You got a reply to your feedback'], ['من فريق مُذكّر', 'From the Mudhakkir team'], ['ردّ فريق مُذكّر', 'Reply from the Mudhakkir team'],
         ['هالصفحة لصاحب التطبيق بس.', 'This page is for the app owner only.'], ['فتح', 'Open'], ['كلمة السر', 'Password'], ['إظهار كلمة السر', 'Show password'], ['بعد 5 محاولات غلط بيتقفل ربع ساعة.', 'After 5 wrong tries it locks for 15 minutes.'],
         // صنع بطاقة
         ['اختار آية أو ذكر، وصمّم البطاقة بضغطة', 'Pick an ayah or dhikr, and design the card in a tap'], ['خلفية لجهازك بلا كتابة', 'A wallpaper without text'], ['منظر مرسوم بمقاس شاشتك بالضبط', 'Artwork sized exactly for your screen'],
@@ -200,6 +200,149 @@ const I18n = (() => {
         ['English', 'English'], ['العربية', 'العربية']
     ]);
 
+    // الدفعة التانية (نصوص الملفات: المصحف، خطة الورد، الإشعارات، المساعد، صنع بطاقة، الملاحظات…)
+    [
+        // أدوات المصحف والتجويد والتفسير والعلامات والبحث
+        ['همزة وصل', 'Hamzat wasl'], ['لا يُنطق', 'Silent'], ['لام شمسية', 'Sun-letter lam'], ['مدّ طبيعي (حركتان)', 'Natural madd (2 counts)'], ['مدّ جائز (2، 4، 6)', 'Permissible madd (2, 4, 6)'],
+        ['مدّ واجب (4–5)', 'Obligatory madd (4–5)'], ['مدّ لازم (6 حركات)', 'Necessary madd (6 counts)'], ['قلقلة', 'Qalqalah'], ['غُنّة', 'Ghunnah'], ['إخفاء', 'Ikhfa’'], ['إخفاء شفوي', 'Labial ikhfa’'],
+        ['إقلاب', 'Iqlab'], ['إدغام بغنّة', 'Idgham with ghunnah'], ['إدغام بلا غنّة', 'Idgham without ghunnah'], ['إدغام شفوي', 'Labial idgham'], ['إدغام متجانس', 'Homogeneous idgham'], ['إدغام متقارب', 'Close idgham'],
+        ['مدّ طبيعي', 'Natural madd'], ['مدّ جائز', 'Permissible madd'], ['مدّ واجب', 'Obligatory madd'], ['مدّ لازم', 'Necessary madd'],
+        ['الميسر', 'Al-Muyassar'], ['التفسير الميسر', 'Tafsir al-Muyassar'], ['المختصر', 'Al-Mukhtasar'], ['المختصر في تفسير القرآن الكريم', 'Al-Mukhtasar fi Tafsir al-Quran'],
+        ['QuranEnc.com — مركز تفسير للدراسات القرآنية', 'QuranEnc.com — Tafsir Center for Quranic Studies'], ['ابن كثير', 'Ibn Kathir'], ['تفسير ابن كثير', 'Tafsir Ibn Kathir'], ['نسخ التفسير', 'Copy tafsir'], ['تم نسخ التفسير', 'Tafsir copied'],
+        ['تعذّر تحميل التفسير الآن. تأكد من الاتصال بالإنترنت ثم حاول مرة أخرى.', 'Couldn’t load the tafsir now. Check your connection and try again.'],
+        ['ذهبي', 'Gold'], ['أخضر', 'Green'], ['أزرق', 'Blue'], ['وردي', 'Pink'], ['تم نسخ الآية', 'Ayah copied'], ['تم نسخ الآية للمشاركة', 'Ayah copied for sharing'], ['صورة', 'Image'],
+        ['إزالة العلامة', 'Remove bookmark'], ['علامة مرجعية', 'Bookmark'], ['تم حفظ العلامة', 'Bookmark saved'], ['تمت إزالة العلامة', 'Bookmark removed'], ['تمييز', 'Highlight'], ['تمييز الآية', 'Highlight ayah'],
+        ['ملاحظتي', 'My note'], ['ملاحظة تدبّر', 'Reflection note'], ['تم تمييز الآية', 'Ayah highlighted'], ['إزالة التمييز', 'Remove highlight'], ['اكتب ما تدبّرته في هذه الآية…', 'Write your reflection on this ayah…'],
+        ['ملاحظة على الآية', 'Note on the ayah'], ['حفظ الملاحظة', 'Save note'], ['تم حفظ الملاحظة', 'Note saved'], ['تم حذف الملاحظة', 'Note deleted'],
+        ['لا توجد علامات بعد. اضغط مطوّلًا على أي آية لتضع علامة مرجعية أو تمييزًا أو ملاحظة.', 'No bookmarks yet. Press and hold any ayah to bookmark, highlight or add a note.'],
+        ['نتيجة واحدة', '1 result'], ['نتيجتان', '2 results'], ['(أول 60)', '(first 60)'], ['اكتب كلمة أو جزءًا من آية (دون تشكيل)', 'Type an Arabic word or part of an ayah (no diacritics)'], ['بحث', 'Search'],
+        ['مثال: الصبر، رحمة الله، إن مع العسر يسرا', 'In Arabic, e.g. الصبر، رحمة الله'], ['جارٍ تجهيز البحث أول مرة (بيشتغل بعدها بلا نت)…', 'Preparing search for the first time (works offline after)…'],
+        ['لا توجد نتائج. جرّب كلمة أخرى أو اكتبها دون تشكيل.', 'No results. Try another word, or type it without diacritics.'], ['اكتب حرفين على الأقل.', 'Type at least two letters.'], ['جارٍ البحث…', 'Searching…'],
+        ['خدمة البحث متوقفة مؤقتًا من مصدرها، حاول بعد قليل.', 'The search service is down at its source, try again shortly.'], ['تعذّر فتح الآية، حاول مرة أخرى', 'Couldn’t open the ayah, try again'],
+        ['تعذّر البحث الآن. تأكد من الاتصال بالإنترنت.', 'Search failed. Check your connection.'], ['الآية', 'Ayah'], ['تعذّر تحميل ألوان التجويد الآن', 'Couldn’t load tajweed colors now'],
+        ['جارٍ تحميل الصفحة', 'Loading page'], ['مصحف المدينة بدّه نت أول مرة لهالصفحة، عرضنالك النص', 'The Madinah mushaf needs internet the first time for this page, showing the text instead'],
+        ['تعذر تحميل الصفحة. تحقق من الاتصال بالإنترنت.', 'Couldn’t load the page. Check your connection.'], ['تعذّر تحميل ألوان التجويد لهذه الصفحة', 'Couldn’t load tajweed colors for this page'], ['من صفحة', 'From page'],
+        ['شريط التمرير', 'Scroll bar'], ['ما في فواصل بعد. اضغط مطوّلًا على أي آية وحطّ علامة، بتطلع هون.', 'No markers yet. Press and hold any ayah and add a bookmark, it shows here.'], ['رقم الصفحة', 'Page number'],
+        ['لتغيّر النمط بسرعة: اضغط مطوّلًا على الشريط. وموجود كمان بـ«تنسيق المصحف».', 'To change the style quickly, press and hold the bar. It’s also in “Mushaf style”.'], ['نمط شريط الصفحات', 'Page bar style'],
+        ['١ – ٦٠٤', '1 – 604'], ['انتقال', 'Go'], ['اكتب رقم صفحة من ١ إلى ٦٠٤', 'Type a page number from 1 to 604'], ['نوع الفهرس', 'Index type'], ['السور', 'Surahs'], ['الأجزاء', 'Juz'], ['الانتقال في المصحف', 'Navigate the mushaf'],
+        ['الحزب', 'Hizb'], ['سورة', 'Surah'],
+        // خطة الورد (أسئلة أول مرة وتعديل الورد)
+        ['مطفي. شغّله واختار الوقت', 'Off. Turn it on and pick a time'],
+        ['حان وقت وردك اليوم، ولو صفحة. «أحبُّ الأعمال إلى الله أدومُها وإن قلّ».', 'Time for today’s wird, even one page. “The most beloved deeds to Allah are the most consistent, even if small.”'],
+        ['ساعة تقريبًا', 'About an hour'], ['ساعتين تقريبًا', 'About 2 hours'], ['صفحة وحدة', 'One page'], ['كم ختمة ناوي تختم إن شاء الله؟', 'How many khatmas do you intend, in sha Allah?'],
+        ['النيّة الصادقة بتسهّل الطريق، وفيك تغيّرها بأي وقت.', 'A sincere intention makes the way easier, and you can change it anytime.'], ['ختمة وحدة', 'One khatma'], ['بداية مباركة', 'A blessed start'], ['ختمتين', 'Two khatmas'],
+        ['نيّة طيبة وهمّة عالية', 'A good intention and high resolve'], ['3 ختمات', '3 khatmas'], ['الله يبارك بوقتك', 'May Allah bless your time'], ['أكتر', 'More'], ['حدّد العدد بنفسك', 'Set the number yourself'],
+        ['بكم يوم حابب تختم الختمة الوحدة؟', 'In how many days would you like to finish one khatma?'], ['اختار يلي بتقدر تداوم عليه، فالقليل الدايم أحسن من الكتير المنقطع.', 'Choose what you can keep up: a little done consistently beats a lot done once.'],
+        ['كل يوم حزب بحدود السور', 'A portion a day by surah boundaries'], ['سنّة الصحابة', 'The Companions’ way'], ['شهر', 'A month'], ['شهرين', 'Two months'], ['على قدّي', 'My own pace'], ['بحدّد كم صفحة باليوم', 'I’ll set pages per day'],
+        ['من مكاني الحالي', 'From where I am now'], ['من أول المصحف', 'From the beginning'], ['من سورة معيّنة', 'From a specific surah'], ['اختار السورة', 'Choose the surah'], ['من وين حابب تبلّش؟', 'Where would you like to start?'],
+        ['الورد بيمشي معك صفحة صفحة من المكان يلي بتختاره.', 'Your wird moves with you page by page from where you choose.'], ['إيمتى بتحب نذكّرك بوردك؟', 'When should we remind you of your wird?'],
+        ['بيوصلك إشعار لطيف كل يوم، حتى والتطبيق مسكّر.', 'A gentle notification every day, even when the app is closed.'], ['الصبح بكّير', 'Early morning'], ['6:00 صباحًا', '6:00 AM'], ['9:00 صباحًا', '9:00 AM'],
+        ['بعد الظهر', 'Afternoon'], ['2:00 ظهرًا', '2:00 PM'], ['بعد المغرب', 'After Maghrib'], ['7:00 مساءً', '7:00 PM'], ['10:00 مساءً', '10:00 PM'], ['وقت تاني', 'Another time'], ['بختار الساعة بنفسي', 'I’ll pick the time'],
+        ['بلا تذكير', 'No reminder'], ['بفتح الورد لحالي', 'I’ll open the wird myself'], ['كم صفحة باليوم؟', 'How many pages a day?'], ['ساعة التذكير', 'Reminder time'], ['من مكانك الحالي', 'From where you are'],
+        ['تحزيب الصحابة: كل يوم حزب', 'The Companions’ division: a portion a day'], ['خطتك جاهزة', 'Your plan is ready'], ['على بركة الله، هي خطتك', 'With Allah’s blessing, here’s your plan'],
+        ['«أحبُّ الأعمالِ إلى اللهِ أدومُها وإن قلَّ»', '“The most beloved deeds to Allah are the most consistent, even if small.”'], ['متفق عليه', 'Bukhari & Muslim'], ['ابدأ على بركة الله', 'Start, with Allah’s blessing'],
+        ['فيك تغيّر أي شي بعدين من «تعديل الورد اليومي».', 'You can change anything later from “Edit daily wird”.'], ['بدأت خطتك، الله يكتب أجرك ويثبّتك 🤍', 'Your plan has started. May Allah reward you and keep you steadfast 🤍'],
+        ['يومان', '2 days'], ['تقبّل الله منك — ابدأ ختمة جديدة متى شئت', 'May Allah accept it. Start a new khatma whenever you like'], ['ختمة كاملة', 'A full khatma'], ['تقبّل الله منك', 'may Allah accept it'],
+        ['🎉 ما شاء الله! أتممت ختمة القرآن الكريم كاملة، تقبّل الله منك.', '🎉 Ma sha Allah! You completed a full khatma of the Quran, may Allah accept it.'], ['أتممت ورد اليوم ✓', 'Finished today’s wird ✓'],
+        ['كل يوم حزب (بين 72 و105 صفحات، يعني تقريبًا 4 إلى 5 أجزاء)', 'A portion a day (72 to 105 pages, about 4 to 5 juz)'], ['ختمة كل أسبوع بإذن الله.', 'A khatma every week, in sha Allah.'],
+        ['متابعة من موضعي الحالي', 'Continue from where I am'], ['من بداية المصحف (سورة الفاتحة)', 'From the start (Al-Fatihah)'], ['من سورة محددة', 'From a specific surah'], ['تم حفظ خطة الورد', 'Wird plan saved'],
+        ['الفاتحة – النساء', 'Al-Fatihah – An-Nisa'], ['المائدة – التوبة', 'Al-Ma’idah – At-Tawbah'], ['يونس – النحل', 'Yunus – An-Nahl'], ['الإسراء – الفرقان', 'Al-Isra – Al-Furqan'], ['الشعراء – يس', 'Ash-Shu‘ara – Ya-Sin'],
+        ['الصافات – الحجرات', 'As-Saffat – Al-Hujurat'], ['ق – الناس', 'Qaf – An-Nas'],
+        ['«ثلاث، وخمس، وسبع، وتسع، وإحدى عشرة، وثلاث عشرة، وحزب المفصّل وحده» — رواه أبو داود (1393) عن أوس بن حذيفة، وفي إسناده كلام. ويُحفظ بكلمة «فَمِي بِشَوْق»: أول سورة بكل حزب.', '“Three, five, seven, nine, eleven, thirteen, and the Mufassal on its own”: Abu Dawud (1393), from Aws ibn Hudhayfah; its chain has some weakness. Remembered by the word «فَمِي بِشَوْق»: the first letter of the first surah of each portion.'],
+        ['ورد اليوم: —', 'Today’s wird: —'], ['الجزء', 'Juz'],
+        // الإشعارات وفحصها
+        ['أذكار عامة', 'General adhkar'], ['✍️ اسأل مُذكّر', '✍️ Ask Mudhakkir'], ['اكتب ما تريد… مثلًا: ذكر عند الغضب', 'Type anything… e.g. a dhikr for anger'], ['متصفحك لا يدعم الإشعارات.', 'Your browser doesn’t support notifications.'],
+        ['الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد تحميل الصفحة.', 'Notifications are blocked for this site. Allow them in browser settings, then reload.'], ['مفعّلة', 'On'],
+        ['فعّل المفتاح لتصلك أذكار عشوائية كل 15 دقيقة.', 'Turn it on to get a random dhikr every 15 minutes.'], ['لا تذكيرات شخصية', 'No personal reminders'],
+        ['من إعدادات الآيفون ← الإشعارات ← مُذكّر ← السماح بالإشعارات.', 'In iPhone Settings → Notifications → Mudhakkir → Allow Notifications.'],
+        ['اضغط القفل بجانب رابط الموقع (أو معلومات التطبيق) ← الأذونات ← الإشعارات ← سماح، ثم أعد الفحص.', 'Tap the lock next to the address (or App info) → Permissions → Notifications → Allow, then check again.'],
+        ['اضغط القفل بجانب رابط الموقع ← الإشعارات ← سماح، ثم أعد الفحص.', 'Tap the lock next to the address → Notifications → Allow, then check again.'],
+        ['من إعدادات الهاتف ← التطبيقات ← مُذكّر (أو Chrome) ← البطارية ← «بلا قيود»، وتأكد أن إشعاراته غير مكتومة.', 'In phone Settings → Apps → Mudhakkir (or Chrome) → Battery → “Unrestricted”, and make sure its notifications aren’t muted.'],
+        ['تأكد أن وضع «التركيز/عدم الإزعاج» متوقف، وأن إشعارات مُذكّر مسموحة من إعدادات الآيفون.', 'Make sure Focus / Do Not Disturb is off, and Mudhakkir notifications are allowed in iPhone Settings.'],
+        ['اترك المتصفح يعمل في الخلفية، وتأكد أن إشعاراته مسموحة من إعدادات النظام.', 'Let the browser run in the background, and make sure its notifications are allowed in system settings.'],
+        ['جارٍ الفحص…', 'Checking…'], ['التطبيق غير مثبّت على الآيفون', 'The app isn’t installed on this iPhone'], ['على الآيفون تعمل الإشعارات من التطبيق المثبّت فقط.', 'On iPhone, notifications only work from the installed app.'],
+        ['افتح الموقع في Safari ← زر المشاركة ⬆️ ← «إضافة إلى الشاشة الرئيسية»، ثم افتح مُذكّر من أيقونته.', 'Open the site in Safari → Share ⬆️ → “Add to Home Screen”, then open Mudhakkir from its icon.'],
+        ['المتصفح لا يدعم الإشعارات في الخلفية', 'This browser doesn’t support background notifications'], ['جرّب Chrome على أندرويد، أو Safari بعد تثبيت التطبيق على الآيفون.', 'Try Chrome on Android, or Safari after installing the app on iPhone.'],
+        ['المتصفح يدعم الإشعارات', 'The browser supports notifications'], ['إذن الإشعارات مسموح', 'Notification permission granted'], ['الإشعارات ممنوعة لهذا الموقع', 'Notifications are blocked for this site'],
+        ['لم تسمح بالإشعارات بعد', 'You haven’t allowed notifications yet'], ['خدمة الخلفية تعمل', 'Background service is running'], ['خدمة الخلفية لم تبدأ', 'Background service hasn’t started'],
+        ['أغلق التطبيق وافتحه من جديد، وإن استمرت المشكلة اضغط «إصلاح الاشتراك».', 'Close and reopen the app. If it continues, tap “Repair subscription”.'], ['الجهاز مسجّل في الخادم', 'This device is registered on the server'],
+        ['لا يوجد ما يُرسَل', 'Nothing to send'], ['فعّل «أذكار عامة» أو أضف تذكيرًا، ثم أعد الفحص.', 'Turn on “General adhkar” or add a reminder, then check again.'], ['تعذّر التسجيل في الخادم', 'Couldn’t register on the server'],
+        ['قد يكون الاتصال ضعيفًا أو الاشتراك قديمًا.', 'The connection may be weak or the subscription old.'], ['اضغط «إصلاح الاشتراك» في الأسفل.', 'Tap “Repair subscription” below.'], ['تعذّر الوصول إلى الخادم الآن', 'Can’t reach the server now'],
+        ['تأكد من الاتصال بالإنترنت وأعد الفحص.', 'Check your connection and check again.'], ['الخادم لم يرسل إشعارات منذ مدة', 'The server hasn’t sent notifications for a while'], ['لا يوجد سجل إرسال.', 'No send log.'],
+        ['المشكلة من جهة الخادم (Cloudflare)، لا من هاتفك.', 'The problem is on the server (Cloudflare), not your phone.'], ['الخادم يعمل', 'The server is running'], ['الخادم يعمل ويرسل كل دقيقة', 'The server is running and sends every minute'],
+        ['جارٍ إرسال إشعار تجربة من الخادم…', 'Sending a test notification from the server…'], ['لا تغلق التطبيق، ثوانٍ فقط.', 'Don’t close the app, just a few seconds.'], ['الخادم لم يجد اشتراك هذا الجهاز', 'The server didn’t find this device’s subscription'],
+        ['انتهى الاشتراك أو أُلغي.', 'The subscription expired or was removed.'], ['اضغط «إصلاح الاشتراك» ثم أعد الفحص.', 'Tap “Repair subscription”, then check again.'], ['خدمة الإشعارات رفضت رسالة الخادم', 'The push service rejected the server’s message'],
+        ['اضغط «إصلاح الاشتراك» ثم أعد الفحص، وإن استمر فالمشكلة من إعداد الخادم.', 'Tap “Repair subscription”, then check again. If it continues, it’s a server setup issue.'], ['تعذّر على الخادم إرسال التجربة', 'The server couldn’t send the test'],
+        ['حاول بعد قليل.', 'Try again shortly.'], ['بلغت حدّ التجارب لهذا اليوم', 'You’ve reached today’s test limit'], ['حاول غدًا.', 'Try tomorrow.'], ['وصل إشعار التجربة ✓', 'The test notification arrived ✓'],
+        ['أرسل الخادم الإشعار لكنه لم يصل إلى الهاتف', 'The server sent it, but it didn’t reach the phone'], ['حدث خطأ أثناء الفحص', 'Something went wrong during the check'], ['أعد المحاولة.', 'Try again.'], ['أعد الفحص', 'Check again'],
+        ['جارٍ الإصلاح…', 'Repairing…'], ['تم تجديد الاشتراك ✓ أعد الفحص للتأكد', 'Subscription renewed ✓ Check again to confirm'], ['تعذّر التجديد، تأكد من الاتصال وإذن الإشعارات', 'Renewal failed, check your connection and notification permission'],
+        // التثبيت (الملاحظات)
+        ['مُذكّر مثبّت على هذا الجهاز.', 'Mudhakkir is installed on this device.'],
+        ['إن لم تجده: افتح إعدادات الجوال ← التطبيقات وابحث عنه بأيقونته (قد لا يظهر عند البحث بكلمة «مذكر» بسبب التشكيل). وإن لم يكن موجودًا فعلًا: من Chrome ← الإعدادات ← إعدادات المواقع ← كل المواقع ←', 'If you can’t find it: open phone Settings → Apps and look for its icon. If it’s really not there: Chrome → Settings → Site settings → All sites →'],
+        ['← «محو وإعادة الضبط»، ثم افتح الموقع واضغط «تثبيت التطبيق».', '→ “Clear & reset”, then open the site and tap “Install app”.'], ['افتحه من قائمة التطبيقات، أو أزل تثبيته من المتصفح ثم ثبّته من جديد.', 'Open it from your app list, or uninstall it from the browser and install again.'],
+        // صنع بطاقة والمشاركة
+        ['ما قدرنا نفتح هالصورة', 'Couldn’t open this photo'], ['اسحب الصورة بإصبعك، وكبّر بإصبعين', 'Drag the photo with a finger, pinch to zoom'], ['ما قدرنا نفتح هالصورة، جرّب وحدة تانية', 'Couldn’t open this photo, try another one'],
+        ['داكنة', 'Dark'], ['فاتحة', 'Light'], ['أضف خلفية', 'Add background'], ['خلفية من صورك', 'Background from your photos'], ['خلفية بلا كتابة', 'Background without text'], ['جارٍ التجهيز…', 'Preparing…'],
+        ['انحفظت الصورة، فيك تشاركها من ملفاتك', 'Image saved, you can share it from your files'], ['تعذّرت المشاركة، جرّب «حفظ»', 'Sharing failed, try “Save”'], ['تعذّر الحفظ، جرّب مرة تانية', 'Saving failed, try again'], ['انحفظت الصورة ✓', 'Image saved ✓'],
+        ['انحفظت ✓ افتحها وكبس يمين ← «تعيين كخلفية»', 'Saved ✓ Open it, right-click → “Set as background”'], ['انحفظت ✓ من الصور: مشاركة ← «استخدام كخلفية»', 'Saved ✓ In Photos: Share → “Use as Wallpaper”'], ['افتح الأذكار', 'Open adhkar'],
+        ['ما في آيات معلّمة لسا. بالمصحف اضغط مطوّلًا على أي آية واختار «علامة مرجعية» أو «تمييز»، أو «صنع بطاقة» مباشرة.', 'No marked ayat yet. In the mushaf, press and hold any ayah and choose “Bookmark” or “Highlight”, or “Make a card” directly.'],
+        ['علامة', 'Bookmark'], ['مميّزة', 'Highlighted'], ['فيها ملاحظة', 'Has a note'], ['في آيات ما قدرنا نجيب نصها هلّق، بتبين لما يكون في نت.', 'Some ayat couldn’t load now; they’ll show when you’re online.'],
+        ['لسا ما في ورد. جهّز خطة الورد من صفحة القرآن.', 'No wird yet. Set up your wird plan on the Quran page.'], ['جارٍ تحميل آيات ورد اليوم…', 'Loading today’s wird ayat…'], ['هي آيات أول 6 صفحات من ورد اليوم.', 'These are the ayat of the first 6 pages of today’s wird.'],
+        ['ما قدرنا نجيب باقي الصفحات، تأكد من النت.', 'Couldn’t load the rest of the pages, check your connection.'], ['ما قدرنا نجيب آيات ورد اليوم. تأكد من النت.', 'Couldn’t load today’s wird ayat. Check your connection.'], ['هالصفحة ما فيها ذكر لبطاقة', 'This page has no dhikr for a card'],
+        ['تعذّر تجهيز الصورة، يمكنك مشاركة النص.', 'Couldn’t prepare the image, you can share the text.'], ['مشاركة الآية', 'Share ayah'], ['تعذّرت المشاركة، جرّب نسخ النص', 'Sharing failed, try copying the text'], ['تعذّر النسخ', 'Copy failed'], ['تم نسخ النص', 'Text copied'],
+        // المساعد (الأزرار والردود الجاهزة؛ أجوبة الذكاء الاصطناعي ما بتنترجم هون)
+        ['يكتب…', 'Typing…'], ['بدون إنترنت · بجاوبك من محتوى التطبيق', 'Offline · answering from the app’s content'], ['تم نسخ رابط التطبيق', 'App link copied'], ['🧭 دليل التطبيق', '🧭 App guide'], ['ملاحظة', 'Note'],
+        ['📖 من أذكار التطبيق', '📖 From the app’s adhkar'], ['عرض النص كاملًا', 'Show full text'], ['الدليل ▾', 'Source ▾'], ['إخفاء الدليل ▴', 'Hide source ▴'], ['تم نسخ الذكر', 'Dhikr copied'], ['ذكّرني فيه', 'Remind me'],
+        ['افتح في الأذكار', 'Open in adhkar'], ['🔔 ذكّرني فيه كل يوم', '🔔 Remind me daily'], ['كمان واحد', 'Another one'], ['عطيني غيره', 'Give me another'], ['شو فضله؟', 'What’s its virtue?'], ['شو فضل هالذكر؟', 'What’s the virtue of this dhikr?'],
+        ['ما زبط معي', 'It didn’t work'], ['جرّبت وما زبط معي، شو ممكن يكون السبب؟', 'I tried and it didn’t work, what could be the reason?'], ['شكرًا 🤍', 'Thanks 🤍'], ['شكرًا', 'Thanks'], ['عطيني ذكر يريّح القلب', 'Give me a dhikr that eases the heart'],
+        ['شو فضل سورة الكهف يوم الجمعة؟', 'What is the virtue of al-Kahf on Friday?'], ['دعاء للرزق والتوفيق', 'Du‘a for provision and success'], ['دعاء للهمّ والضيق', 'Du‘a for worry and distress'], ['شو بقول قبل النوم؟', 'What do I say before sleep?'],
+        ['ما عم يجيني نوم', 'I can’t sleep'], ['عطيني ذكر عند الغضب', 'A dhikr for when I’m angry'], ['كيف بثبّت التطبيق؟', 'How do I install the app?'], ['ليش ما عم توصلني الإشعارات؟', 'Why am I not getting notifications?'],
+        ['أنا مُذكّر، معك بأي وقت: ذكر لموقف عم تمرّ فيه، فضل سورة أو دعاء، أو أي شي بالتطبيق. شو ببالك؟', 'I’m Mudhakkir, here anytime: a dhikr for what you’re going through, the virtue of a surah or du‘a, or anything in the app. What’s on your mind?'],
+        ['العفو، الله يجزيك كل خير 🤍', 'You’re welcome, may Allah reward you 🤍'], ['ولو، هاد واجبي 😊 الله يتقبّل منك.', 'Of course 😊 May Allah accept from you.'], ['الله يعافيك ويسعدك 🤍 لا تنساني من دعائك.', 'May Allah keep you well and happy 🤍 Remember me in your du‘a.'],
+        ['الحمد لله بخير، وأحلى شي لما نتذاكر سوا 😊 وإنت كيفك؟ إن شاء الله مرتاح.', 'Alhamdulillah, well, and it’s best when we remember Allah together 😊 How are you?'],
+        ['أنا مُذكّر 🤍 مساعد جوّا التطبيق، مو إنسان، بس موجود دايمًا: بعطيك الذكر المناسب لأي موقف مع دليله، وبساعدك بأي شي بالتطبيق. شو بدك نعمل؟', 'I’m Mudhakkir 🤍 an assistant inside the app, not a person, but always here: I give you the right dhikr for any situation with its source, and help with anything in the app. What shall we do?'],
+        ['هاد اللي لقيتلك ياه من أذكار التطبيق:', 'Here’s what I found in the app’s adhkar:'], ['تفضّل، هاد الذكر المناسب 🤍', 'Here’s the right dhikr 🤍'], ['خذ هالذكر، إن شاء الله ينفعك:', 'Take this dhikr, may it benefit you:'],
+        ['سامحني، ما لقيت هالشي عندي. فيك تسألني عن ذكر لموقف (غضب، همّ، سفر، مطر…) أو عن أي ميزة بالتطبيق.', 'Sorry, I didn’t find that. You can ask me for a dhikr for a situation (anger, worry, travel, rain…) or about any feature in the app.'],
+        ['بدون إنترنت · رد من محتوى التطبيق', 'Offline · reply from the app’s content'], ['رد سريع من محتوى التطبيق', 'Quick reply from the app’s content'], ['المساعد الذكي يرجع بكرة', 'The smart assistant is back tomorrow'],
+        ['بدأت محادثة جديدة', 'New chat started'], ['اسمح للمتصفح باستخدام الميكروفون', 'Allow the browser to use the microphone'],
+        // الملاحظات
+        ['قبل دقيقة', '1 min ago'], ['قبل دقيقتين', '2 min ago'], ['قبل ساعة', '1 h ago'], ['قبل ساعتين', '2 h ago'], ['أمس', 'Yesterday'], ['قبل يومين', '2 days ago'],
+        ['اختار نوع الرسالة أول.', 'Choose a message type first.'], ['اكتب ملاحظتك أول.', 'Write your feedback first.'], ['الإرسال مو متاح هلّق.', 'Sending isn’t available right now.'],
+        ['ما في نت هلّق. رسالتك بتضل مكتوبة هون، ابعتها لما يرجع النت.', 'You’re offline. Your message stays here; send it when you’re back online.'], ['جارٍ الإرسال…', 'Sending…'],
+        ['بعتت رسائل كتير اليوم. جرّب بكرا إن شاء الله.', 'You sent many messages today. Try tomorrow, in sha Allah.'], ['ما قدرنا نبعت الرسالة. تأكد من النت وجرّب مرة تانية.', 'Couldn’t send the message. Check your connection and try again.'], ['لسا ما في رد', 'No reply yet'],
+        // المصحف بلا نت، الشاشة، الأدوات، اختيار التاريخ
+        ['محفوظ على جهازك ✓ القراءة والبحث بلا نت', 'Saved on your device ✓ Read and search offline'], ['المصحف محفوظ على جهازك ✓', 'Mushaf saved on your device ✓'], ['بدّك نت مرة وحدة لتنزيل المصحف', 'You need internet once to download the mushaf'],
+        ['ما كمل التنزيل، تأكد من النت واضغط مرة تانية', 'The download didn’t finish, check your connection and tap again'], ['انحفظ المصحف كامل ✓ بتقدر تقرأ وتبحث بلا نت', 'Whole mushaf saved ✓ You can read and search offline'],
+        ['من أذكار الصباح', 'From the morning adhkar'], ['من أذكار المساء', 'From the evening adhkar'], ['آية اليوم', 'Ayah of the day'], ['حديث اليوم', 'Hadith of the day'], ['الختمة كاملة، تقبّل الله', 'Khatma complete, may Allah accept it'],
+        ['ورد اليوم تمّ، تقبّل الله', 'Today’s wird is done, may Allah accept it'], ['ابدأ سلسلتك اليوم', 'Start your streak today'], ['مرتين', 'Twice'],
+        ['انسخ هالنص', 'Copy this text'], ['انسخ النص المحدّد', 'Copy selected text'], ['انتسخ، الصقه بـ Scriptable', 'Copied, paste it into Scriptable'], ['بدّها نت أول مرة، جرّب كمان شوي', 'Needs internet the first time, try again shortly'],
+        ['انتسخ الرابط', 'Link copied'], ['وقف الربط، والأدوات بتضل تعرض الأذكار بلا الورد', 'Unlinked; widgets keep showing adhkar without the wird'],
+        ['أحد', 'Sun'], ['اثنين', 'Mon'], ['ثلاثاء', 'Tue'], ['أربعاء', 'Wed'], ['خميس', 'Thu'], ['جمعة', 'Fri'], ['سبت', 'Sat'], ['اختر الوقت', 'Choose time'], ['اختر التاريخ', 'Choose date'], ['من', 'of'],
+        ['تسبيحة', 'tasbih'], ['تسبيحتان', '2 tasbih'], ['تسبيحات', 'tasbih'], ['آية', 'ayah'], ['آيتان', '2 ayat'], ['آيات', 'ayat'], ['التالي', 'Next'],
+        // المشاركة (النص والصورة، share.js ← T)
+        ['تطبيق مُذكّر — القرآن والأذكار', 'Mudhakkir — Quran & Adhkar'], ['🎉 ختمتُ القرآن الكريم كاملاً بفضل الله، تقبّل الله منا ومنكم', '🎉 I completed the whole Quran by Allah’s grace. May Allah accept from us and you'],
+        ['✅ أتممتُ وردي اليوم من القرآن الكريم', '✅ I finished my Quran wird today'], ['📖 وردي اليوم من القرآن الكريم', '📖 My Quran wird today'], ['🌙 إنجازاتي في مُذكّر', '🌙 My progress in Mudhakkir'],
+        ['وقليل دائم خير من كثير منقطع', 'A little that lasts is better than a lot that stops'], ['ختمتُ القرآن الكريم', 'I completed the Quran'], ['أتممتُ وردي اليوم', 'I finished today’s wird'],
+        ['تقدّم اليوم', 'Today'], ['ختمة القرآن', 'Quran khatma'], ['يوم الختمة', 'Khatma day'], ['سلسلة الورد (يوم)', 'Streak (days)'], ['إنجازاتي مع مُذكّر', 'My progress with Mudhakkir'],
+        ['رحلتي مع القرآن والأذكار', 'My journey with the Quran and adhkar'], ['تسبيحة اليوم', 'Tasbih today'], ['ختمات مكتملة', 'Completed khatmas'], ['تطبيق القرآن والأذكار', 'Quran & adhkar app'],
+        // ألوان الوقت (atmosphere.js)
+        ['وقت الفجر', 'Dawn'], ['وقت النهار', 'Daytime'], ['وقت العصر', 'Afternoon'], ['وقت المغرب', 'Sunset'], ['وقت الليل', 'Night'],
+        ['تلقائي حسب وقتك', 'Auto, follows your time of day'], ['تتغيّر الألوان مع وقت يومك، أو ثبّت الفترة التي تحبها', 'Colours follow the time of your day, or pin the one you like'],
+        // إحصائية اليوم (home.js: النص مقسوم حوالين <strong>)
+        ['إحصائية اليوم:', 'Today:'], ['تسبيحة واحدة', '1 tasbih'], ['آية واحدة', '1 ayah'],
+        // النسخة الاحتياطية والمشاركة
+        ['نسخة مُذكّر الاحتياطية', 'Mudhakkir backup'], ['ستحلّ محلّ بياناتك الحالية على هذا الجهاز (الورد، التذكيرات، العلامات، الإعدادات).', 'It will replace your current data on this device (wird, reminders, bookmarks, settings).'],
+        ['من تطبيق مُذكّر:', 'From the Mudhakkir app:'],
+        // تعريف الورد (wird-intro.js) والتحديثات
+        ['كل يوم، بالوقت يلي جنبه', 'Every day, at the time next to it'], ['مطفي. شغّله واختار الوقت', 'Off. Turn it on and pick a time'],
+        ['يوجد تحديث جاهز للتثبيت', 'an update is ready'], ['أنت على أحدث إصدار', 'you’re up to date'], ['يوم واحد', '1 day'],
+        // ملاحظات الإصدار (version.json ← نافذة «شو الجديد» والتحديث)
+        ['الإنجليزي صار أكمل', 'English is more complete'], ['صورة المشاركة ونصّها صاروا بالإنجليزي إذا اخترت English', 'The share image and its text are now in English when you choose English'],
+        ['نوافذ «متأكد؟» وأرباع الحزب وألوان الوقت صاروا مترجمين', '“Are you sure?” dialogs, hizb quarters and time-of-day colours are now translated'],
+        ['بالإنجليزي زر الإغلاق ✕ والمفاتيح صاروا بمكانهن الصح', 'In English, the ✕ close button and the switches now sit on the right side'],
+        ['الردود على ملاحظاتك والإعلانات صارت باسم «فريق مُذكّر»', 'Replies to your feedback and announcements now come from “the Mudhakkir team”']
+    ].forEach(([a, b]) => EN.set(a, b));
+
     // أسماء السور بالإنجليزي، بنفس ترتيب SURAH_NAMES (wird.js)
     const SURAH_EN = ['Al-Fatihah', 'Al-Baqarah', 'Al Imran', 'An-Nisa', 'Al-Ma’idah', 'Al-An‘am', 'Al-A‘raf', 'Al-Anfal', 'At-Tawbah', 'Yunus', 'Hud', 'Yusuf', 'Ar-Ra‘d', 'Ibrahim', 'Al-Hijr', 'An-Nahl', 'Al-Isra', 'Al-Kahf', 'Maryam', 'Ta-Ha',
         'Al-Anbiya', 'Al-Hajj', 'Al-Mu’minun', 'An-Nur', 'Al-Furqan', 'Ash-Shu‘ara', 'An-Naml', 'Al-Qasas', 'Al-‘Ankabut', 'Ar-Rum', 'Luqman', 'As-Sajdah', 'Al-Ahzab', 'Saba', 'Fatir', 'Ya-Sin', 'As-Saffat', 'Sad', 'Az-Zumar', 'Ghafir',
@@ -216,8 +359,73 @@ const I18n = (() => {
     const plural = (n, one, many) => `${n} ${Number(n) === 1 ? one : many}`;
 
     // ===== أنماط للنصوص يلي فيها أرقام أو أسماء =====
+    const PHASE = { 'الفجر': 'dawn', 'النهار': 'daytime', 'العصر': 'afternoon', 'المغرب': 'sunset', 'الليل': 'night' };
+    const QUARTER = { 'ربع': '¼', 'نصف': '½', 'ثلاثة أرباع': '¾' };
     const PATTERNS = [
         [/^(\d+) من (\d+)$/, (m, a, b) => `${a} of ${b}`],
+        // الدفعة التانية
+        [/^الآن (الفجر|النهار|العصر|المغرب|الليل)$/, (m, a) => `now ${PHASE[a]}`],
+        [/^ثابتة على ألوان (الفجر|النهار|العصر|المغرب|الليل) طول اليوم$/, (m, a) => `Fixed on ${PHASE[a]} colours all day`],
+        [/^إحصائية اليوم: (.+)$/, (m, a) => `Today: ${tr(a) || a}`],
+        [/^الختمة (\d+) من (\d+)$/, (m, a, b) => `Khatma ${a} of ${b}`],
+        [/^(ربع|نصف|ثلاثة أرباع) الحزب (\d+)(?:: (.+))?$/, (m, a, b, c) => `${QUARTER[a]} of hizb ${b}${c ? ': ' + (tr(c) || c) : ''}`],
+        [/^ص(\d+)$/, (m, a) => `p. ${a}`],
+        [/^استرجاع النسخة(?: المحفوظة في (.+))?؟$/, (m, a) => `Restore the backup${a ? ' saved on ' + a : ''}?`],
+        [/^من تطبيق مُذكّر: (.+)$/, (m, a) => `From the Mudhakkir app: ${a}`],
+        [/^إضافة تذكير (.+)$/, (m, a) => `Add reminder: ${tr(a) || a}`],
+        [/^تقدّمي اليوم: (\d+)[٪%]$/, (m, a) => `My progress today: ${a}%`],
+        [/^(📖 )?ختمة القرآن: (\d+)[٪%](?: \((\d+) من (\d+) صفحة\))?$/, (m, a, b, c, d) => `${a || ''}Quran khatma: ${b}%${c ? ` (${c} of ${d} pages)` : ''}`],
+        [/^(🔥 )?سلسلة الورد: (.+)$/, (m, a, b) => `${a || ''}Wird streak: ${tr(b) || b}`],
+        [/^✨ اليوم: (\d+) تسبيحة$/, (m, a) => `✨ Today: ${a} tasbih`],
+        [/^(\d+) (?:آية|آيات)$/, (m, a) => `${a} ayat`],
+        [/^🏅 ختمات مكتملة: (\d+)$/, (m, a) => `🏅 Completed khatmas: ${a}`],
+        [/^المصدر: (.+)$/, (m, a) => `Source: ${tr(a) || a}`],
+        [/^(\d+) (?:نتائج|نتيجة)$/, (m, a) => `${a} results`],
+        [/^(\d+) دقيقة تقريبًا$/, (m, a) => `About ${a} min`],
+        [/^(\d+) ساعات تقريبًا$/, (m, a) => `About ${a} hours`],
+        [/^(\d+) (?:صفحة|صفحات)$/, (m, a) => plural(a, 'page', 'pages')],
+        [/^سؤال (\d+) من (\d+)$/, (m, a, b) => `Question ${a} of ${b}`],
+        [/^(\d+) ختمات$/, (m, a) => `${a} khatmas`],
+        [/^(\d+)\. سورة (.+)$/, (m, a, b) => `${a}. Surah ${surah(b)}`],
+        [/^كل يوم (\d.+)$/, (m, a) => `Every day at ${a}`],
+        [/^من سورة (.+) إلى سورة (.+)$/, (m, a, b) => `From ${surah(a)} to ${surah(b)}`],
+        [/^من سورة (.+)$/, (m, a) => `From Surah ${surah(a)}`],
+        [/^(\d+) ختمات? خلال (\d+) (?:يوم|يوماً|يومًا) تقريبًا$/, (m, a, b) => `${a} khatmas in about ${b} days`],
+        [/^ختمة كل (.+)$/, (m, a) => `A khatma every ${tr(a) || a}`],
+        [/^جزء كل يوم \((.+)\)$/, (m, a) => `A juz a day (${tr(a) || a})`],
+        [/^الإشعار القادم (.+)$/, (m, a) => `Next notification ${a}`],
+        [/^(\d+) تذكير$/, (m, a) => `${a} reminders`],
+        [/^آخر إرسال قبل (\d+) دقيقة\.$/, (m, a) => `Last sent ${a} min ago.`],
+        [/^لكن جدوله كل (\d+) دقيقة، فقد يتأخر التذكير حتى (\d+) دقيقة\.$/, (m, a, b) => `But it runs every ${a} min, so a reminder may be up to ${b} min late.`],
+        [/^الرمز (\d+): توقيع الخادم أو الاشتراك غير مقبول\.$/, (m, a) => `Code ${a}: the server signature or subscription was not accepted.`],
+        [/^كل شيء يعمل\. المسجّل في الخادم: (.+)\.$/, (m, a) => `Everything works. Registered on the server: ${tr(a) || a}.`],
+        [/^تم نسخ الرابط، افتحه في (\S+) ثم اضغط «تثبيت التطبيق»$/, (m, a) => `Link copied. Open it in ${a}, then tap “Install app”`],
+        [/^افتح الرابط في (\S+): (.+)$/, (m, a, b) => `Open the link in ${a}: ${b}`],
+        [/^الحزب (\d+): من سورة (.+) إلى سورة (.+)$/, (m, a, b, c) => `Portion ${a}: ${surah(b)} to ${surah(c)}`],
+        [/^جارٍ حفظ ورد اليوم للقراءة بدون نت… (\d+) من (\d+)$/, (m, a, b) => `Saving today’s wird for offline… ${a} of ${b}`],
+        [/^الجزء (\d+) – (\d+)$/, (m, a, b) => `Juz ${a}–${b}`],
+        [/^ختمات مكتملة: (\d+)$/, (m, a) => `Completed khatmas: ${a}`],
+        [/^قرأت (\d+) من (\d+) صفحة$/, (m, a, b) => `Read ${a} of ${b} pages`],
+        [/^المتبقي (\d+)$/, (m, a) => `${a} left`],
+        [/^تنتهي بإذن الله في (.+)$/, (m, a) => `Ends, in sha Allah, on ${a}`],
+        [/^🎉 تقبّل الله طاعتك! أتممت وردك اليوم \((\d+) صفحة\)\.$/, (m, a) => `🎉 May Allah accept it! You finished today’s wird (${a} pages).`],
+        [/^(\d+) صفحة كل يوم$/, (m, a) => `${a} pages a day`],
+        [/^\(≈ (\d+) جزء\)$/, (m, a) => `(≈ ${a} juz)`],
+        [/^وردك (\d+) صفحة يوميًا(?: \(≈ (\d+) جزء\))?$/, (m, a, b) => `Your wird: ${a} pages a day${b ? ` (≈ ${b} juz)` : ''}`],
+        [/^تنتهي الختمة خلال (.+?) بإذن الله، في (.+)\.$/, (m, a, b) => `The khatma ends in ${tr(a) || a}, in sha Allah, on ${b}.`],
+        [/^قبل (\d+) (?:دقيقة|دقايق|دقائق)$/, (m, a) => `${a} min ago`],
+        [/^قبل (\d+) (?:ساعة|ساعات)$/, (m, a) => `${a} h ago`],
+        [/^قبل (\d+) (?:يوم|أيام)$/, (m, a) => `${a} days ago`],
+        [/^جارٍ التنزيل… (\d+) من (\d+) صفحة$/, (m, a, b) => `Downloading… ${a} of ${b} pages`],
+        [/^انحفظ (\d+) من (\d+)، اضغط لتكمّل الباقي$/, (m, a, b) => `Saved ${a} of ${b}, tap to finish the rest`],
+        [/^من صفحة (\d+) لـ (\d+)$/, (m, a, b) => `From page ${a} to ${b}`],
+        [/^ورد اليوم (\d+)[٪%](.*)$/, (m, a, b) => `Today’s wird ${a}%${b}`],
+        [/^سلسلة (\d+) (.+)$/, (m, a) => `${a}-day streak`],
+        [/^يُقال (\d+) مرات$/, (m, a) => `Say it ${a} times`],
+        [/^(صباح الخير|مسا الخير|مسا النور)(.*?) (☀️|🌤️|🌙)$/, (m, a, b, c) => `${a === 'صباح الخير' ? 'Good morning' : 'Good evening'}${b} ${c}`],
+        [/^الحزب (\d+)$/, (m, a) => `Hizb ${a}`], [/^بداية الحزب (\d+)$/, (m, a) => `Start of hizb ${a}`],
+        [/^ختمة خلال (\d+) (?:يوم|يوماً|يومًا|أيام)$/, (m, a) => `Khatma in ${a} days`],
+        [/^ختمة خلال (.+)$/, (m, a) => `Khatma in ${tr(a) || a}`],
         [/^(\d+) من (\d+) صفحة$/, (m, a, b) => `${a} of ${b} pages`],
         [/^ختمة خلال (\d+) (?:يوم|يوماً|يومًا|أيام)$/, (m, a) => `Khatma in ${a} days`],
         [/^(خفيفة|كاملة)( \(تلقائي على هذا الجهاز\))?: (.+)$/, (m, a, b, c) => `${a === 'خفيفة' ? 'Light' : 'Full'}${b ? ' (auto on this device)' : ''}: ${tr(c) || c}`],
@@ -272,27 +480,43 @@ const I18n = (() => {
         [/^حذف التذكير «(.+)»؟$/, (m, a) => `Delete the reminder “${a}”?`],
         [/^من الأيام البيض$/, () => 'One of the White Days'],
         [/^اليوم (\d+) من رمضان$/, (m, a) => `Day ${a} of Ramadan`],
-        [/^العشر الأواخر من رمضان$/, () => 'Last ten nights of Ramadan'], [/^الليلة (\d+)$/, (m, a) => `Night ${a}`]
+        [/^العشر الأواخر من رمضان$/, () => 'Last ten nights of Ramadan'], [/^الليلة (\d+)$/, (m, a) => `Night ${a}`],
+        // عامّة بالآخر (حتى ما تسبق الأنماط الأدق)
+        [/^(.+) باليوم$/, (m, a) => `${tr(a) || a} a day`],
+        [/^من (.+) إلى (.+)$/, (m, a, b) => { surah(''); return surahMap && surahMap.has(a) && surahMap.has(b) ? `From ${surah(a)} to ${surah(b)}` : m; }],
+        // «البقرة 25» و«[البقرة: 255]» (سورة ورقم آية). null = مو هاد، كمّل دوّر
+        [/^(.+) (\d+)$/, (m, a, b) => { surah(''); return surahMap && surahMap.has(a) ? `${surahMap.get(a)} ${b}` : null; }],
+        [/^\[(.+): (\d+)\]$/, (m, a, b) => { surah(''); return surahMap && surahMap.has(a) ? `[${surahMap.get(a)}: ${b}]` : null; }]
     ];
 
+    const WHOLE = PATTERNS.filter(([re]) => re.source.includes(' · '));
     const AR = /[؀-ۿ]/;
     function seg(p) {
         if (EN.has(p)) return EN.get(p);
-        for (const [re, fn] of PATTERNS) { const m = p.match(re); if (m) return fn(...m); }
+        for (const [re, fn] of PATTERNS) { const m = p.match(re); if (m) { const r = fn(...m); if (r != null) return r; } }
         if (surahMap === null) surah('');
         if (surahMap && surahMap.has(p)) return surahMap.get(p);
         if (p.includes('، ')) { const parts = p.split('، '); const out = parts.map(seg); if (out.some((x, i) => x !== parts[i])) return out.join(', '); }
         return p;
     }
     // ترجمة نص كامل (أو null إذا ما في ترجمة)
+    // الأرقام العربية (٣) بنصوص الواجهة بتصير إنجليزية (3) بس إذا انترجم النص؛ نص القرآن ما بيوصل لهون (SKIP)
+    const latin = s => s.replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x660).replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x6F0);
     function tr(s) {
         if (!s) return null;
-        const k = s.replace(/\s+/g, ' ').trim();
+        let k = latin(s.replace(/\s+/g, ' ').trim());
         if (!k || !AR.test(k)) return null;
         if (EN.has(k)) return EN.get(k);
+        // «·» بأول أو آخر النص (لما ينقسم السطر حوالين <strong>): منشيلها ومنرجّعها
+        let pre = '', post = '';
+        if (k.startsWith('· ')) { pre = '· '; k = k.slice(2); }
+        if (k.endsWith(' ·')) { post = ' ·'; k = k.slice(0, -2); }
+        if ((pre || post) && EN.has(k)) return pre + EN.get(k) + post;
+        // الأنماط يلي فيها « · » لازم تنجرّب عالسطر كلو قبل التقسيم
+        for (const [re, fn] of WHOLE) { const m = k.match(re); if (m) { const r = fn(...m); if (r != null) return pre + r + post; } }
         const parts = k.split(' · ');
         const out = parts.map(seg);
-        return out.some((x, i) => x !== parts[i]) ? out.join(' · ') : null;
+        return out.some((x, i) => x !== parts[i]) ? pre + out.join(' · ') + post : null;
     }
     const t = s => (isEn ? (tr(s) || s) : s);
 
@@ -315,7 +539,8 @@ const I18n = (() => {
 
     // ===== ترجمة الصفحة =====
     // محتوى عربي ما منلمسو: نص الأذكار والقرآن والمصحف
-    const SKIP = 'script, style, textarea, [data-no-i18n], .single-verse-content, .dk-text, .dk-seq-text, .dk-list, .dk-hadith, .dk-foot, .dk-intro, .ayah, .dhikr-copy, .tb-dz, .tm-dz, .adhkar-body > p, .proof, .reader, .qp-page, .mushaf, .verse-text, .ask-msg, #ask-log, .cm-text, .cd-text';
+    // (المصحف: منستثني صفحاتو بس (.reader-stage)، وأزرارو وقوائمو بتنترجم. والمساعد: الردود الجاهزة بتنترجم، وأجوبة الذكاء ما بتلاقي ترجمة فبتضل متل ما هي)
+    const SKIP = 'script, style, textarea, [data-no-i18n], .single-verse-content, .dk-text, .dk-seq-text, .dk-list, .dk-hadith, .dk-foot, .dk-intro, .ayah, .dhikr-copy, .tb-dz, .tm-dz, .adhkar-body > p, .proof, .reader-stage, .qp-page, .mushaf, .verse-text, .cm-text, .cd-text';
     const ATTRS = ['placeholder', 'aria-label', 'title', 'alt'];
     function fixText(n) {
         const p = n.parentElement; if (!p || p.closest(SKIP)) return;
@@ -364,6 +589,11 @@ const I18n = (() => {
         document.documentElement.lang = 'en'; document.documentElement.dir = 'ltr';
         const meta = document.querySelector('meta[property="og:locale"]'); if (meta) meta.content = 'en_US';
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
+        // نوافذ التأكيد والتنبيه (confirm/alert) ما بتمرق على الصفحة: منترجم كل سطر لحالو
+        ['alert', 'confirm'].forEach(k => {
+            const o = window[k]; if (typeof o !== 'function') return;
+            window[k] = msg => o.call(window, typeof msg === 'string' ? msg.split('\n').map(l => t(l)).join('\n') : msg);
+        });
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindSetting, { once: true }); else bindSetting();
 

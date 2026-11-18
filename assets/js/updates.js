@@ -9,10 +9,10 @@
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
-const APP_BUILD = 28;
+const APP_BUILD = 29;
 // تاريخ النشر: نفس الرقم انتشر قبل (14)، فـ«ما الجديد» وإشعار التحديث بيعتمدوا كمان على هالتاريخ
 // ← عند كل نشر: غيّره (ومعه release في version.json)
-const APP_RELEASE = '2026-11-18';
+const APP_RELEASE = '2026-11-18b';
 const SITE_URL = 'https://bader2000345.github.io/reminder/';
 const UpdateNotice = (() => {
     const $ = id => document.getElementById(id);
@@ -116,6 +116,8 @@ const UpdateNotice = (() => {
     // بطاقة «التحديثات» في الإعدادات
     function paintSettings(hasUpdate = !!pending) {
         const label = $('app-version-label'), btn = $('check-update-btn');
+        // رقم الإصدار بآخر الإعدادات (كان بـ dev.js لما كانت صفحة المطوّر جوّا التطبيق، قبل الإصدار 29)
+        const chip = $('ver-chip'); if (chip) chip.textContent = `مُذكّر، الإصدار ${ar(APP_BUILD)}`;
         if (!label || !btn) return;
         label.textContent = hasUpdate ? `الإصدار ${ar(APP_BUILD)} · يوجد تحديث جاهز للتثبيت` : `الإصدار ${ar(APP_BUILD)} · أنت على أحدث إصدار`;
         btn.textContent = hasUpdate ? 'تحديث' : 'فحص التحديث';

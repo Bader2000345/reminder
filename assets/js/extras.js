@@ -172,7 +172,7 @@ const Backup = (() => {
         // على الجوال: المشاركة (حفظ بالملفات أو إرسال لحالك)، وإلا تنزيل
         try {
             if (matchMedia('(hover: none)').matches && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file], title: 'نسخة مُذكّر الاحتياطية' });
+                await navigator.share({ files: [file], title: typeof I18n !== 'undefined' ? I18n.t('نسخة مُذكّر الاحتياطية') : 'نسخة مُذكّر الاحتياطية' });
                 Toast.show('تم تجهيز النسخة الاحتياطية ✓');
                 return;
             }

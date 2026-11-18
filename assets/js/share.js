@@ -12,6 +12,9 @@ const Share = (() => {
     const SAMPLE = 'مذكر القرآن الكريم الورد 0123456789';
     let kind = 'wird', blob = null, previewUrl = '', renderId = 0, logoImage = null, ayahData = null;
 
+    // الإصدار 28 (English): نص المشاركة والصورة بالإنجليزي إذا اللغة إنجليزي (الصورة canvas، فما بتوصلها ترجمة الصفحة).
+    // en: ترجمة صريحة للكلمات يلي إلها معنى غير بمكان تاني («آية اليوم» هون = كم آية قريت اليوم)
+    const T = (s, en) => (typeof I18n !== 'undefined' && I18n.isEn ? (en || I18n.t(s)) : s);
     const appUrl = () => (/^https?:$/.test(location.protocol) ? location.href.split('#')[0] : '');
     const pagesPhrase = d => (d.from === d.to ? `الصفحة ${fmt(d.from)}` : `الصفحات ${fmt(d.from)} – ${fmt(d.to)}`);
     const collect = () => ({ ...Wird.snapshot(), ...DailyStats.get() });
@@ -22,7 +25,7 @@ const Share = (() => {
             lines.push(`﴿${d.text}﴾`, `[${surahName(d.s)}: ${fmt(d.a)}]`, '', 'تطبيق مُذكّر — القرآن والأذكار');
             const url = appUrl();
             if (url) lines.push(url);
-            return lines.join('\n');
+            return lines.map(l => T(l)).join('\n');
         }
         if (k === 'wird') {
             lines.push(d.complete ? '🎉 ختمتُ القرآن الكريم كاملاً بفضل الله، تقبّل الله منا ومنكم'
@@ -41,7 +44,7 @@ const Share = (() => {
         lines.push('', 'وقليل دائم خير من كثير منقطع', 'تطبيق مُذكّر — القرآن والأذكار');
         const url = appUrl();
         if (url) lines.push(url);
-        return lines.join('\n');
+        return lines.map(l => T(l)).join('\n');
     }
 
     // ---------- رسم بطاقة الصورة ----------
@@ -87,17 +90,17 @@ const Share = (() => {
     function cardContent(k, d) {
         if (k === 'wird') {
             return {
-                title: d.complete ? 'ختمتُ القرآن الكريم' : d.done ? 'أتممتُ وردي اليوم' : 'وردي اليوم',
-                sub: [d.rangeTitle, pagesPhrase(d)],
-                ring: d.done ? 100 : d.todayPct, ringLabel: 'تقدّم اليوم',
-                stats: [[`${fmt(d.khatmaPct)}٪`, 'ختمة القرآن'], [`${fmt(d.dayN)} / ${fmt(d.totalDays)}`, 'يوم الختمة'], [fmt(d.streak), 'سلسلة الورد (يوم)']]
+                title: T(d.complete ? 'ختمتُ القرآن الكريم' : d.done ? 'أتممتُ وردي اليوم' : 'وردي اليوم'),
+                sub: [T(d.rangeTitle), T(pagesPhrase(d))],
+                ring: d.done ? 100 : d.todayPct, ringLabel: T('تقدّم اليوم'),
+                stats: [[`${fmt(d.khatmaPct)}%`, T('ختمة القرآن')], [`${fmt(d.dayN)} / ${fmt(d.totalDays)}`, T('يوم الختمة')], [fmt(d.streak), T('سلسلة الورد (يوم)')]]
             };
         }
         return {
-            title: 'إنجازاتي مع مُذكّر',
-            sub: [d.streak > 0 ? `سلسلة الورد: ${daysLabel(d.streak)}` : 'رحلتي مع القرآن والأذكار'],
-            ring: d.khatmaPct, ringLabel: 'ختمة القرآن',
-            stats: [[fmt(d.tasbeeh), 'تسبيحة اليوم'], [fmt(d.wirdVerses), 'آية اليوم'], [fmt(d.khatmas), 'ختمات مكتملة']]
+            title: T('إنجازاتي مع مُذكّر'),
+            sub: [T(d.streak > 0 ? `سلسلة الورد: ${daysLabel(d.streak)}` : 'رحلتي مع القرآن والأذكار')],
+            ring: d.khatmaPct, ringLabel: T('ختمة القرآن'),
+            stats: [[fmt(d.tasbeeh), T('تسبيحة اليوم')], [fmt(d.wirdVerses), T('آية اليوم', 'Ayat today')], [fmt(d.khatmas), T('ختمات مكتملة')]]
         };
     }
     async function drawCard(k, d) {
@@ -119,7 +122,7 @@ const Share = (() => {
 
         if (logo) { const lh = 270, lw = lh * logo.width / logo.height; g.drawImage(logo, (W - lw) / 2, 84, lw, lh); }
         g.fillStyle = '#a8843a'; g.font = '500 32px "Readex Pro", sans-serif';
-        g.fillText('تطبيق القرآن والأذكار', W / 2, 392);
+        g.fillText(T('تطبيق القرآن والأذكار'), W / 2, 392);
 
         g.fillStyle = '#1f5444'; g.font = '700 66px "Readex Pro", sans-serif';
         g.fillText(content.title, W / 2, 490);
@@ -136,7 +139,7 @@ const Share = (() => {
             g.strokeStyle = grad; g.beginPath(); g.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 - Math.PI * 2 * frac, true); g.stroke();
         }
         g.fillStyle = '#1f5444'; g.font = '700 92px "Readex Pro", sans-serif';
-        g.fillText(`${fmt(Math.round(content.ring))}٪`, cx, cy + 22);
+        g.fillText(`${fmt(Math.round(content.ring))}${T('٪', '%')}`, cx, cy + 22);
         g.fillStyle = '#6b7269'; g.font = '500 30px "Readex Pro", sans-serif';
         g.fillText(content.ringLabel, cx, cy + 72);
 

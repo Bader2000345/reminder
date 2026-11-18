@@ -389,8 +389,6 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 #page-settings .backup-actions > * { flex:1; min-height:40px; }
 #page-settings .install-how, #page-settings .ic-note { flex:1 1 100%; color:var(--nl-mut) !important; }
 #page-settings .fb-pill { background:var(--nl-ac2) !important; color:var(--nl-aci) !important; }
-#page-settings .dev-row { background:var(--nl-card) !important; border:0 !important; box-shadow:none !important; border-radius:18px !important; color:var(--nl-ink) !important; }
-#page-settings .dev-row-ic { background:color-mix(in srgb, var(--nl-ac) 12%, transparent) !important; color:var(--nl-ac) !important; }
 #page-settings .ver-chip { background:transparent !important; color:var(--nl-mut) !important; border:0 !important; box-shadow:none !important; justify-self:center; }
 #page-settings .setting-card[hidden] { display:none !important; }
 [data-install]::before, [data-install]::after { display:none !important; }
@@ -563,7 +561,7 @@ html[dir="ltr"] body { direction:ltr; }
 html[dir="ltr"] :is(.dhikr-copy, .dk-text, .dk-seq-text, .dk-hadith, .dk-list, .dk-foot, .ayah, .single-verse-content, .tb-dz, .tm-dz, .adhkar-body > p, .proof > div, .am) { direction:rtl; unicode-bidi:isolate; }
 html[dir="ltr"] :is(.adhkar-body > p, .dhikr-copy) { text-align:right; }
 /* الأسهم بتنقلب مع الاتجاه */
-html[dir="ltr"] :is(.chev, .dk-back, .wird-focus-close, .fb-back, .back, .dev-row-go, .hn-go, .dk-nav) svg { transform:scaleX(-1); }
+html[dir="ltr"] :is(.chev, .dk-back, .wird-focus-close, .fb-back, .back, .hn-go, .dk-nav) svg { transform:scaleX(-1); }
 /* عالكمبيوتر: الشريط عالشمال والمحتوى بعدو */
 @media (min-width:701px) {
   html[dir="ltr"] .sidebar { right:auto !important; left:16px !important; }
@@ -578,4 +576,11 @@ html[dir="ltr"] .rem-today .rt-line li::before { right:auto; left:-26px; }
 html[dir="ltr"] .rem-today .rt-line li.rt-now::before { right:auto; left:-30px; }
 html[dir="ltr"] #page-adhkar .shelf-card.is-now::after { left:auto; right:12px; }
 html[dir="ltr"] .side-link::after { left:50%; }
+/* زر الإغلاق ✕ بالنوافذ: بالعربي عاليسار (آخر السطر)، بالإنجليزي عاليمين حتى ما يقعد فوق العنوان */
+html[dir="ltr"] .modal-close { left:auto; right:20px; }
+html[dir="ltr"] .tm-exit { left:auto; right:16px; }
+html[dir="ltr"] .hn-x { left:auto; right:6px; }
+/* المفاتيح (تشغيل/إطفاء): بالإنجليزي الدائرة بتبلّش عاليسار وبتروح لليمين */
+html[dir="ltr"] .switch span:before { right:auto; left:3px; }
+html[dir="ltr"] .switch input:checked + span:before { transform:translateX(20px); }
 html[lang="en"] #page-adhkar .shelf-card.is-now::after { content:"Now"; }

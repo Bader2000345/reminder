@@ -318,7 +318,8 @@ const AyahSheet = (() => {
             try { await navigator.clipboard.writeText(`﴿${ayah.text}﴾ [${surahName(ayah.s)}: ${ayah.a}]`); Toast.show('تم نسخ الآية'); } catch (e) {}
         });
         add('share', 'مشاركة', async () => {
-            const text = `﴿${ayah.text}﴾ [${surahName(ayah.s)}: ${ayah.a}]\n\nمن تطبيق مُذكّر: ${typeof SITE_URL !== 'undefined' ? SITE_URL : location.href}`;
+            const from = typeof I18n !== 'undefined' ? I18n.t('من تطبيق مُذكّر:') : 'من تطبيق مُذكّر:';
+            const text = `﴿${ayah.text}﴾ [${surahName(ayah.s)}: ${ayah.a}]\n\n${from} ${typeof SITE_URL !== 'undefined' ? SITE_URL : location.href}`;
             try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { return; }
             try { await navigator.clipboard.writeText(text); Toast.show('تم نسخ الآية للمشاركة'); } catch (e) {}
         });

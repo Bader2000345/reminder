@@ -3,8 +3,8 @@
  * «ملاحظات وشكاوي» (ل1): نوع الرسالة والنجوم والكتابة، ومعها نسخة التطبيق ونوع الجهاز بس (بلا اسم ولا رقم).
  *   رسائلك والردود تحت النموذج. الجهاز بيتعرّف برمز عشوائي (mudhakkir-fb-id) بيتولد أول ما تبعت.
  * ر2 «وصلك رد»: بطاقة بأول الرئيسية + نقطة على «الإعدادات» بالشريط + «جديد» جنب «ملاحظات وشكاوي».
- * ع1 إعلان من المطوّر: بطاقة بأول الرئيسية بتضل لحد ما تسكّرها أو تخلص مدتها.
- * على جهاز المطوّر نفس الصفحة بتصير صندوق الرسائل (dev.js).
+ * ع1 إعلان من فريق مُذكّر: بطاقة بأول الرئيسية بتضل لحد ما تسكّرها أو تخلص مدتها.
+ * الرسائل بتوصل لتطبيق الفريق (bader2000345.github.io/mudhakkir-dev، الإصدار 29)، ومن هونيك بيردّوا.
  * يعتمد على PUSH_SERVER (notifications.js) و APP_BUILD (updates.js) و Install و Toast و navigateTo.
  * ===================================================================== */
 const Feedback = (() => {
@@ -19,7 +19,6 @@ const Feedback = (() => {
     const read = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } };
     const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
     const server = () => (typeof PUSH_SERVER !== 'undefined' ? PUSH_SERVER : '');
-    const isDev = () => typeof Dev !== 'undefined' && Dev.isDevice();
     let type = '', stars = 0, sending = false, wasOpen = false;
 
     // «قبل 5 دقايق»، «أمس»… (بالعامية متل باقي التطبيق)
@@ -130,7 +129,7 @@ const Feedback = (() => {
         box.innerHTML = mine.map(m => `<article class="fb-msg${m.replyAt > seen ? ' is-new' : ''}" data-id="${esc(m.id)}">
             <div class="fb-msg-h">${tagHTML(m.type)}${starsHTML(m.stars)}<time>${when(m.at)}</time></div>
             <p>${esc(m.text)}</p>
-            ${m.reply ? `<div class="fb-reply"><b>ردّ المطوّر</b><p>${esc(m.reply)}</p></div>` : '<small class="fb-wait">لسا ما في رد</small>'}
+            ${m.reply ? `<div class="fb-reply"><b>ردّ فريق مُذكّر</b><p>${esc(m.reply)}</p></div>` : '<small class="fb-wait">لسا ما في رد</small>'}
         </article>`).join('');
     }
     async function syncMine(force = false) {
@@ -174,14 +173,12 @@ const Feedback = (() => {
         const box = $('home-notes');
         if (!box) return;
         const cards = [];
-        const inbox = isDev() ? Dev.homeCard() : ''; // جهاز المطوّر: «صندوق الرسائل: 3 رسائل جديدة»
-        if (inbox) cards.push(inbox);
         if (hasNew()) {
             const m = read(KEY_MINE, []).filter(x => x.replyAt).sort((a, b) => b.replyAt - a.replyAt)[0];
-            cards.push(`<button type="button" class="hn-card hn-reply" data-hn="reply"><span class="hn-ic" aria-hidden="true">${ICON_FB}</span><span class="hn-body"><b>وصلك رد على ملاحظتك</b><small>من المطوّر · ${when(m.replyAt)}</small></span><span class="hn-go" aria-hidden="true">${ICON_GO}</span></button>`);
+            cards.push(`<button type="button" class="hn-card hn-reply" data-hn="reply"><span class="hn-ic" aria-hidden="true">${ICON_FB}</span><span class="hn-body"><b>وصلك رد على ملاحظتك</b><small>من فريق مُذكّر · ${when(m.replyAt)}</small></span><span class="hn-go" aria-hidden="true">${ICON_GO}</span></button>`);
         }
         const a = liveAnnouncement();
-        if (a) cards.push(`<article class="hn-card hn-ann"><button type="button" class="hn-x" data-hn="dismiss" data-id="${esc(a.id)}" aria-label="إخفاء الإعلان">×</button><small>من المطوّر</small><b>${esc(a.title)}</b><p>${esc(a.text)}</p></article>`);
+        if (a) cards.push(`<article class="hn-card hn-ann"><button type="button" class="hn-x" data-hn="dismiss" data-id="${esc(a.id)}" aria-label="إخفاء الإعلان">×</button><small>من فريق مُذكّر</small><b>${esc(a.title)}</b><p>${esc(a.text)}</p></article>`);
         box.innerHTML = cards.join('');
         box.hidden = !cards.length;
     }
@@ -207,7 +204,6 @@ const Feedback = (() => {
             return;
         }
         navigateTo('feedback');
-        if (b.dataset.hn === 'inbox') return;
         setTimeout(() => {
             const card = document.querySelector('#fb-mine .fb-msg.is-new');
             card?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -216,7 +212,7 @@ const Feedback = (() => {
 
     // ---------- عدد المستخدمين (الإصدار 22، والإصدار 27: مثبّت أو من الموقع، ونوع الجهاز، والمنطقة) ----------
     // رمز عشوائي (مو نفس رمز الرسائل، فما بينربطوا ببعض) بينبعت مرة بالأسبوع، أو أول ما يتغيّر شي (متلًا ثبّت التطبيق)،
-    // حتى يعرف المطوّر كم واحد عم يستعمل مُذكّر. بلا اسم ولا إيميل ولا موقع دقيق: المنطقة الزمنية بس (متل «دمشق»)
+    // حتى يعرف فريق مُذكّر كم واحد عم يستعمل التطبيق. بلا اسم ولا إيميل ولا موقع دقيق: المنطقة الزمنية بس (متل «دمشق»)
     const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     const osOf = () => { const ua = navigator.userAgent; return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'ios' : /Android/.test(ua) ? 'android' : /Windows|Macintosh|Linux|CrOS/.test(ua) ? 'desktop' : 'other'; };
     async function hello() {
@@ -240,8 +236,6 @@ const Feedback = (() => {
 
     // ---------- فتح الصفحة ----------
     function onShow() {
-        if (isDev()) { Dev.showInbox(); return; }
-        if (typeof Dev !== 'undefined') Dev.showUser();
         renderMine();
         syncMine(true);
         setTimeout(markSeen, 1200); // بعد ما يشوف الردود الجديدة مميّزة

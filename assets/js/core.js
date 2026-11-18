@@ -155,7 +155,7 @@ const QuranTabs = (() => {
 })();
 
 // 1. Navigation SPA
-const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings', 'cards', 'feedback', 'dev'];
+const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings', 'cards', 'feedback'];
 // صفحات قديمة صارت جزء من صفحة القرآن: «القراءة الحرة» = زر «افتح المصحف» (روابط المساعد وإشعار الكهف القديمة تبقى شغّالة)
 const PAGE_ALIAS = { 'free-reading': ['quran', 'mushaf'], wird: ['quran', 'wird'] };
 // صفحات بتنفتح من الإعدادات (الإصدار 20): زر «الإعدادات» بالشريط بيضل مفعّل عليها
