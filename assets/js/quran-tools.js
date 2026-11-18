@@ -14,7 +14,7 @@
 
 const qEl = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 const qEsc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const qAr = n => Number(n).toLocaleString('ar-EG');
+const qAr = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
 const surahName = s => (typeof SURAH_NAMES !== 'undefined' && SURAH_NAMES[s - 1]) || ('سورة ' + s);
 const ayahRef = (s, a) => `${surahName(s)} · الآية ${qAr(a)}`;
 const ICONS = {
@@ -117,7 +117,7 @@ const Tajweed = (() => {
     // رموز alquran.cloud ← اسم الحكم
     const RULES = {
         h: ['tj-wasl', 'همزة وصل'], s: ['tj-silent', 'لا يُنطق'], l: ['tj-silent', 'لام شمسية'],
-        n: ['tj-madd2', 'مدّ طبيعي (حركتان)'], p: ['tj-madd246', 'مدّ جائز (٢، ٤، ٦)'], o: ['tj-madd45', 'مدّ واجب (٤–٥)'], m: ['tj-madd6', 'مدّ لازم (٦ حركات)'],
+        n: ['tj-madd2', 'مدّ طبيعي (حركتان)'], p: ['tj-madd246', 'مدّ جائز (2، 4، 6)'], o: ['tj-madd45', 'مدّ واجب (4–5)'], m: ['tj-madd6', 'مدّ لازم (6 حركات)'],
         q: ['tj-qalqala', 'قلقلة'], g: ['tj-ghunna', 'غُنّة'], f: ['tj-ikhfa', 'إخفاء'], c: ['tj-ikhfa-sh', 'إخفاء شفوي'],
         i: ['tj-iqlab', 'إقلاب'], a: ['tj-idgham-g', 'إدغام بغنّة'], u: ['tj-idgham', 'إدغام بلا غنّة'], w: ['tj-idgham-sh', 'إدغام شفوي'],
         d: ['tj-idgham-m', 'إدغام متجانس'], b: ['tj-idgham-m', 'إدغام متقارب']
@@ -147,7 +147,7 @@ const Tajweed = (() => {
     }
     // ---- إبقاء الحروف موصولة بين الأجزاء الملوّنة ----
     // بعض المتصفحات تشكّل كل <span> وحده فتنفصل الحروف؛ لذلك:
-    // ١) الحركة تبقى مع حرفها  ٢) حذف التطويل المضاف قبل الألف الخنجرية  ٣) محرف الوصل ZWJ على طرفي كل حدّ بين حرفين متصلين
+    // 1) الحركة تبقى مع حرفها  2) حذف التطويل المضاف قبل الألف الخنجرية  3) محرف الوصل ZWJ على طرفي كل حدّ بين حرفين متصلين
     const ZWJ = '‍';
     const MARK = '[\\u0610-\\u061A\\u064B-\\u065F\\u0670\\u06D6-\\u06DC\\u06DF-\\u06E4\\u06E7\\u06E8\\u06EA-\\u06ED\\u08D3-\\u08FF]';
     const LEAD_MARKS = new RegExp('^' + MARK + '+'), TAIL_CLUSTER = new RegExp('[^\\s\\u200D]' + MARK + '*$'), IS_MARK = new RegExp(MARK);
@@ -249,7 +249,7 @@ const Tafsir = (() => {
         const k = `${src}/${s}/${a}`;
         if (cache[k]) return cache[k].text;
         let text = '';
-        // ١) عبر سيرفر مُذكّر (مخزّن ومنظّف)  ٢) مباشرة من المصدر إن لم يكن السيرفر محدّثًا
+        // 1) عبر سيرفر مُذكّر (مخزّن ومنظّف)  2) مباشرة من المصدر إن لم يكن السيرفر محدّثًا
         try {
             const res = await fetch(`${PUSH_SERVER}/tafsir?src=${src}&s=${s}&a=${a}`);
             if (res.ok) text = (await res.json()).text || '';
@@ -399,8 +399,8 @@ const QuranMarks = (() => {
 const QuranSearch = (() => {
     const API = 'https://api.alquran.cloud/v1/';
     const strip = s => (typeof Knowledge !== 'undefined' ? Knowledge.norm(s) : String(s)).trim();
-    // «نتيجة واحدة، نتيجتان، ٣ نتائج، ١١ نتيجة» + (أول ٦٠) إذا أكتر
-    const countLabel = n => (n === 1 ? 'نتيجة واحدة' : n === 2 ? 'نتيجتان' : n <= 10 ? `${qAr(n)} نتائج` : `${qAr(n)} نتيجة`) + (n > 60 ? ' (أول ٦٠)' : '');
+    // «نتيجة واحدة، نتيجتان، 3 نتائج، 11 نتيجة» + (أول 60) إذا أكتر
+    const countLabel = n => (n === 1 ? 'نتيجة واحدة' : n === 2 ? 'نتيجتان' : n <= 10 ? `${qAr(n)} نتائج` : `${qAr(n)} نتيجة`) + (n > 60 ? ' (أول 60)' : '');
     function view(onGo) {
         const box = qEl('div', 'qs-view');
         const form = qEl('form', 'qs-form');
@@ -410,7 +410,7 @@ const QuranSearch = (() => {
         const info = qEl('p', 'qs-info', 'مثال: الصبر، رحمة الله، إن مع العسر يسرا');
         const results = qEl('div', 'qs-results');
         let token = 0;
-        // إ٤ (الإصدار ١٥): البحث محلي من نص القرآن المحفوظ بالجهاز (offline.js)، أول مرة بينزل النص (~٤٠٠ كيلو)
+        // إ4 (الإصدار 15): البحث محلي من نص القرآن المحفوظ بالجهاز (offline.js)، أول مرة بينزل النص (~400 كيلو)
         async function runLocal(q, my) {
             if (typeof QuranIndex === 'undefined') return false;
             const ready = await QuranIndex.has();

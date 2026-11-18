@@ -7,7 +7,7 @@
 // 4. الورد اليومي بآلية «الختمة»: خطة (مدة أو ورد يومي) + موضع قراءة محفوظ + ورد يتجدد كل يوم
 const WIRD_STREAK_KEY = 'mudhakkir-wird-streak';
 const SURAH_NAMES = ['الفاتحة','البقرة','آل عمران','النساء','المائدة','الأنعام','الأعراف','الأنفال','التوبة','يونس','هود','يوسف','الرعد','إبراهيم','الحجر','النحل','الإسراء','الكهف','مريم','طه','الأنبياء','الحج','المؤمنون','النور','الفرقان','الشعراء','النمل','القصص','العنكبوت','الروم','لقمان','السجدة','الأحزاب','سبأ','فاطر','يس','الصافات','ص','الزمر','غافر','فصلت','الشورى','الزخرف','الدخان','الجاثية','الأحقاف','محمد','الفتح','الحجرات','ق','الذاريات','الطور','النجم','القمر','الرحمن','الواقعة','الحديد','المجادلة','الحشر','الممتحنة','الصف','الجمعة','المنافقون','التغابن','الطلاق','التحريم','الملك','القلم','الحاقة','المعارج','نوح','الجن','المزمل','المدثر','القيامة','الإنسان','المرسلات','النبأ','النازعات','عبس','التكوير','الانفطار','المطففين','الانشقاق','البروج','الطارق','الأعلى','الغاشية','الفجر','البلد','الشمس','الليل','الضحى','الشرح','التين','العلق','القدر','البينة','الزلزلة','العاديات','القارعة','التكاثر','العصر','الهمزة','الفيل','قريش','الماعون','الكوثر','الكافرون','النصر','المسد','الإخلاص','الفلق','الناس'];
-function formatAr(n) { return Number(n).toLocaleString('ar-EG'); }
+function formatAr(n) { return Number(n).toLocaleString('ar-EG-u-nu-latn'); }
 function streakData() { try { return JSON.parse(localStorage.getItem(WIRD_STREAK_KEY)) || {days:0,last:''}; } catch(e) { return {days:0,last:''}; } }
 function markWirdDay() { const d=new Date(), key=`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; const st=streakData(); if(st.last===key) return st; const prev=new Date(d); prev.setDate(d.getDate()-1); const pk=`${prev.getFullYear()}-${prev.getMonth()+1}-${prev.getDate()}`; st.days = st.last===pk ? Number(st.days||0)+1 : 1; st.last=key; try{localStorage.setItem(WIRD_STREAK_KEY,JSON.stringify(st));}catch(e){} return st; }
 let feedbackAudioContext = null;
@@ -16,7 +16,7 @@ function playWirdFeedback(){
     try { if (navigator.vibrate) navigator.vibrate([18, 24, 28]); } catch(e) {}
 }
 
-// صيغة عدد الأيام بالعربية: يوم / يومان / ٣ أيام / ١١ يوماً
+// صيغة عدد الأيام بالعربية: يوم / يومان / 3 أيام / 11 يوماً
 function daysLabel(n) {
     if (n === 1) return 'يوم';
     if (n === 2) return 'يومان';
@@ -37,31 +37,31 @@ const Toast = (() => {
     };
 })();
 
-// بيانات المصحف المشتركة بين الورد اليومي ووضع القراءة (صفحات مصحف المدينة: ٦٠٤)
+// بيانات المصحف المشتركة بين الورد اليومي ووضع القراءة (صفحات مصحف المدينة: 604)
 const QuranData = (() => {
     const TOTAL_PAGES = 604;
     const API = 'https://api.alquran.cloud/v1/page/';
     const BASMALA = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
-    // أول صفحة لكل سورة (١١٤ سورة)
+    // أول صفحة لكل سورة (114 سورة)
     const SURAH_START_PAGES = [1, 2, 50, 77, 106, 128, 151, 177, 187, 208, 221, 235, 249, 255, 262, 267, 282, 293, 305, 312, 322, 332, 342, 350, 359, 367, 377, 385, 396, 404, 411, 415, 418, 428, 434, 440, 446, 453, 458, 467, 477, 483, 489, 496, 499, 502, 507, 511, 515, 518, 520, 523, 526, 528, 531, 534, 537, 542, 545, 549, 551, 553, 554, 556, 558, 560, 562, 564, 566, 568, 570, 572, 574, 575, 577, 578, 580, 582, 583, 585, 586, 587, 587, 589, 590, 591, 591, 592, 593, 594, 595, 595, 596, 596, 597, 597, 598, 598, 599, 599, 600, 600, 601, 601, 601, 602, 602, 602, 603, 603, 603, 604, 604, 604];
     const STORE_PREFIX = 'mudhakkir-qp1-';
     const cache = new Map();
     const inflight = new Map();
     const stripMarks = word => word.replace(/[\u064B-\u065F\u0670\u0640]/g, '');
 
-    // بدايات أرباع الأحزاب (٢٤٠ ربع = ٦٠ حزب = ٣٠ جزء): [السورة، الآية، الصفحة] — من api.alquran.cloud/v1/meta
-    // كل ٤ أرباع حزب، وكل ٨ أرباع جزء
+    // بدايات أرباع الأحزاب (240 ربع = 60 حزب = 30 جزء): [السورة، الآية، الصفحة] — من api.alquran.cloud/v1/meta
+    // كل 4 أرباع حزب، وكل 8 أرباع جزء
     const QUARTERS = [[1,1,1],[2,26,5],[2,44,7],[2,60,9],[2,75,11],[2,92,14],[2,106,17],[2,124,19],[2,142,22],[2,158,24],[2,177,27],[2,189,29],[2,203,32],[2,219,34],[2,233,37],[2,243,39],[2,253,42],[2,263,44],[2,272,46],[2,283,49],[3,15,51],[3,33,54],[3,52,56],[3,75,59],[3,93,62],[3,113,64],[3,133,67],[3,153,69],[3,171,72],[3,186,74],[4,1,77],[4,12,79],[4,24,82],[4,36,84],[4,58,87],[4,74,89],[4,88,92],[4,100,94],[4,114,97],[4,135,100],[4,148,102],[4,163,104],[5,1,106],[5,12,109],[5,27,112],[5,41,114],[5,51,117],[5,67,119],[5,82,121],[5,97,124],[5,109,126],[6,13,129],[6,36,132],[6,59,134],[6,74,137],[6,95,140],[6,111,142],[6,127,144],[6,141,146],[6,151,148],[7,1,151],[7,31,154],[7,47,156],[7,65,158],[7,88,162],[7,117,164],[7,142,167],[7,156,170],[7,171,173],[7,189,175],[8,1,177],[8,22,179],[8,41,182],[8,61,184],[9,1,187],[9,19,189],[9,34,192],[9,46,194],[9,60,196],[9,75,199],[9,93,201],[9,111,204],[9,122,206],[10,11,209],[10,26,212],[10,53,214],[10,71,217],[10,90,219],[11,6,222],[11,24,224],[11,41,226],[11,61,228],[11,84,231],[11,108,233],[12,7,236],[12,30,238],[12,53,242],[12,77,244],[12,101,247],[13,5,249],[13,19,252],[13,35,254],[14,10,256],[14,28,259],[15,1,262],[15,50,264],[16,1,267],[16,30,270],[16,51,272],[16,75,275],[16,90,277],[16,111,280],[17,1,282],[17,23,284],[17,50,287],[17,70,289],[17,99,292],[18,17,295],[18,32,297],[18,51,299],[18,75,302],[18,99,304],[19,22,306],[19,59,309],[20,1,312],[20,55,315],[20,83,317],[20,111,319],[21,1,322],[21,29,324],[21,51,326],[21,83,329],[22,1,332],[22,19,334],[22,38,336],[22,60,339],[23,1,342],[23,36,344],[23,75,347],[24,1,350],[24,21,352],[24,35,354],[24,53,356],[25,1,359],[25,21,362],[25,53,364],[26,1,367],[26,52,369],[26,111,371],[26,181,374],[27,1,377],[27,27,379],[27,56,382],[27,82,384],[28,12,386],[28,29,389],[28,51,392],[28,76,394],[29,1,396],[29,26,399],[29,46,402],[30,1,404],[30,31,407],[30,54,410],[31,22,413],[32,11,415],[33,1,418],[33,18,420],[33,31,422],[33,51,425],[33,60,426],[34,10,429],[34,24,431],[34,46,433],[35,15,436],[35,41,439],[36,28,442],[36,60,444],[37,22,446],[37,83,449],[37,145,451],[38,21,454],[38,52,456],[39,8,459],[39,32,462],[39,53,464],[40,1,467],[40,21,469],[40,41,472],[40,66,474],[41,9,477],[41,25,479],[41,47,482],[42,13,484],[42,27,486],[42,51,488],[43,24,491],[43,57,493],[44,17,496],[45,12,499],[46,1,502],[46,21,505],[47,10,507],[47,33,510],[48,18,513],[49,1,515],[49,14,517],[50,27,519],[51,31,522],[52,24,524],[53,26,526],[54,9,529],[55,1,531],[56,1,534],[56,75,536],[57,16,539],[58,1,542],[58,14,544],[59,11,547],[60,7,550],[62,1,553],[63,4,554],[65,1,558],[66,1,560],[67,1,562],[68,1,564],[69,1,566],[70,19,569],[72,1,572],[73,20,575],[75,1,577],[76,19,579],[78,1,582],[80,1,585],[82,1,587],[84,1,589],[87,1,591],[90,1,594],[94,1,596],[100,9,599]];
     const QUARTER_AT = new Map(QUARTERS.map((q, i) => [q[0] * 1000 + q[1], i]));
 
     const clampPage = n => Math.max(1, Math.min(TOTAL_PAGES, Math.trunc(Number(n)) || 1));
-    // رقم الصفحة بعد قراءة `count` صفحة منذ صفحة البداية (مع الالتفاف بعد صفحة ٦٠٤)
+    // رقم الصفحة بعد قراءة `count` صفحة منذ صفحة البداية (مع الالتفاف بعد صفحة 604)
     const pageAt = (startPage, count) => ((startPage - 1 + count) % TOTAL_PAGES + TOTAL_PAGES) % TOTAL_PAGES + 1;
-    // آخر ربع بيبلش بهالصفحة أو قبلها (الجزء ٧ والجزء ١١ بيبلشوا بنص الصفحة ١٢١ و٢٠١)
+    // آخر ربع بيبلش بهالصفحة أو قبلها (الجزء 7 والجزء 11 بيبلشوا بنص الصفحة 121 و201)
     const quarterOfPage = page => { let i = 0; while (i + 1 < QUARTERS.length && QUARTERS[i + 1][2] <= page) i++; return i; };
     const juzOfPage = page => Math.floor(quarterOfPage(clampPage(page)) / 8) + 1;
     const hizbOfPage = page => Math.floor(quarterOfPage(clampPage(page)) / 4) + 1;
-    // رقم الربع (من ٠) إذا الآية أول ربع، وإلا -1
+    // رقم الربع (من 0) إذا الآية أول ربع، وإلا -1
     const quarterAt = (s, a) => { const i = QUARTER_AT.get(s * 1000 + a); return i === undefined ? -1 : i; };
     // علامة نهاية الآية متل المصحف: «۝» والرقم جوّاها (خط Amiri Quran بيرسمهن شكل واحد)
     const endMark = n => '۝' + Number(n).toLocaleString('ar-EG');
@@ -70,7 +70,7 @@ const QuranData = (() => {
     const surahAtPage = page => SURAH_START_PAGES.reduce((found, start, i) => (start <= page ? i + 1 : found), 1);
 
     const normalize = rows => rows.map(r => ({ text: r.t, numberInSurah: r.n, juz: r.j, surah: { number: r.s, name: r.sn } }));
-    // الإصدار ١٥: الصفحات المحفوظة صارت بـ Cache API بدل localStorage (المصحف كامل ما بيثقّل فتح التطبيق،
+    // الإصدار 15: الصفحات المحفوظة صارت بـ Cache API بدل localStorage (المصحف كامل ما بيثقّل فتح التطبيق،
     // و localStorage بيتحمّل كله بالذاكرة أول ما يفتح). الصفحات القديمة بتنقل لحالها أول ما تنقرا.
     // sw.js ما بيمسح هالمخزن عند التحديث.
     const PAGE_CACHE = 'mudhakkir-quran-v1';
@@ -95,14 +95,14 @@ const QuranData = (() => {
         }
         try { localStorage.setItem(STORE_PREFIX + n, JSON.stringify(rows)); return true; } catch (e) { return false; }
     }
-    // إ٣: نتأكد إنو الصفحة محفوظة بالجهاز (بلا ما نحتفظ فيها بالذاكرة) — لتنزيل المصحف كامل
+    // إ3: نتأكد إنو الصفحة محفوظة بالجهاز (بلا ما نحتفظ فيها بالذاكرة) — لتنزيل المصحف كامل
     async function ensureStored(n) {
         n = clampPage(n);
         if (cache.has(n) || await readStored(n)) return true;
         return writeStored(n, await fetchRows(n));
     }
-    // المصدر الأساسي alquran.cloud، وإذا وقف (متل ما صار بالإصدار ١٥: خطأ 503 عندهم) منجيب نفس الصفحة من Quran.com
-    // (نفس ترقيم مصحف المدينة ٦٠٤ صفحة). الصفحة بتنحفظ بالجهاز بعد أول مرة فما بتحتاج نت بعدها.
+    // المصدر الأساسي alquran.cloud، وإذا وقف (متل ما صار بالإصدار 15: خطأ 503 عندهم) منجيب نفس الصفحة من Quran.com
+    // (نفس ترقيم مصحف المدينة 604 صفحة). الصفحة بتنحفظ بالجهاز بعد أول مرة فما بتحتاج نت بعدها.
     async function fetchRows(n) {
         try { return await fetchCloud(n); }
         catch (e) { return await fetchQuranCom(n); }
@@ -178,7 +178,7 @@ const Wird = (() => {
     }
     const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
     const $ = id => document.getElementById(id);
-    const fmt = n => Number(n).toLocaleString('ar-EG');
+    const fmt = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
     // ---------- التواريخ ----------
@@ -186,10 +186,10 @@ const Wird = (() => {
     const dayNumber = key => { const [y, m, d] = key.split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / 86400000); };
     const daysBetween = (from, to) => dayNumber(to) - dayNumber(from);
     const addDays = (key, n) => { const t = new Date((dayNumber(key) + n) * 86400000); return new Date(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()); };
-    const longDate = date => date.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+    const longDate = date => date.toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' });
 
     // ---------- الحالة ----------
-    // readCount: عدد الصفحات المكتملة منذ بداية الختمة (٠–٦٠٤) · verseIdx: آيات مكتملة في الصفحة الحالية
+    // readCount: عدد الصفحات المكتملة منذ بداية الختمة (0–604) · verseIdx: آيات مكتملة في الصفحة الحالية
     // goal: عدد الختمات المنويّة (من أسئلة الخطة)
     const blankState = () => ({ v: 2, mode: 'duration', days: DEFAULT_DAYS, pagesPerDay: Math.ceil(TOTAL / DEFAULT_DAYS), planDate: dayKey(), startPage: 1, readCount: 0, verseIdx: 0, pageLen: 0, khatmas: 0, goal: 1, today: null, pos: null });
     function sanitize(raw) {
@@ -352,6 +352,11 @@ const Wird = (() => {
         const done = isComplete() ? TOTAL : clamp(S.readCount - t.fromCount, 0, t.pages);
         const total = isComplete() ? TOTAL : t.pages;
         $('wird-live-progress').style.width = pct + '%';
+        // الإصدار 28: هلال ورد اليوم (الورشة «دائرة وهلال»): بيكبر مع القراية
+        $('q-moon')?.style.setProperty('--f', String(Math.min(1, Math.max(0, pct / 100))));
+        // وفوق رزمة الورد: خط التقدّم وكم صفحة
+        const wfBar = $('wf-bar'); if (wfBar) wfBar.style.width = pct + '%';
+        const wfProg = $('wf-progress'); if (wfProg) wfProg.textContent = $('wird-progress-label').textContent;
         $('wird-progress-label').textContent = isComplete() ? 'ختمة كاملة' : `${fmt(done)} / ${fmt(total)} صفحة`;
         $('wird-total-target').textContent = fmt(total);
         $('wird-khatma-display').textContent = daysLabel(planDays().totalDays);
@@ -361,7 +366,7 @@ const Wird = (() => {
         $('khatma-percent').textContent = `${fmt(pct)}٪`;
         $('khatma-progress').style.width = pct + '%';
         const meta = $('khatma-meta');
-        // النيّة من أسئلة الخطة: «الختمة ٢ من ٣»
+        // النيّة من أسئلة الخطة: «الختمة 2 من 3»
         const goal = S.goal > 1 ? `الختمة ${fmt(Math.min(S.khatmas + (isComplete() ? 0 : 1), S.goal))} من ${fmt(S.goal)} · ` : '';
         if (isComplete()) { meta.textContent = `${goal}ختمات مكتملة: ${fmt(S.khatmas)} · تقبّل الله منك`; return; }
         const end = longDate(addDays(S.planDate, planDays().totalDays - 1));
@@ -370,9 +375,13 @@ const Wird = (() => {
     function renderStreak() {
         const st = streakData(), badge = $('wird-badge');
         $('wird-streak-text').textContent = st.days ? `أنت مستمر منذ ${formatAr(st.days)} يوم${st.days === 1 ? '' : 'اً'}` : 'استمرارية الورد تبدأ اليوم';
+        // الإصدار 28: مربع «السلسلة» جنب «تابع الورد» و«افتح المصحف»
+        const qn = $('q-streak-n'), qs = $('q-streak-sub');
+        if (qn) qn.textContent = st.days ? `${fmt(st.days)} ${st.days === 1 ? 'يوم' : st.days === 2 ? 'يومين' : st.days <= 10 ? 'أيام' : 'يوم'}` : 'ابدأ اليوم';
+        if (qs) qs.textContent = st.days ? 'ورا بعض' : 'سلسلة الورد';
         $('wird-streak-sub').textContent = st.days >= 30 ? 'وسام الختمة الشهرية جاهز لك' : st.days >= 7 ? 'أسبوع كامل من الثبات — أحسنت' : 'أتمم وردك اليوم لتحافظ على سلسلتك';
         badge.classList.toggle('visible', st.days >= 7);
-        badge.textContent = st.days >= 30 ? 'وسام ٣٠ يوماً' : 'وسام ٧ أيام متتالية';
+        badge.textContent = st.days >= 30 ? 'وسام 30 يوماً' : 'وسام 7 أيام متتالية';
     }
     function renderDashboard() {
         const t = S.today, pct = Math.round(todayFraction() * 100);
@@ -400,11 +409,12 @@ const Wird = (() => {
         next.disabled = finished || !current;
         focusNext.disabled = next.disabled;
         next.innerHTML = finished ? 'اكتمل الورد ✓' : isBehind() ? 'التالية' : 'أتممت هذه الآية <span aria-hidden="true">✓</span>';
-        focusNext.textContent = finished ? 'اكتمل الورد ✓' : isBehind() ? 'التالية' : 'أتممت هذه الآية · التالية';
+        focusNext.textContent = finished ? 'اكتمل الورد ✓' : isBehind() ? 'التالية' : 'أتممت هذه الآية';
         $('prev-verse-btn').disabled = !canGoBack();
+        const fp = $('focus-prev-btn'); if (fp) fp.disabled = !canGoBack();
         $('wird-page-btn').disabled = S.today.done || isComplete() || !current;
     }
-    // ق٣ (الإصدار ١٥): رأس صفحة القرآن «ختمتي»: الأجزاء الـ٣٠ كمربعات، ونص الزرّين الكبار
+    // ق3 (الإصدار 15): رأس صفحة القرآن «ختمتي»: الأجزاء الـ30 كمربعات، ونص الزرّين الكبار
     let juzCache = { key: '', cells: [] };
     function juzCells() {
         const key = `${S.startPage}:${S.readCount}`;
@@ -480,6 +490,7 @@ const Wird = (() => {
         paintVerse(verseEl, ayah);
         $('verse-badge-num').textContent = `${SURAH_NAMES[ayah.surah.number - 1]} · الآية ${fmt(ayah.numberInSurah)}`;
         $('verse-page-note').textContent = `الصفحة ${fmt(pageNo(view.count))} · الجزء ${fmt(ayah.juz || QuranData.juzOfPage(pageNo(view.count)))}`;
+        const wfPage = $('wf-page'); if (wfPage) wfPage.textContent = $('verse-page-note').textContent;
         $('wird-current-aya-num').textContent = fmt(ayah.numberInSurah);
         paintVerse($('focus-verse-text'), ayah);
         if (typeof FocusTools !== 'undefined') FocusTools.update(ayah, pageNo(view.count), view.idx); // التجويد والتفسير في وضع التركيز
@@ -527,7 +538,8 @@ const Wird = (() => {
     }
     function afterProgress(label) {
         celebrate(label);
-        resetView(); save(); renderAll(); showView();
+        resetView(); save(); renderAll();
+        return showView(); // الإصدار 28: منرجّع الوعد حتى «رزمة البطاقات» تستنى الآية الجديدة قبل ما تطلّعها
     }
 
     async function stepForward() {
@@ -551,7 +563,7 @@ const Wird = (() => {
         S.verseIdx += 1;
         S.pageLen = current.ayahs.length;
         if (S.verseIdx >= S.pageLen) completePageCore();
-        afterProgress('+١ آية');
+        return afterProgress('+1 آية');
     }
     async function completePage() {
         if (!current || S.today.done || isComplete()) return;
@@ -564,7 +576,7 @@ const Wird = (() => {
         playWirdFeedback();
         DailyStats.add('wirdVerses', Math.max(1, current.ayahs.length - S.verseIdx));
         completePageCore();
-        afterProgress('+١ صفحة');
+        afterProgress('+1 صفحة');
     }
     // تقدّم المستخدم صفحة تلو الأخرى في المصحف على صفحة وِرده الحالية
     function onReaderAdvance(fromPage) {
@@ -625,12 +637,12 @@ const Wird = (() => {
         const baseline = f.start === 'continue' ? S.today.fromCount : 0;
         const remaining = TOTAL - baseline;
         if (f.mode === 'sahaba') {
-            $('wird-plan-preview').textContent = `كل يوم حزب (بين ٧٢ و١٠٥ صفحات، يعني تقريبًا ٤ إلى ٥ أجزاء) · ختمة كل أسبوع بإذن الله.`;
+            $('wird-plan-preview').textContent = `كل يوم حزب (بين 72 و105 صفحات، يعني تقريبًا 4 إلى 5 أجزاء) · ختمة كل أسبوع بإذن الله.`;
             return;
         }
         const pages = f.mode === 'daily' ? f.pagesPerDay : Math.ceil(remaining / f.days);
         const days = f.mode === 'daily' ? Math.ceil(remaining / f.pagesPerDay) : f.days;
-        const juz = pages >= 5 ? ` (≈ ${(Math.round(pages / 20 * 10) / 10).toLocaleString('ar-EG')} جزء)` : '';
+        const juz = pages >= 5 ? ` (≈ ${(Math.round(pages / 20 * 10) / 10).toLocaleString('ar-EG-u-nu-latn')} جزء)` : '';
         $('wird-plan-preview').textContent = `وردك ${fmt(pages)} صفحة يوميًا${juz} · تنتهي الختمة خلال ${daysLabel(days)} بإذن الله، في ${longDate(addDays(dayKey(), days - 1))}.`;
     }
     function openPlanModal(fresh = false) {
@@ -699,27 +711,70 @@ const Wird = (() => {
         save();
         resetView();
         $('next-verse-btn').addEventListener('click', advance);
-        $('focus-complete-btn').addEventListener('click', advance);
         $('prev-verse-btn').addEventListener('click', stepBack);
+        // الإصدار 28: «رزمة بطاقات» بقراءة الورد. البطاقة يلي خلصت بتطوي لفوق والجاية بتطلع من ورا (متل الأذكار)
+        const reduceM = matchMedia('(prefers-reduced-motion: reduce)');
+        const wfPlay = (node, frames, ms, easing) => {
+            if (!node || !node.animate || reduceM.matches) return Promise.resolve();
+            const a = node.animate(frames, { duration: ms, easing });
+            return Promise.race([a.finished, new Promise(r => setTimeout(r, ms + 80))]).catch(() => {}).then(() => { try { a.finish(); } catch (e) {} });
+        };
+        let stacking = false;
+        const stacked = async (dir, can, fn) => {
+            if (stacking || !can()) return;
+            stacking = true;
+            const card = $('wf-card');
+            try {
+                await wfPlay(card, dir > 0 ? [{ transform: 'none', opacity: 1 }, { transform: 'translateY(-26px) scale(.97)', opacity: 0 }]
+                    : [{ transform: 'none', opacity: 1 }, { transform: 'translateY(18px) scale(.94)', opacity: 0 }], 200, 'cubic-bezier(.7,0,.84,0)');
+                if (card) card.style.opacity = '0';
+                await fn();
+            } finally {
+                if (card) card.style.opacity = '';
+                wfPlay(card, dir > 0 ? [{ transform: 'translateY(16px) scale(.95)', opacity: .5 }, { transform: 'none', opacity: 1 }]
+                    : [{ transform: 'translateY(-22px) scale(.97)', opacity: 0 }, { transform: 'none', opacity: 1 }], 300, 'cubic-bezier(.16,1,.3,1)');
+                stacking = false;
+            }
+        };
+        const canAdvance = () => !!current && (isBehind() || !S.today.done);
+        const nextCard = () => stacked(1, canAdvance, advance);
+        const prevCard = () => stacked(-1, canGoBack, stepBack);
+        $('focus-complete-btn').addEventListener('click', nextCard);
+        $('focus-prev-btn')?.addEventListener('click', prevCard);
         $('wird-page-btn').addEventListener('click', completePage);
         $('wird-reader-btn').addEventListener('click', () => Reader.openAt(readerStartPage()));
         $('wird-edit-btn').addEventListener('click', () => openPlanModal());
         $('wird-new-khatma').addEventListener('click', () => openPlanModal(true));
-        // ق٣: «تابع الورد» بينزل لبطاقة الآية، و«خطة الختمة» بتفتح تعديل الورد
-        $('q-continue')?.addEventListener('click', () => {
-            if (isComplete()) { openPlanModal(true); return; }
-            const card = document.querySelector('#quran-wird .single-verse-display');
-            card?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-            setTimeout(() => $('next-verse-btn')?.focus({ preventScroll: true }), 400);
-        });
         $('q-plan')?.addEventListener('click', () => openPlanModal());
-        // وضع التركيز: ملء الشاشة، وزر الإغلاق يظهر بضغطة على الشاشة
+        // قراءة الورد بملء الشاشة (كانت «وضع التركيز»). الأدوات ضلّت ظاهرة لأنو الكبسة عالبطاقة صارت تكمّل
         const focusRoot = $('wird-focus');
-        // الشاشة ما بتطفي طول ما وضع التركيز مفتوح (KeepAwake بـ core.js)
+        // الشاشة ما بتطفي طول ما القراءة مفتوحة (KeepAwake بـ core.js)
         const closeFocus = (fromPop = false) => { if (!focusRoot.classList.contains('open')) return; focusRoot.classList.remove('open'); KeepAwake.off('focus'); Immersive.exit(focusRoot, fromPop === true); };
-        $('wird-focus-btn').addEventListener('click', () => { focusRoot.classList.add('open'); KeepAwake.on('focus'); Immersive.enter(focusRoot, { onClose: closeFocus, hideAfter: 2500 }); });
+        const openFocus = () => {
+            if (isComplete()) { openPlanModal(true); return; }
+            if (focusRoot.classList.contains('open')) return;
+            focusRoot.classList.add('open'); KeepAwake.on('focus'); Immersive.enter(focusRoot, { onClose: closeFocus, hideAfter: 0 });
+            setTimeout(() => $('focus-complete-btn')?.focus({ preventScroll: true }), 300);
+        };
+        // ق3 + الإصدار 28: «تابع الورد» وزر الورد وكبسة عالآية بالصفحة كلهن بيفتحوا رزمة الورد
+        $('q-continue')?.addEventListener('click', openFocus);
+        $('wird-focus-btn').addEventListener('click', openFocus);
+        $('wird-open')?.addEventListener('click', openFocus);
+        document.querySelector('#quran-wird .single-verse-display')?.addEventListener('click', e => { if (!e.target.closest('button')) openFocus(); });
         $('wird-focus-close').addEventListener('click', () => closeFocus());
-        Immersive.bindTap(focusRoot, focusRoot);
+        // كبسة عالبطاقة = أتممت هالآية، والسحب لليسار = السابقة
+        let wsx = 0, wsy = 0, wmoved = false;
+        const stage = $('wf-stage');
+        stage?.addEventListener('pointerdown', e => { wsx = e.clientX; wsy = e.clientY; wmoved = false; });
+        stage?.addEventListener('pointerup', e => {
+            const dx = e.clientX - wsx, dy = e.clientY - wsy;
+            if (Math.abs(dx) > 10 || Math.abs(dy) > 10) wmoved = true;
+            if (dx < -55 && Math.abs(dx) > Math.abs(dy) * 1.4) prevCard();
+        });
+        stage?.addEventListener('click', e => {
+            if (wmoved || e.target.closest('button, a, input, select, textarea, label, summary, details')) return;
+            if (e.target.closest('#wf-card')) nextCard();
+        });
         document.querySelectorAll('#wird-mode [data-mode]').forEach(b => b.addEventListener('click', () => { setMode(b.dataset.mode); updatePreview(); }));
         ['input-wird-days', 'input-wird-start'].forEach(id => $(id).addEventListener('change', () => { syncFields(); updatePreview(); }));
         ['input-wird-custom-days', 'input-wird-pages', 'input-wird-sura'].forEach(id => $(id).addEventListener('input', updatePreview));

@@ -1,18 +1,18 @@
 /* =====================================================================
  * مُذكّر — updates.js
  * التحديثات بموافقة المستخدم:
- *   ١. التطبيق يعمل من نسخته المحفوظة ولا يتغيّر وحده.
- *   ٢. عند نشر تحديث، تُنزَّل الملفات الجديدة في الخلفية (sw.js).
- *   ٣. يظهر شريط «تم تنزيل تحديث جديد» وزر «تحديث».
- *   ٤. بعد الضغط: يُعاد فتح التطبيق على الجديد وتظهر «ما الجديد» مع رابط المشاركة.
+ *   1. التطبيق يعمل من نسخته المحفوظة ولا يتغيّر وحده.
+ *   2. عند نشر تحديث، تُنزَّل الملفات الجديدة في الخلفية (sw.js).
+ *   3. يظهر شريط «تم تنزيل تحديث جديد» وزر «تحديث».
+ *   4. بعد الضغط: يُعاد فتح التطبيق على الجديد وتظهر «ما الجديد» مع رابط المشاركة.
  * ← عند نشر تعديل جديد: ارفع APP_BUILD هنا، و build في version.json، و CACHE في sw.js.
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
-const APP_BUILD = 26;
-// تاريخ النشر: نفس الرقم انتشر قبل (١٤)، فـ«ما الجديد» وإشعار التحديث بيعتمدوا كمان على هالتاريخ
+const APP_BUILD = 28;
+// تاريخ النشر: نفس الرقم انتشر قبل (14)، فـ«ما الجديد» وإشعار التحديث بيعتمدوا كمان على هالتاريخ
 // ← عند كل نشر: غيّره (ومعه release في version.json)
-const APP_RELEASE = '2026-11-04';
+const APP_RELEASE = '2026-11-18';
 const SITE_URL = 'https://bader2000345.github.io/reminder/';
 const UpdateNotice = (() => {
     const $ = id => document.getElementById(id);
@@ -21,7 +21,7 @@ const UpdateNotice = (() => {
     const DISMISS_KEY = 'mudhakkir-update-dismissed'; // إخفاء الشريط لهذه الجلسة فقط
     const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
     const session = { get: k => { try { return sessionStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) {} } };
-    const ar = n => Number(n).toLocaleString('ar-EG');
+    const ar = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     let remote = null, checking = false, pending = null;
     // مستخدم سابق؟ (لديه بيانات محفوظة من نسخة قديمة قبل نظام الإصدارات)
     const returning = (() => { try { return Object.keys(localStorage).some(k => k.startsWith('mudhakkir-') && !['mudhakkir-theme-dark', 'mudhakkir-theme'].includes(k)); } catch (e) { return false; } })();

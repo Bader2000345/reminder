@@ -1,11 +1,11 @@
 /* =====================================================================
- * مُذكّر — 17-mushaf.css  (الإصدار ١٥، والإصدار ١٦ من معرض ٩: م١ ب٣ ل١ ن٢ ش٢)
+ * مُذكّر — 17-mushaf.css  (الإصدار 15، والإصدار 16 من معرض 9: م1 ب3 ل1 ن2 ش2)
  * المصحف بملء الشاشة متل تطبيق آية — بلا مربع بنص الشاشة:
- *   م١ الصفحة بعرض الشاشة وطولها: فوق السورة · الساعة · الجزء، وتحت ربع الحزب · رقم الصفحة
- *   ب٣ إطار اسم السورة زمرّدي بورود ذهبية (mushaf.js بيرسمه بقياسه الحقيقي)
- *   ل١ ورق عاجي بالفاتح، وأسود عميق بالداكن مع علامات آيات رمادية
- *   ن٢ النصي: كل آية بسطرها وبينهن فاصل رفيع
- *   ش٢ «شريط الصفحات» تحت بعرض الشاشة (الصفحات، شريط التمرير، الفواصل)
+ *   م1 الصفحة بعرض الشاشة وطولها: فوق السورة · الساعة · الجزء، وتحت ربع الحزب · رقم الصفحة
+ *   ب3 إطار اسم السورة زمرّدي بورود ذهبية (mushaf.js بيرسمه بقياسه الحقيقي)
+ *   ل1 ورق عاجي بالفاتح، وأسود عميق بالداكن مع علامات آيات رمادية
+ *   ن2 النصي: كل آية بسطرها وبينهن فاصل رفيع
+ *   ش2 «شريط الصفحات» تحت بعرض الشاشة (الصفحات، شريط التمرير، الفواصل)
  * حجم مصحف المدينة كله بوحدة em من --qfs (بيحسبه Mushaf.fit). آخر ملف: بيعدّل فوق 01–16.
  * ===================================================================== */
 
@@ -47,7 +47,7 @@
 .reader-stage[data-mode="text"] .rd-spread { height:auto; min-height:100%; align-items:stretch; }
 .rd-msg { margin:auto; padding:40vh 24px 0; text-align:center; color:var(--qp-muted); }
 
-/* ---------- م١ صفحة مصحف المدينة ---------- */
+/* ---------- م1 صفحة مصحف المدينة ---------- */
 .qp {
   --qfs:24px; --qpad:14px; position:relative; flex:1 1 0; min-width:0; height:100%; overflow:hidden;
   display:flex; flex-direction:column; box-sizing:border-box; direction:rtl; color:var(--qp-ink);
@@ -68,7 +68,7 @@
 .pg-no { font-weight:600; color:color-mix(in srgb, var(--qp-ink) 70%, transparent); font-variant-numeric:tabular-nums; }
 .pg-q { color:var(--qp-mark); }
 
-/* ١٥ سطر بتتوزّع على طول الصفحة، والكلام بعرضها */
+/* 15 سطر بتتوزّع على طول الصفحة، والكلام بعرضها */
 .qp-lines {
   flex:1 1 auto; min-height:0; box-sizing:border-box; width:var(--qw, 100%); max-width:calc(100% - var(--qpad) * 2); margin-inline:auto;
   font-size:var(--qfs); display:grid; grid-template-rows:repeat(var(--rows, 15), minmax(0, 1fr));
@@ -102,15 +102,15 @@
 .reader[data-theme="dark"] .rd-spread.is-two > .qp:last-child { background:linear-gradient(to right, transparent 93%, rgba(255,255,255,.035)); }
 .rd-spread.is-two > .tp:first-child { box-shadow:inset 1px 0 0 var(--qp-line); }
 
-/* ---------- ب٣ إطار اسم السورة (الرسم من mushaf.js بقياسه) ---------- */
+/* ---------- ب3 إطار اسم السورة (الرسم من mushaf.js بقياسه) ---------- */
 .qp-surah { position:relative; box-sizing:border-box; width:100%; height:min(94%, 1.7em); display:flex; align-items:center; justify-content:center; background:center / 100% 100% no-repeat; }
-.qp-surah-name { font-family:qcf_names, "Amiri", serif; font-size:1.3em; line-height:1; color:var(--ban-ink, var(--qp-ink)); transform:translateY(.06em); }
+.qp-surah-name { display:inline-flex; direction:rtl; align-items:baseline; gap:.22em; font-family:qcf_names, "Amiri", serif; font-size:1.3em; line-height:1; color:var(--ban-ink, var(--qp-ink)); transform:translateY(.06em); }
 /* إذا ما تحمّل خط أسماء السور: الاسم بخط أميري */
 .no-names-font .qp-surah-name { font-size:0; }
 .no-names-font .qp-surah-name::after { content:attr(data-fallback); font:700 max(14px, calc(var(--qfs, 24px) * .58))/1 "Amiri", serif; }
 .tp .no-names-font .qp-surah-name::after { font-size:clamp(15px, 4.2vw, 20px); }
 
-/* ---------- ن٢ العرض النصي بملء الشاشة ---------- */
+/* ---------- ن2 العرض النصي بملء الشاشة ---------- */
 .tp { --qpad:clamp(16px, 4vw, 28px); flex:1 1 0; min-width:0; display:flex; flex-direction:column; direction:rtl; color:var(--qp-ink); }
 .tp-body {
   flex:1 0 auto; box-sizing:border-box; width:100%; max-width:760px; margin-inline:auto; padding:2px var(--qpad) 10px;
@@ -145,7 +145,7 @@
 .qp-skeleton .sk-line:nth-child(4n), .tp-skeleton .sk-line:nth-child(3n) { width:min(72%, 400px); }
 .tp-skeleton { justify-content:flex-start; gap:22px; }
 
-/* ---------- ش٢ «شريط الصفحات» تحت بعرض الشاشة ---------- */
+/* ---------- ش2 «شريط الصفحات» تحت بعرض الشاشة ---------- */
 .rd-pager {
   position:absolute; left:0; right:0; bottom:0; z-index:4; display:flex; flex-direction:column; gap:4px; direction:rtl;
   padding:6px max(12px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
@@ -175,7 +175,7 @@
 .pg-tile.is-surah { background:color-mix(in srgb, var(--qp-ink) 26%, transparent); }
 .pg-tile.on { background:var(--qp-accent); }
 .pg-tile.is-c { background:var(--qp-accent); transform:scaleY(1.14); }
-/* شريط التمرير: الصفحة ١ يمين متل المصحف */
+/* شريط التمرير: الصفحة 1 يمين متل المصحف */
 .pg-slide { padding:2px 2px 0; }
 .pg-range { display:block; width:100%; height:30px; margin:0; accent-color:var(--qp-accent); cursor:pointer; }
 /* الفواصل: آياتك المعلَّمة */
@@ -203,8 +203,8 @@
 .pg-thumb.is-marks i.c { background:var(--gold, #c9a45c); }
 .pg-menu-hint { margin:0; text-align:center; font-size:12.5px; line-height:1.6; color:var(--muted); }
 
-/* ---------- ح٥ التقليب «قلب ورقة خفيف» (معرض ٨) ----------
-   الصفحة بتنفتح من عند الكعب بزاوية ١٤° مع تلاشٍ، ٣٠٠ms، transform و opacity بس. وبيشمل الصفحتين سوا. */
+/* ---------- ح5 التقليب «قلب ورقة خفيف» (معرض 8) ----------
+   الصفحة بتنفتح من عند الكعب بزاوية 14° مع تلاشٍ، 300ms، transform و opacity بس. وبيشمل الصفحتين سوا. */
 .rd-spread.turn-next { transform-origin:right center; animation:rdFlipNext var(--m-300, 300ms) cubic-bezier(.16,1,.3,1); }
 .rd-spread.turn-prev { transform-origin:left center; animation:rdFlipPrev var(--m-300, 300ms) cubic-bezier(.16,1,.3,1); }
 @keyframes rdFlipNext { from { transform:rotateY(-14deg); opacity:0; } }

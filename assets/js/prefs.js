@@ -1,10 +1,10 @@
 /* =====================================================================
- * مُذكّر — prefs.js  (الإصدار ١٤)
+ * مُذكّر — prefs.js  (الإصدار 14)
  * تفضيلات القراءة:
  *   - TextSize: حجم خط التطبيق كله (صغير، عادي، كبير، أكبر) من الإعدادات. بيكبّر محتوى الصفحات
  *     بدون ما يخرّب الشريط والأزرار العائمة. preload-theme.js بيطبّقه قبل الرسم.
  *   - VerseSize: حجم خط الآية بالورد ووضع التركيز (أزرار أ− أ+)، ومحفوظ.
- *   - Effects (الإصدار ١٥): المؤثرات تلقائي / خفيفة / كاملة (html.fx-lite ← 14-performance.css).
+ *   - Effects (الإصدار 15): المؤثرات تلقائي / خفيفة / كاملة (html.fx-lite ← 14-performance.css).
  * Prefs.init() من main.js.
  * ===================================================================== */
 
@@ -43,10 +43,10 @@ const Prefs = (() => {
         store.set(VERSE_KEY, String(STEPS[verse]));
         document.querySelectorAll('[data-verse-zoom="-1"]').forEach(b => { b.disabled = verse === 0; });
         document.querySelectorAll('[data-verse-zoom="1"]').forEach(b => { b.disabled = verse === STEPS.length - 1; });
-        if (announce && typeof Toast !== 'undefined') Toast.show(`حجم الآية: ${Math.round(STEPS[verse] * 100).toLocaleString('ar-EG')}٪`, 1200);
+        if (announce && typeof Toast !== 'undefined') Toast.show(`حجم الآية: ${Math.round(STEPS[verse] * 100).toLocaleString('ar-EG-u-nu-latn')}٪`, 1200);
     }
 
-    // ---------- المؤثرات (الإصدار ١٥) ----------
+    // ---------- المؤثرات (الإصدار 15) ----------
     // auto: خفيفة على الجوال والأجهزة الضعيفة، وكاملة على الكمبيوتر (نفس شرط preload-theme.js)
     const FX_KEY = 'mudhakkir-effects';
     const FX_LABEL = { auto: 'تلقائي', lite: 'خفيفة', full: 'كاملة' };

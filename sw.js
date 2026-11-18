@@ -15,17 +15,17 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v39';
+const CACHE = 'mudhakkir-v41';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
-const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion', '14-performance', '15-look', '16-layout', '17-mushaf', '18-screen', '19-feedback', '20-cards'].map(n => `./assets/css/${n}.css`);
-const JS_FILES = ['preload-theme', 'splash', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'offline', 'mushaf', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'screen', 'widgets', 'feedback', 'dev', 'cardart', 'cards', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
+const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion', '14-performance', '15-look', '16-layout', '17-mushaf', '18-screen', '19-feedback', '20-cards', '21-new-look'].map(n => `./assets/css/${n}.css`);
+const JS_FILES = ['preload-theme', 'splash', 'i18n', 'knowledge', 'core', 'adhkar-viewer', 'theme', 'prefs', 'modals-and-picker', 'wird', 'wird-intro', 'quran-tools', 'offline', 'mushaf', 'reader', 'notifications', 'reminders', 'updates', 'install', 'fx', 'tasbih', 'home', 'share', 'extras', 'screen', 'widgets', 'feedback', 'dev', 'cardart', 'cards', 'time-context', 'atmosphere', 'motion', 'assistant', 'main'].map(n => `./assets/js/${n}.js`);
 // محتوى «شاشة مُذكّر» (نفس محتوى الأدوات برّا التطبيق): بيتخزّن متل ملفات التطبيق حتى تشتغل الشاشة بلا نت
 const DATA_FILES = ['./assets/data/widget-content.json'];
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES, ...DATA_FILES,
     './assets/img/logo-light.webp', './assets/img/logo-dark.webp', './assets/img/icon-192.webp', './assets/img/icon-192.png', './assets/img/favicon-64.png'];
 const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
-// يُعرض التذكير إن تأخر وصول الإشعار حتى ساعة: السيرفر بيلقط المتأخر لحد ٣٠ دقيقة (جدول كل نص ساعة)،
+// يُعرض التذكير إن تأخر وصول الإشعار حتى ساعة: السيرفر بيلقط المتأخر لحد 30 دقيقة (جدول كل نص ساعة)،
 // وفوقها تأخير خدمة الإشعارات نفسها (TTL نص ساعة). و«shown» بيمنع التكرار.
 const DUE_WINDOW = 60 * 60 * 1000;
 const dataUrl = name => new URL('__mdk/' + name, self.registration.scope).href;
@@ -131,15 +131,15 @@ function occurrence(r, now) {
 let chain = Promise.resolve();
 const serial = fn => (chain = chain.then(fn, fn));
 
-// إ٢ (الإصدار ١٥): أزرار إشعار التذكير: «أتممت» (بتنحسب بإنجاز اليوم) و«بعد ١٠ دقائق» (غفوة)
+// إ2 (الإصدار 15): أزرار إشعار التذكير: «أتممت» (بتنحسب بإنجاز اليوم) و«بعد 10 دقائق» (غفوة)
 const SNOOZE_MS = 10 * 60 * 1000;
 function reminderActions(r) {
-    const snooze = { action: 'snooze', title: '⏰ بعد ١٠ دقائق' };
+    const snooze = { action: 'snooze', title: '⏰ بعد 10 دقائق' };
     if (r.id === 'friday' || r.kahf) return [{ action: 'kahf', title: '📖 اقرأ الكهف' }, snooze];
     if (r.id === 'wird' || r.wird) return [{ action: 'open-wird', title: '📖 افتح الورد' }, snooze];
     return [{ action: 'done', title: '✓ أتممت' }, snooze];
 }
-// الغفوات: تذكير «مرة واحدة» بعد ١٠ دقائق. بنحفظها هون (الصفحة ما بتعرف عنها) وبنبعتها للسيرفر حتى توصل والتطبيق مسكّر
+// الغفوات: تذكير «مرة واحدة» بعد 10 دقائق. بنحفظها هون (الصفحة ما بتعرف عنها) وبنبعتها للسيرفر حتى توصل والتطبيق مسكّر
 async function liveSnoozes(now = Date.now()) {
     const list = await getJSON('snoozes', []);
     return (Array.isArray(list) ? list : []).filter(s => s && now - (s.at || 0) < DUE_WINDOW);
@@ -318,7 +318,7 @@ self.addEventListener('notificationclick', event => {
     })());
 });
 
-// إشعار «تحديث جديد» لمن لم يفتح التطبيق منذ نشر إصدار أحدث (نفحص مرة كل ١٢ ساعة عند وصول نبضة)
+// إشعار «تحديث جديد» لمن لم يفتح التطبيق منذ نشر إصدار أحدث (نفحص مرة كل 12 ساعة عند وصول نبضة)
 async function checkUpdateNotice() {
     try {
         const meta = await getJSON('update-meta', {});
@@ -330,7 +330,7 @@ async function checkUpdateNotice() {
         const v = await res.json();
         const seen = await getJSON('seen', { build: 0 });
         const build = Number(v.build) || 0, rel = v.release || '';
-        // أحدث = رقم أكبر، أو نفس الرقم بتاريخ نشر جديد (الإصدار ١٤ انتشر مرتين)
+        // أحدث = رقم أكبر، أو نفس الرقم بتاريخ نشر جديد (الإصدار 14 انتشر مرتين)
         const newer = build > seen.build || (build === seen.build && !!rel && seen.release !== rel);
         const tag = rel ? `${build}|${rel}` : build;
         if (!seen.build || !newer || meta.notified === tag) return;
@@ -346,10 +346,10 @@ async function checkUpdateNotice() {
 
 // نبضة من السيرفر (Web Push) — تعمل والتطبيق مغلق
 // السيرفر يرسل نبضة عند كل ربع ساعة (الأذكار العامة) وعند وقت كل تذكير شخصي، ونحن نقرر هنا ماذا نعرض
-// ← الإصدار ١٣: كل نبضة لازم يطلع منها إشعار، حتى والتطبيق مفتوح. على الآيفون النبضة «الصامتة» بتخلّي Safari
+// ← الإصدار 13: كل نبضة لازم يطلع منها إشعار، حتى والتطبيق مفتوح. على الآيفون النبضة «الصامتة» بتخلّي Safari
 //   يلغي اشتراك الموقع بعد كم مرة، فبتوقف كل الإشعارات والسيرفر لسا مفكّر حاله عم يبعت.
 self.addEventListener('push', event => {
-    // الإصدار ٢٠: إشعار فيه نص من السيرفر (رسالة جديدة بصندوق المطوّر، إعلان من المطوّر، تجربة إشعار المطوّر).
+    // الإصدار 20: إشعار فيه نص من السيرفر (رسالة جديدة بصندوق المطوّر، إعلان من المطوّر، تجربة إشعار المطوّر).
     // التذكيرات والأذكار بتضل نبضة بلا محتوى، ونحن منقرر شو نعرض تحت.
     let msg = null;
     try { msg = event.data ? event.data.json() : null; } catch (e) {}

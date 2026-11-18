@@ -1,9 +1,9 @@
 /* =====================================================================
- * مُذكّر — tasbih.js  (الإصدار ١٢)
+ * مُذكّر — tasbih.js  (الإصدار 12)
  * المسبحة الموحّدة: عدّاد واحد تتشاركه بطاقة الرئيسية وصفحة «التسبيح» و«وضع التسبيح».
- *   - صفحة التسبيح (س٣ من الإصدار ١٥): رقم كبير هادئ وتحته شريط تقدّم رفيع، ومنطقة الضغط كبيرة،
- *     اختيار الذكر والعدد (٣٣، ١٠٠، بلا حد)، مجموع اليوم والدورة بسطر الوصف، والصوت، والتصفير.
- *   - وضع التسبيح (م٣ + خ١): زر عائم بكل صفحة فوق «اسأل مُذكّر» يفتح شاشة كاملة، أي ضغطة بتحسب.
+ *   - صفحة التسبيح (س3 من الإصدار 15): رقم كبير هادئ وتحته شريط تقدّم رفيع، ومنطقة الضغط كبيرة،
+ *     اختيار الذكر والعدد (33، 100، بلا حد)، مجموع اليوم والدورة بسطر الوصف، والصوت، والتصفير.
+ *   - وضع التسبيح (م3 + خ1): زر عائم بكل صفحة فوق «اسأل مُذكّر» يفتح شاشة كاملة، أي ضغطة بتحسب.
  *     الخروج مقصود: ضغط مطوّل ثانية على × (أو Esc على الكمبيوتر). زر الرجوع بالجوال ما بيطلّع بالغلط،
  *     والشاشة ما بتطفي (Wake Lock) إن دعمها المتصفح.
  * يُحمَّل قبل home.js (الرئيسية تستعمل Tasbih)، و Tasbih.init() من main.js. يستعمل DailyStats و Immersive.
@@ -16,7 +16,7 @@ const Tasbih = (() => {
         get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } },
         set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} }
     };
-    const AR = n => Number(n).toLocaleString('ar-EG');
+    const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     // الأذكار: النص المشكول للعرض، والقصير للأزرار
     const DHIKR = [
@@ -38,7 +38,7 @@ const Tasbih = (() => {
 
     // ---------- الحالة المشتقة ----------
     function state(extra = {}) {
-        const cyc = goal || 33;               // حلقة الرئيسية تكتمل كل ٣٣ إن لم يُحدَّد عدد
+        const cyc = goal || 33;               // حلقة الرئيسية تكتمل كل 33 إن لم يُحدَّد عدد
         const r = count % cyc, full = count > 0 && r === 0;
         return {
             count, goal, dhikr, soundOn,
@@ -65,7 +65,7 @@ const Tasbih = (() => {
         } catch (e) {}
     }
     const buzz = p => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
-    // ك٢ (الإصدار ١٤): مع كل تسبيحة موجة ذهبية بتطلع من حوالين المسبحة (الرئيسية، الصفحة، الوضع)
+    // ك2 (الإصدار 14): مع كل تسبيحة موجة ذهبية بتطلع من حوالين المسبحة (الرئيسية، الصفحة، الوضع)
     function wave(el) {
         if (!el || reduce.matches) return;
         const w = document.createElement('i');
@@ -125,8 +125,10 @@ const Tasbih = (() => {
             $('tb-count').textContent = AR(s.shown);
             $('tb-of').textContent = s.goal ? 'من ' + AR(s.goal) : 'بلا حد';
             $('tb-ring').style.strokeDashoffset = String(100 - (s.goal ? s.progress : 0) * 100);
-            // س٣ (الإصدار ١٥): شريط تقدّم رفيع تحت الرقم (transform بس، خفيف عالجوال)
+            // س3 (الإصدار 15): شريط تقدّم رفيع تحت الرقم (transform بس، خفيف عالجوال)
             const bar = $('tb-bar'); if (bar) bar.style.transform = `scaleX(${s.goal ? s.progress : 0})`;
+            // الإصدار 28: حبّات المسبحة عالطرف بتنزل حبّة مع كل عدّة (21-new-look.css ← .tb-beads)
+            orb.style.setProperty('--n', String(s.shown));
             $('tb-today').textContent = AR(s.today);
             $('tb-cycle').textContent = AR(s.cycle);
             $('tb-cycle-wrap').hidden = !s.goal;

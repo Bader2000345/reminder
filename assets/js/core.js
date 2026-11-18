@@ -51,7 +51,7 @@ function renderGeneralAdhkar(filterText = '') {
             sum.textContent = 'الدليل';
             const body = document.createElement('div');
             const src = document.createElement('small');
-            src.textContent = proof[1].replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); // أرقام الأحاديث عربية متل باقي التطبيق
+            src.textContent = proof[1]; // الإصدار 27: أرقام الأحاديث بالإنجليزي متل باقي التطبيق
             body.append(document.createTextNode(proof[0]), src);
             det.append(sum, body);
             p.append(det);
@@ -88,6 +88,13 @@ function renderGeneralAdhkar(filterText = '') {
         }
 
         article.append(num, p, acts);
+        // الإصدار 28 «سطور مختصرة» (الورشة): السطر بيبين أول الذكر، وكبسة عليه بتفتحو كامل مع الدليل
+        article.classList.add('is-short');
+        article.tabIndex = 0;
+        article.setAttribute('aria-expanded', 'false');
+        const flip = () => { const open = article.classList.toggle('open'); article.setAttribute('aria-expanded', String(open)); };
+        article.addEventListener('click', e => { if (!e.target.closest('button, a, summary, details')) flip(); });
+        article.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === article) { e.preventDefault(); flip(); } });
         container.appendChild(article);
     });
 }
@@ -106,9 +113,9 @@ function updateNavPill(instant = false) {
 }
 addEventListener('resize', () => updateNavPill(true));
 
-// صفحة «القرآن» (الإصدار ١٢): تبويبا «الورد اليومي» و«المصحف»، والتبويب الأخير محفوظ
-// إ٣: الشاشة ما بتطفي وقت القراءة (المصحف، وضع التركيز، الورد). كل جزء بيطلب بسبب خاص فيه،
-// والقفل بيتحرّر إذا ما في ولا سبب، أو الصفحة مخفية، أو ما في ولا لمسة من ١٠ دقايق (حتى ما تخلص البطارية).
+// صفحة «القرآن» (الإصدار 12): تبويبا «الورد اليومي» و«المصحف»، والتبويب الأخير محفوظ
+// إ3: الشاشة ما بتطفي وقت القراءة (المصحف، وضع التركيز، الورد). كل جزء بيطلب بسبب خاص فيه،
+// والقفل بيتحرّر إذا ما في ولا سبب، أو الصفحة مخفية، أو ما في ولا لمسة من 10 دقايق (حتى ما تخلص البطارية).
 const KeepAwake = (() => {
     const reasons = new Set(), IDLE_MS = 10 * 60 * 1000;
     let lock = null, busy = false, last = Date.now();
@@ -133,7 +140,7 @@ function syncWirdAwake() {
     KeepAwake.set('wird', !!document.getElementById('page-quran')?.classList.contains('active-page'));
 }
 
-// صفحة القرآن (ق٣، الإصدار ١٥): بلا تبويبات. «الورد» = ورد اليوم بنفس الصفحة، و«المصحف» = زر «افتح المصحف».
+// صفحة القرآن (ق3، الإصدار 15): بلا تبويبات. «الورد» = ورد اليوم بنفس الصفحة، و«المصحف» = زر «افتح المصحف».
 // بنضل نقبل show('wird' | 'mushaf') للروابط القديمة (المساعد، إشعار الكهف): بنمرّر للمكان المطلوب.
 const QuranTabs = (() => {
     function show(tab = 'wird') {
@@ -151,7 +158,7 @@ const QuranTabs = (() => {
 const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings', 'cards', 'feedback', 'dev'];
 // صفحات قديمة صارت جزء من صفحة القرآن: «القراءة الحرة» = زر «افتح المصحف» (روابط المساعد وإشعار الكهف القديمة تبقى شغّالة)
 const PAGE_ALIAS = { 'free-reading': ['quran', 'mushaf'], wird: ['quran', 'wird'] };
-// صفحات بتنفتح من الإعدادات (الإصدار ٢٠): زر «الإعدادات» بالشريط بيضل مفعّل عليها
+// صفحات بتنفتح من الإعدادات (الإصدار 20): زر «الإعدادات» بالشريط بيضل مفعّل عليها
 const NAV_PARENT = { feedback: 'settings', dev: 'settings', cards: 'settings' };
 function navigateTo(pageId, tab) {
     if (PAGE_ALIAS[pageId]) [pageId, tab] = PAGE_ALIAS[pageId];
@@ -173,7 +180,7 @@ function navigateTo(pageId, tab) {
         window.scrollTo({ top: 0, behavior: 'auto' });
         if (pageId === 'quran' && tab) QuranTabs.show(tab);
     };
-    // انتقال ناعم بين الصفحات. بالمؤثرات الخفيفة: بلا لقطة للصفحة (أخف على الجوال)، الصفحة الجديدة بتظهر بتلاشٍ ١٥٠ms
+    // انتقال ناعم بين الصفحات. بالمؤثرات الخفيفة: بلا لقطة للصفحة (أخف على الجوال)، الصفحة الجديدة بتظهر بتلاشٍ 150ms
     if (!reduce && from && from !== pageId && document.documentElement.classList.contains('fx-lite')) {
         swap();
         const p = document.getElementById('page-' + pageId);

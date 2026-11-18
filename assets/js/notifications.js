@@ -1,11 +1,11 @@
 /* =====================================================================
  * مُذكّر — notifications.js
- * الإشعارات: رابط السيرفر، التخزين المشترك مع sw.js، مواعيد التذكير، الإشعار والتنبيه داخل التطبيق، المزامنة مع السيرفر، والأذكار العامة كل ١٥ دقيقة.
+ * الإشعارات: رابط السيرفر، التخزين المشترك مع sw.js، مواعيد التذكير، الإشعار والتنبيه داخل التطبيق، المزامنة مع السيرفر، والأذكار العامة كل 15 دقيقة.
  * ← رابط سيرفر Cloudflare في أول هذا الملف (PUSH_SERVER).
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
-// ===== الإشعارات الدورية للأذكار العامة (كل ١٥ دقيقة) =====
+// ===== الإشعارات الدورية للأذكار العامة (كل 15 دقيقة) =====
 // ضع هنا رابط الـ Worker بعد نشره (مثال: https://mudhakkir-push.name.workers.dev) — اتركه فارغاً لتعطيل Push
 const PUSH_SERVER = 'https://mudhakkir-push.bader-bm-2000.workers.dev';
 const VAPID_PUBLIC_KEY = 'BHIWTXCv4Gmy6fy5fbsJ_NX4fLD0dkEo2PqyCVWzmbxaxw8xo8Ud9eMw_rZOp_qxOaDkSEThGzQbhQhSCQ6p2_8';
@@ -21,7 +21,7 @@ const NotifyStore = (() => {
         if (!('caches' in window)) return;
         try { const c = await caches.open(DATA_CACHE); await c.put(url(name), new Response(JSON.stringify(value), { headers: { 'Content-Type': 'application/json' } })); } catch (e) {}
     }
-    // يلي بيكتبه sw.js: الغفوات (إ٢) و«أتممت» من الإشعار
+    // يلي بيكتبه sw.js: الغفوات (إ2) و«أتممت» من الإشعار
     async function get(name, fallback = null) {
         if (!('caches' in window)) return fallback;
         try { const r = await (await caches.open(DATA_CACHE)).match(url(name)); return r ? await r.json() : fallback; } catch (e) { return fallback; }
@@ -31,7 +31,7 @@ const NotifyStore = (() => {
 
 // مواعيد التذكيرات (نفس المنطق موجود في sw.js)
 const Sched = (() => {
-    const DUE_WINDOW = 30 * 60 * 1000; // نعرض التذكير إن تأخر وصوله حتى ٣٠ دقيقة
+    const DUE_WINDOW = 30 * 60 * 1000; // نعرض التذكير إن تأخر وصوله حتى 30 دقيقة
     const pad = n => String(n).padStart(2, '0');
     const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     function at(r, base) {
@@ -144,7 +144,7 @@ const PushSync = (() => {
         if (!PUSH_SERVER) return setState('nourl');
         if (!SW_OK || !('PushManager' in window)) return setState('unsupported');
         const general = GeneralReminder.isActive();
-        // + غفوات «بعد ١٠ دقائق» من الإشعار (sw.js) حتى ما تنمسح من السيرفر لما نبعت التذكيرات
+        // + غفوات «بعد 10 دقائق» من الإشعار (sw.js) حتى ما تنمسح من السيرفر لما نبعت التذكيرات
         const snoozes = (await NotifyStore.get('snoozes', [])) || [];
         const reminders = allReminders().filter(r => r.on && Sched.next(r))
             .concat(Array.isArray(snoozes) ? snoozes.filter(s => s && s.at > Date.now() - 60000) : [])
@@ -292,10 +292,10 @@ const GeneralReminder = (() => {
             status.textContent = 'الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد تحميل الصفحة.';
         } else if (isActive()) {
             const nextTime = new Date((slotOf(Date.now()) + 1) * INTERVAL_MS)
-                .toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' });
+                .toLocaleTimeString('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' });
             status.textContent = `مفعّلة · الإشعار القادم ${nextTime} · ${{ on: 'تصلك حتى والتطبيق مغلق ✓', outdated: 'تصلك حتى والتطبيق مغلق ✓', pending: 'جارٍ تفعيل الإشعار في الخلفية…', error: 'تعذر تفعيل الإشعار في الخلفية، تعمل والتطبيق مفتوح فقط', unsupported: 'متصفحك لا يدعم الإشعار في الخلفية', nourl: 'تعمل طالما الموقع أو التطبيق مفتوح', off: '' }[PushSync.state()] || ''}`;
         } else {
-            status.textContent = 'فعّل المفتاح لتصلك أذكار عشوائية كل ١٥ دقيقة.';
+            status.textContent = 'فعّل المفتاح لتصلك أذكار عشوائية كل 15 دقيقة.';
         }
     }
 
@@ -334,18 +334,18 @@ const GeneralReminder = (() => {
         schedule();
     }
 
-    const nextSlotText = () => new Date((slotOf(Date.now()) + 1) * INTERVAL_MS).toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' });
+    const nextSlotText = () => new Date((slotOf(Date.now()) + 1) * INTERVAL_MS).toLocaleTimeString('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' });
     return { init, isActive, nextSlotText, refresh: schedule };
 })();
 
-// ===== «فحص الإشعارات»: يفحص كل حلقة بالسلسلة ويجرّب إشعار حقيقي من السيرفر (الإصدار ١٣) =====
+// ===== «فحص الإشعارات»: يفحص كل حلقة بالسلسلة ويجرّب إشعار حقيقي من السيرفر (الإصدار 13) =====
 const NotifyCheck = (() => {
     const $ = id => document.getElementById(id);
     const ua = navigator.userAgent || '';
     const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/.test(ua);
     const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-    const AR = n => Number(n).toLocaleString('ar-EG');
+    const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const remindersLabel = n => n === 0 ? 'لا تذكيرات شخصية' : n === 1 ? 'تذكير واحد' : n === 2 ? 'تذكيران'
         : n % 100 >= 3 && n % 100 <= 10 ? `${AR(n)} تذكيرات` : n % 100 >= 11 ? `${AR(n)} تذكيرًا` : `${AR(n)} تذكير`;
     let running = false, testWaiter = null;
@@ -389,26 +389,26 @@ const NotifyCheck = (() => {
         const add = s => { steps.push(s); paint(steps); return s; };
         let canTest = true, needRepair = false;
         try {
-            // ١) دعم المتصفح
+            // 1) دعم المتصفح
             const supported = Notifier.supported && SW_OK && 'PushManager' in window;
             if (isIOS && !standalone()) { add({ status: 'fail', title: 'التطبيق غير مثبّت على الآيفون', detail: 'على الآيفون تعمل الإشعارات من التطبيق المثبّت فقط.', fix: 'افتح الموقع في Safari ← زر المشاركة ⬆️ ← «إضافة إلى الشاشة الرئيسية»، ثم افتح مُذكّر من أيقونته.' }); canTest = false; }
             else if (!supported) { add({ status: 'fail', title: 'المتصفح لا يدعم الإشعارات في الخلفية', detail: 'جرّب Chrome على أندرويد، أو Safari بعد تثبيت التطبيق على الآيفون.' }); canTest = false; }
             else add({ status: 'ok', title: 'المتصفح يدعم الإشعارات' });
-            // ٢) الإذن
+            // 2) الإذن
             if (canTest) {
                 let perm = Notifier.permission();
                 if (perm === 'default') perm = await Notifier.ensurePermission();
                 if (perm === 'granted') add({ status: 'ok', title: 'إذن الإشعارات مسموح' });
                 else { add({ status: 'fail', title: perm === 'denied' ? 'الإشعارات ممنوعة لهذا الموقع' : 'لم تسمح بالإشعارات بعد', fix: fixDenied() }); canTest = false; }
             }
-            // ٣) خدمة الخلفية
+            // 3) خدمة الخلفية
             let reg = null;
             if (canTest) {
                 reg = await timeout(navigator.serviceWorker.ready, 8000).catch(() => null);
                 if (reg && reg.active) add({ status: 'ok', title: 'خدمة الخلفية تعمل' });
                 else { add({ status: 'fail', title: 'خدمة الخلفية لم تبدأ', fix: 'أغلق التطبيق وافتحه من جديد، وإن استمرت المشكلة اضغط «إصلاح الاشتراك».' }); canTest = false; needRepair = true; }
             }
-            // ٤) الاشتراك بالسيرفر (نعيد المزامنة أول شي)
+            // 4) الاشتراك بالسيرفر (نعيد المزامنة أول شي)
             let sub = null;
             if (canTest) {
                 await PushSync.sync();
@@ -418,7 +418,7 @@ const NotifyCheck = (() => {
                 else if (!sub && st === 'off') { add({ status: 'warn', title: 'لا يوجد ما يُرسَل', detail: 'فعّل «أذكار عامة» أو أضف تذكيرًا، ثم أعد الفحص.' }); canTest = false; }
                 else { add({ status: 'fail', title: 'تعذّر التسجيل في الخادم', detail: 'قد يكون الاتصال ضعيفًا أو الاشتراك قديمًا.', fix: 'اضغط «إصلاح الاشتراك» في الأسفل.' }); canTest = false; needRepair = true; }
             }
-            // ٥) الخادم نفسه
+            // 5) الخادم نفسه
             let server = null;
             try { server = await timeout(fetch(PUSH_SERVER + '/status', { cache: 'no-store' }).then(r => r.json()), 8000); } catch (e) {}
             if (!server) add({ status: 'warn', title: 'تعذّر الوصول إلى الخادم الآن', detail: 'تأكد من الاتصال بالإنترنت وأعد الفحص.' });
@@ -430,7 +430,7 @@ const NotifyCheck = (() => {
                 else if (step > 1) add({ status: 'warn', title: 'الخادم يعمل', detail: `لكن جدوله كل ${AR(step)} دقيقة، فقد يتأخر التذكير حتى ${AR(step)} دقيقة.` });
                 else add({ status: 'ok', title: 'الخادم يعمل ويرسل كل دقيقة' });
             }
-            // ٦) تجربة حقيقية
+            // 6) تجربة حقيقية
             if (canTest && sub) {
                 const s = add({ status: 'wait', title: 'جارٍ إرسال إشعار تجربة من الخادم…', detail: 'لا تغلق التطبيق، ثوانٍ فقط.' });
                 await NotifyStore.put('test', { at: Date.now() });

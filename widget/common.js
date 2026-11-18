@@ -1,8 +1,8 @@
 /* =====================================================================
- * مُذكّر — widget/common.js  (الإصدار ١٧)
+ * مُذكّر — widget/common.js  (الإصدار 17)
  * مشترك بين صفحات الأدوات برّا التطبيق: خلفية اللابتوب (wallpaper.html) ولوحة التلفزيون (tv.html).
  *   - المحتوى من السيرفر (worker.js ← GET /widget): التاريخين، ذكر الوقت، آية أو حديث اليوم، وتقدّم الورد
- *   - بيتحدّث كل ١٠ دقايق ولما يتغيّر اليوم، وآخر نسخة بتنحفظ فبتضل الصفحة شغّالة إذا انقطع النت
+ *   - بيتحدّث كل 10 دقايق ولما يتغيّر اليوم، وآخر نسخة بتنحفظ فبتضل الصفحة شغّالة إذا انقطع النت
  *   - الساعة والتاريخ بينحسبوا هون، فما بيوقفوا ولا ثانية
  *   - الرابط فيه رمز الأداة ‎?k=…‎ (من «أدوات مُذكّر» بالتطبيق) حتى يبيّن الورد، وبلاه بتشتغل بلا ورد
  * ما في Service Worker هون، والصفحة ما بتعرف أي شي عن المستخدم غير هالرمز العشوائي.
@@ -15,11 +15,11 @@ const MdkWidget = (() => {
     const key = /^[a-z0-9]{20,40}$/.test(q.get('k') || '') ? q.get('k') : '';
     const STORE = 'mdk-widget-last';
     const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (e) { return 'UTC'; } })();
-    const AR = n => Number(n).toLocaleString('ar-EG');
+    const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
     function clock(d = new Date()) {
-        const parts = new Intl.DateTimeFormat('ar-EG', { hour: 'numeric', minute: '2-digit' }).formatToParts(d);
+        const parts = new Intl.DateTimeFormat('ar-EG-u-nu-latn', { hour: 'numeric', minute: '2-digit' }).formatToParts(d);
         return { time: parts.filter(p => p.type !== 'dayPeriod').map(p => p.value).join('').trim(), period: (parts.find(p => p.type === 'dayPeriod') || {}).value || '' };
     }
     const ymd = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -27,8 +27,8 @@ const MdkWidget = (() => {
     function localDates() {
         const d = new Date();
         let hijri = '';
-        try { hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-arab', { day: 'numeric', month: 'long', year: 'numeric' }).format(d).replace(/\s*هـ$/, '') + ' هـ'; } catch (e) {}
-        return { greg: d.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }), hijri, ymd: ymd(d) };
+        try { hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(d).replace(/\s*هـ$/, '') + ' هـ'; } catch (e) {}
+        return { greg: d.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' }), hijri, ymd: ymd(d) };
     }
     const saved = () => { try { return JSON.parse(localStorage.getItem(STORE)) || null; } catch (e) { return null; } };
     async function load() {
@@ -49,7 +49,7 @@ const MdkWidget = (() => {
         return d;
     }
 
-    // render(data) بينعاد كل ما وصل جديد؛ tick() كل ٥ ثواني للساعة
+    // render(data) بينعاد كل ما وصل جديد؛ tick() كل 5 ثواني للساعة
     function start(render, tick) {
         let data = merge(saved()), lastDay = ymd();
         render(data); tick();

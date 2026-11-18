@@ -1,7 +1,7 @@
 /* =====================================================================
  * مُذكّر — reminders.js
  * أذكاري: التذكيرات الشخصية (يومي / أيام محددة / مرة واحدة)، البطاقات، ونموذج الإضافة والتعديل،
- * و«جاهزة بضغطة» (إ١، الإصدار ١٥).
+ * و«جاهزة بضغطة» (إ1، الإصدار 15).
  * يُحمَّل بالترتيب من index.html؛ الأجزاء تتشارك المتغيرات العامة فيما بينها.
  * ===================================================================== */
 
@@ -17,8 +17,8 @@ const Reminders = (() => {
     list = (Array.isArray(list) ? list : []).filter(r => r && r.id && /^\d\d:\d\d$/.test(r.time))
         .map(r => ({ repeat: 'daily', days: [], date: '', since: 0, on: true, ...r }));
     const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {} };
-    const fmtTime = t => { const [h, m] = t.split(':'); return new Date(2000, 0, 1, h, m).toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' }); };
-    const fmtDate = key => { const [y, m, d] = key.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }); };
+    const fmtTime = t => { const [h, m] = t.split(':'); return new Date(2000, 0, 1, h, m).toLocaleTimeString('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' }); };
+    const fmtDate = key => { const [y, m, d] = key.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' }); };
     const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt !== undefined) n.textContent = txt; return n; };
 
     function scheduleText(r) {
@@ -47,6 +47,38 @@ const Reminders = (() => {
         return `مفعّل · ${when}${bg ? ' · ' + bg : ''}`;
     }
     const badgeText = r => ({ daily: 'يومي', days: 'أيام محددة', once: 'مرة واحدة' })[r.repeat] || 'يومي';
+
+    // الإصدار 28 (اللوحة المعتمدة): «خط اليوم». كل تذكير بيجي اليوم (الشخصية + الجمعة + الورد) مرتّب بالوقت،
+    // ويلي فات وقتو بيتعلّم، ونقطة «هلّق» بمكان الوقت الحالي. بيتحدّث كل دقيقة مع render()
+    function renderToday() {
+        const line = $('rem-today-line'); if (!line) return;
+        const now = new Date(), dow = now.getDay(), mins = now.getHours() * 60 + now.getMinutes();
+        const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+        const all = typeof allReminders === 'function' ? allReminders() : list;
+        const items = all.filter(r => r && r.on !== false && /^\d\d:\d\d$/.test(r.time || '') && (
+            r.repeat === 'daily' || !r.repeat || (r.repeat === 'days' && (r.days || []).includes(dow)) || (r.repeat === 'once' && r.date === key)))
+            .map(r => ({ t: r.time, title: r.title || 'تذكير' }))
+            .sort((a, b) => a.t.localeCompare(b.t));
+        const nowLi = () => {
+            const li = el('li', 'rt-now');
+            li.append(el('span', '', 'هلّق ' + fmtTime(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`)));
+            return li;
+        };
+        const nodes = [];
+        let placed = false;
+        items.forEach(it => {
+            if (!placed && toMin(it.t) > mins) { nodes.push(nowLi()); placed = true; }
+            const li = el('li', toMin(it.t) <= mins ? 'is-done' : '');
+            li.append(el('b', '', it.title), el('small', '', fmtTime(it.t)));
+            nodes.push(li);
+        });
+        if (!placed && items.length) nodes.push(nowLi());
+        line.replaceChildren(...nodes);
+        const n = items.length, AR = Number(n).toLocaleString('ar-EG-u-nu-latn');
+        $('rem-today').classList.toggle('is-empty', !n);
+        $('rem-today-sub').textContent = !n ? '' : n === 1 ? 'تذكير واحد' : n === 2 ? 'تذكيران' : n <= 10 ? `${AR} تذكيرات` : `${AR} تذكيرًا`;
+    }
 
     function render() {
         const box = $('personal-reminders');
@@ -89,17 +121,18 @@ const Reminders = (() => {
         });
         $('rem-empty').style.display = list.length ? 'none' : 'block';
         renderTemplates();
+        renderToday();
         // سطر الوصف تحت العنوان: كم تذكير شغّال (الشخصية + الجمعة + الورد + الأذكار العامة)
         const lead = $('mine-lead');
         if (lead) {
             const n = allReminders().filter(r => r.on).length + (GeneralReminder.isActive() ? 1 : 0);
-            const AR = Number(n).toLocaleString('ar-EG');
+            const AR = Number(n).toLocaleString('ar-EG-u-nu-latn');
             lead.textContent = !n ? 'تذكيراتك، تصلك في وقتها' : n === 1 ? 'تذكير واحد مفعّل' : n === 2 ? 'تذكيران مفعّلان'
                 : n <= 10 ? `${AR} تذكيرات مفعّلة` : `${AR} تذكيرًا مفعّلًا`;
         }
     }
 
-    // ---------- إ١ (الإصدار ١٥): تذكيرات جاهزة بضغطة ----------
+    // ---------- إ1 (الإصدار 15): تذكيرات جاهزة بضغطة ----------
     // يلي بتضيفه بيختفي من هون (منعرفه بـ tpl)، وبتقدر تعدّله أو تحذفه متل أي تذكير
     const TEMPLATES = [
         { tpl: 'morning', title: 'أذكار الصباح', text: 'حان وقت أذكار الصباح، ابدأ يومك بذكر الله.', time: '06:00', repeat: 'daily' },
@@ -230,6 +263,7 @@ const Reminders = (() => {
 
     function init() {
         $('rem-new').addEventListener('click', () => openForm());
+        $('rem-today-new')?.addEventListener('click', () => openForm());
         $('reminder-form').addEventListener('submit', submit);
         document.querySelectorAll('#rem-repeat [data-repeat]').forEach(b => b.addEventListener('click', () => setRepeat(b.dataset.repeat)));
         document.querySelectorAll('#rem-days [data-day]').forEach(b => b.addEventListener('click', () => {

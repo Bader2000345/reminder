@@ -7,9 +7,9 @@
 // ===== مشاركة الورد والإنجازات =====
 const Share = (() => {
     const $ = id => document.getElementById(id);
-    const fmt = n => Number(n).toLocaleString('ar-EG');
+    const fmt = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const W = 1080, H = 1350;
-    const SAMPLE = 'مذكر القرآن الكريم الورد ٠١٢٣٤٥٦٧٨٩';
+    const SAMPLE = 'مذكر القرآن الكريم الورد 0123456789';
     let kind = 'wird', blob = null, previewUrl = '', renderId = 0, logoImage = null, ayahData = null;
 
     const appUrl = () => (/^https?:$/.test(location.protocol) ? location.href.split('#')[0] : '');

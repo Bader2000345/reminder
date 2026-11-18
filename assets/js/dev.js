@@ -1,11 +1,11 @@
 /* =====================================================================
- * مُذكّر — dev.js  (الإصدار ٢٠، معرض ٩)
+ * مُذكّر — dev.js  (الإصدار 20، معرض 9)
  * وضع المطوّر، ما بيبين لحدا غير صاحب التطبيق، وعلى جواله ولابتوبه بس (السيرفر بيقبل جهازين):
- *   • أول مرة على الجهاز: ٥ كبسات ورا بعض على زر «مُذكّر، الإصدار…» بآخر الإعدادات ← صفحة القفل (ق٢) ← كلمة السر.
+ *   • أول مرة على الجهاز: 5 كبسات ورا بعض على زر «مُذكّر، الإصدار…» بآخر الإعدادات ← صفحة القفل (ق2) ← كلمة السر.
  *   • بعدها الجهاز بيتذكّر (رمز موقّع لسنة: mudhakkir-dev-device، وما بيطلع بالنسخة الاحتياطية):
- *     بيبين «للمطوّرين» بآخر الإعدادات، و«ملاحظات وشكاوي» بتصير صندوق الرسائل (ص١) بلا كلمة سر،
+ *     بيبين «للمطوّرين» بآخر الإعدادات، و«ملاحظات وشكاوي» بتصير صندوق الرسائل (ص1) بلا كلمة سر،
  *     وبطاقة «صندوق الرسائل» بأول الرئيسية لما يكون في رسائل جديدة.
- *   • صفحة المطوّرين (ط٣) بتطلب كلمة السر كل ما ينفتح التطبيق (رمز الجلسة بالذاكرة بس، ١٢ ساعة بالأكتر).
+ *   • صفحة المطوّرين (ط3) بتطلب كلمة السر كل ما ينفتح التطبيق (رمز الجلسة بالذاكرة بس، 12 ساعة بالأكتر).
  * كلمة السر نفسها بـ Cloudflare (Secret اسمه DEV_KEY)، ما بتنكتب بأي ملف ولا بتنحفظ عالجهاز.
  * يعتمد على Feedback (feedback.js) و PUSH_SERVER و PushSync و Notifier (notifications.js) و Toast و navigateTo.
  * ===================================================================== */
@@ -91,7 +91,7 @@ const Dev = (() => {
         } catch (e) { return null; }
     }
 
-    // ===================== ص١ صندوق الرسائل (نفس صفحة «ملاحظات وشكاوي») =====================
+    // ===================== ص1 صندوق الرسائل (نفس صفحة «ملاحظات وشكاوي») =====================
     const FILTERS = [['all', 'الكل'], ['bug', 'أخطاء'], ['idea', 'اقتراحات'], ['complaint', 'شكاوي'], ['thanks', 'شكر'], ['archived', 'الأرشيف']];
     const INFO = {
         platform: { android: 'أندرويد', samsung: 'سامسونج', ios: 'آيفون أو آيباد', desktop: 'كمبيوتر', inapp: 'متصفح جوّا تطبيق' },
@@ -131,7 +131,7 @@ const Dev = (() => {
     }
     function renderInbox() {
         const root = $('fb-inbox'), c = box.counts;
-        $('fb-lead').textContent = c ? `${c.unread ? msgs(c.unread) : 'ما في رسائل جديدة'}${box.avg ? `، ومتوسط التقييم ${ar(box.avg)} من ٥` : ''}`
+        $('fb-lead').textContent = c ? `${c.unread ? msgs(c.unread) : 'ما في رسائل جديدة'}${box.avg ? `، ومتوسط التقييم ${ar(box.avg)} من 5` : ''}`
             : box.state === 'error' ? 'تعذّر التحميل' : 'جارٍ التحميل…';
         if (box.open) return renderDetail(root);
         const sel = box.archived ? 'archived' : box.filter;
@@ -229,7 +229,7 @@ const Dev = (() => {
         else if (act === 'archive' || act === 'unarchive') moveMsg(act);
     }
 
-    // ===================== ق٢ القفل =====================
+    // ===================== ق2 القفل =====================
     function showLock(msg = '') {
         $('dv-lock').hidden = false; $('dv-main').hidden = true;
         $('page-dev').querySelector(':scope > .fb-back').hidden = false;
@@ -262,7 +262,7 @@ const Dev = (() => {
     }
     const sessionOver = () => { session = ''; showLock('انتهت الجلسة، اكتب كلمة السر من جديد.'); };
 
-    // ===================== ط٣ صفحة المطوّرين =====================
+    // ===================== ط3 صفحة المطوّرين =====================
     function showMain(v = 'list') {
         $('dv-lock').hidden = true; $('dv-main').hidden = false;
         view = v; confirmPush = false;
@@ -308,7 +308,7 @@ const Dev = (() => {
         const s = stats, fb = s && s.feedback, c = box.counts || fb;
         const rows = [
             ['inbox', ICON.fb, 'صندوق الرسائل', c ? (c.unread ? msgs(c.unread) : 'ما في رسائل جديدة') : '…'],
-            ['nums', ICON.chart, 'الأرقام', s ? `${s.users ? ar(s.users) + ' مستخدم بالمجموع' : 'لسا عم ينعدّوا المستخدمين'}، ${fb && fb.avg ? 'والتقييم ' + ar(fb.avg) + ' من ٥' : 'ولسا ما في تقييم'}` : '…'],
+            ['nums', ICON.chart, 'الأرقام', s ? `${s.users ? ar(s.users) + ' مستخدم بالمجموع' : 'لسا عم ينعدّوا المستخدمين'}، ${fb && fb.avg ? 'والتقييم ' + ar(fb.avg) + ' من 5' : 'ولسا ما في تقييم'}` : '…'],
             ['ann', ICON.mega, 'إعلان لكل المستخدمين', s ? (s.announce ? `شغّال: «${s.announce.title}»` : 'ما في إعلان شغّال هلّق') : '…'],
             ['tools', ICON.pulse, 'أدوات الفحص', health ? ({ 0: 'كلشي شغّال', 1: 'في شي بدّو انتباه', 2: 'في شغلتين بدهن انتباه' }[problems().length] || `في ${ar(problems().length)} شغلات بدها انتباه`) : '…'],
             ['devices', ICON.devices, 'الأجهزة المسموحة', devs ? devs.devices.map(d => d.label).join('، ') || 'ما في أجهزة' : '…']
@@ -324,17 +324,27 @@ const Dev = (() => {
         const s = stats;
         if (!s) return '<p class="dv-wait">جارٍ التحميل…</p>';
         const fb = s.feedback || {};
-        const tiles = [[ar(s.users || 0), 'مستخدم بالمجموع'], [ar(s.active30 || 0), 'فتحوه آخر ٣٠ يوم'],
+        const tiles = [[ar(s.users || 0), 'مستخدم بالمجموع'], [ar(s.active30 || 0), 'فتحوه آخر 30 يوم'],
             [ar(s.subscribers), 'مشترك بالإشعارات'], [ar(s.withReminders), 'عندهم تذكيرات'], [ar(fb.unread || 0), 'رسائل جديدة'],
             [fb.avg ? ar(fb.avg) : '—', 'متوسط التقييم'], [ar(s.widgets || 0), 'أدوات برّا التطبيق'], [s.lastRun ? F.when(Date.parse(s.lastRun)) : '—', 'آخر إرسال إشعارات']];
-        const tz = s.timezones || [], max = Math.max(1, ...tz.map(t => t.n));
+        // الإصدار 27: كل رقم معه اسمه ووحدته («دمشق · 3 أجهزة») حتى ما يضل رقم معلّق لحاله
+        const a = s.active || null, people = n => (n === 1 ? 'جهاز واحد' : n === 2 ? 'جهازين' : `${ar(n)} ${n <= 10 ? 'أجهزة' : 'جهاز'}`);
+        const bars = (title, sub, rows) => {
+            const max = Math.max(1, ...rows.map(r => r.n));
+            return `<section class="fb-card dv-tz"><h2>${title} <small>${sub}</small></h2>${rows.map(r => `<div class="dv-bar"><span class="dv-bar-t"><b>${esc(r.label)}</b><small>${people(r.n)}</small></span><span class="dv-trk"><i style="width:${Math.round(r.n / max * 100)}%"></i></span></div>`).join('')}</section>`;
+        };
+        const places = a && a.places && a.places.length ? a.places.map(p => ({ label: tzName(p.tz), n: p.n })) : (s.timezones || []).map(t => ({ label: tzName(t.tz), n: t.n }));
+        const modeRows = a ? [{ label: 'مثبّتين التطبيق', n: a.mode.app }, { label: 'من الموقع بالمتصفح', n: a.mode.web }, { label: 'ما منعرف (نسخة قديمة)', n: a.mode.unknown }].filter(r => r.n) : [];
+        const osRows = a ? [{ label: 'آيفون', n: a.os.ios }, { label: 'أندرويد', n: a.os.android }, { label: 'كمبيوتر', n: a.os.desktop }, { label: 'غير هيك', n: a.os.other }].filter(r => r.n) : [];
         return `<div class="dv-tiles">${tiles.map(([v, l]) => `<div class="dv-tile"><b>${esc(v)}</b><small>${l}</small></div>`).join('')}</div>
-            ${tz.length ? `<section class="fb-card dv-tz"><h2>وين الناس <small>حسب المنطقة الزمنية</small></h2>${tz.map(t => `<div class="dv-bar"><span>${esc(tzName(t.tz))}</span><span class="dv-trk"><i style="width:${Math.round(t.n / max * 100)}%"></i></span><span>${ar(t.n)}</span></div>`).join('')}</section>` : ''}
-            <p class="dv-note">الأرقام من سيرفر مُذكّر، بلا أسماء ولا إيميلات ولا أي شي بيعرّف الشخص. عدّ المستخدمين بلّش من الإصدار ٢٢: كل جهاز بيتحسب أول ما يفتح التطبيق بعد التحديث، فالرقم رح يكبر خلال كم يوم.</p>`;
+            ${modeRows.length ? bars('مثبّت أو من الموقع', 'آخر 30 يوم', modeRows) : ''}
+            ${osRows.length ? bars('الأجهزة', 'آخر 30 يوم', osRows) : ''}
+            ${places.length ? bars('وين الناس', a && a.places && a.places.length ? 'حسب المنطقة الزمنية، آخر 30 يوم' : 'حسب المنطقة الزمنية للمشتركين بالإشعارات', places) : ''}
+            <p class="dv-note">الأرقام من سيرفر مُذكّر، بلا أسماء ولا إيميلات ولا أي شي بيعرّف الشخص. عدّ المستخدمين بلّش من الإصدار 22: كل جهاز بيتحسب أول ما يفتح التطبيق بعد التحديث، فالرقم رح يكبر خلال كم يوم.</p>`;
     }
     function curAnnHTML(a) {
         if (!a) return '';
-        const until = a.until ? ' · لحد ' + new Date(a.until).toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }) : ' · لحد ما تشيله';
+        const until = a.until ? ' · لحد ' + new Date(a.until).toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' }) : ' · لحد ما تشيله';
         return `<section class="hn-card hn-ann dv-ann-now"><small>الإعلان الشغّال هلّق${until}</small><b>${esc(a.title)}</b><p>${esc(a.text)}</p><button type="button" class="ghost-button" data-dv="ann-clear">إيقاف الإعلان</button></section>`;
     }
     function annHTML() {
@@ -492,7 +502,7 @@ const Dev = (() => {
         else if (act === 'ann-clear') clearAnnouncement(b);
     }
 
-    // ٥ كبسات ورا بعض على زر «مُذكّر، الإصدار…» بآخر الإعدادات بتفتح صفحة القفل (متل خيارات المطوّر بالأندرويد).
+    // 5 كبسات ورا بعض على زر «مُذكّر، الإصدار…» بآخر الإعدادات بتفتح صفحة القفل (متل خيارات المطوّر بالأندرويد).
     // زر حقيقي مو نص: الآيفون كان يفهم الكبس السريع عالنص تكبير أو تحديد، فما كانت تنحسب الكبسات.
     function bindTaps() {
         const chip = $('ver-chip');

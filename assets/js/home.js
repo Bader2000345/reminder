@@ -24,8 +24,8 @@ const DailyStats = (() => {
     };
     const render = () => {
         const line = document.getElementById('daily-stats-line'); if (!line) return;
-        const stats = read(); const format = n => Number(n).toLocaleString('ar-EG');
-        // العدد مع المعدود بقاعدة العربية: ١ تسبيحة · ٢ تسبيحتان · ٣–١٠ تسبيحات · ١١+ تسبيحة
+        const stats = read(); const format = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
+        // العدد مع المعدود بقاعدة العربية: 1 تسبيحة · 2 تسبيحتان · 3–10 تسبيحات · 11+ تسبيحة
         const count = (n, one, two, few, many) => n === 1 ? `${one} واحدة` : n === 2 ? two
             : `<strong>${format(n)}</strong> ${n % 100 >= 3 && n % 100 <= 10 ? few : many}`;
         const parts = [];
@@ -49,11 +49,11 @@ const DailyStats = (() => {
     // العدّ والصوت والاهتزاز صاروا في tasbih.js: نفس العدّاد بالرئيسية وصفحة التسبيح ووضع التسبيح
     const INDEX_KEY = 'mudhakkir-home-dhikr-index';
     let index = Number(localStorage.getItem(INDEX_KEY) || 0);
-    const format = n => Number(n).toLocaleString('ar-EG');
+    const format = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const render = s => {
         // العدّاد يتدحرج (fx.js)، وإن لم يتوفر نكتب الرقم مباشرة
         if (typeof FX !== 'undefined') FX.ticker(countEl, s.count); else countEl.textContent = format(s.count);
-        orb.style.setProperty('--p', String(s.progress)); // الحلقة تكتمل مع العدد المختار (٣٣ افتراضيًا)
+        orb.style.setProperty('--p', String(s.progress)); // الحلقة تكتمل مع العدد المختار (33 افتراضيًا)
         if (soundToggle) { soundToggle.textContent = `الصوت: ${s.soundOn ? 'تشغيل' : 'إيقاف'}`; soundToggle.setAttribute('aria-pressed', String(s.soundOn)); }
     };
     const showDhikr = () => { if (!Array.isArray(window.GENERAL_ADHKAR_LIST) && typeof GENERAL_ADHKAR_LIST === 'undefined') return; const list = typeof GENERAL_ADHKAR_LIST !== 'undefined' ? GENERAL_ADHKAR_LIST : []; if (!list.length) return; index = (index + 1) % list.length; if (typeof FX !== 'undefined') FX.textIn(dhikrText, list[index]); else dhikrText.textContent = list[index]; dhikrSource.textContent = `ذكر مقترح · ${format(index + 1)} من ${format(list.length)}`; localStorage.setItem(INDEX_KEY, index); };

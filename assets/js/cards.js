@@ -1,20 +1,20 @@
 /* =====================================================================
- * مُذكّر — cards.js  (الإصدار ٢٣، معرض ١٠: ن٣ ص١ ق١ د٣ · الإصدار ٢٤، معرض ١١: كل الخلفيات وزر فاتح/داكن ل١)
+ * مُذكّر — cards.js  (الإصدار 23، معرض 10: ن3 ص1 ق1 د3 · الإصدار 24، معرض 11: كل الخلفيات وزر فاتح/داكن ل1)
  * «صنع بطاقة»: أي ذكر أو آية ← بطاقة للمشاركة أو خلفية للجهاز، بالخلفيات المرسومة (cardart.js).
- *   Cards.open(item)  ← شاشة الصنع بملء الشاشة (ص١): فاتح/داكن، الخلفيات، المقاس (خلفية لجهازي / ستوري / مربّع)،
+ *   Cards.open(item)  ← شاشة الصنع بملء الشاشة (ص1): فاتح/داكن، الخلفيات، المقاس (خلفية لجهازي / ستوري / مربّع)،
  *                        «بلا كتابة»، «رسمة تانية»، حفظ ومشاركة. item: { kind: 'ayah'|'dhikr', text, ref } أو null للخلفية لحالها
- *   صفحة «صنع بطاقة» (ق١، من الإعدادات د٣): آياتي (العلامات والتمييز والملاحظات)، ورد اليوم، والأذكار (متل المصحف: من زر البطاقة بأي ذكر).
+ *   صفحة «صنع بطاقة» (ق1، من الإعدادات د3): آياتي (العلامات والتمييز والملاحظات)، ورد اليوم، والأذكار (متل المصحف: من زر البطاقة بأي ذكر).
  * «خلفية لجهازي» بمقاس الشاشة الحقيقي، والنص بعيد عن الساعة والأيقونات. «مُذكّر» بيطلع زغير بس بالمشاركة.
  * المداخل التانية: زر البطاقة بعارض الأذكار، «صنع بطاقة» بالضغط المطوّل على الآية، وزر «بطاقة» بوضع التركيز بالورد.
  * يعتمد على CardArt و AyahStore و QuranData و Wird و AdhkarViewer و FocusTools و Immersive و Toast.
  * ===================================================================== */
 const Cards = (() => {
     const $ = id => document.getElementById(id);
-    const ar = n => Number(n).toLocaleString('ar-EG');
+    const ar = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const KEY_STYLE = 'mudhakkir-card-style', KEY_SIZE = 'mudhakkir-card-size', KEY_MODE = 'mudhakkir-card-mode';
     const SIZES = ['device', 'story', 'square'];
-    // mode: فاتح أو داكن (ل١)، أول مرة حسب مظهر التطبيق وبعدين حسب آخر اختيار
+    // mode: فاتح أو داكن (ل1)، أول مرة حسب مظهر التطبيق وبعدين حسب آخر اختيار
     // photo: صورة المستخدم المختارة { id, img, fit, zoom, ox, oy } أو null للخلفيات المرسومة
     let item = null, style = 'forest', size = 'device', mode = '', bare = false, seed = 1, busy = false, thumbsMode = '', tab = 'mine';
     let photo = null, photos = [], lastGeom = null;
@@ -45,7 +45,7 @@ const Cards = (() => {
     function render(canvas, W, H, kind, sign) {
         canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
-        // صورة المستخدم (ك١): التطبيق بيختار مكان الكتابة ولونها حسب الصورة نفسها
+        // صورة المستخدم (ك1): التطبيق بيختار مكان الكتابة ولونها حسب الصورة نفسها
         if (photo) {
             const g = CardArt.photo(ctx, W, H, photo.img, photo);
             if (!bare && item) { const st = CardArt.photoStyle(canvas, kind); CardArt.text(ctx, W, H, item, { kind, layout: st.layout, style: st, sign }); }
@@ -56,8 +56,8 @@ const Cards = (() => {
         return null;
     }
 
-    // ---------- «أضف خلفية»: صور المستخدم (ح١، بتبقى بجهازه بس) ----------
-    // آخر ٨ صور بـ IndexedDB، وإذا ما انفتح (تصفّح خاص قديم) بتضل لهالجلسة بس
+    // ---------- «أضف خلفية»: صور المستخدم (ح1، بتبقى بجهازه بس) ----------
+    // آخر 8 صور بـ IndexedDB، وإذا ما انفتح (تصفّح خاص قديم) بتضل لهالجلسة بس
     const PhotoStore = (() => {
         const MAX = 8; let dbp = null, mem = [];
         const db = () => dbp || (dbp = new Promise((res, rej) => {
@@ -81,7 +81,7 @@ const Cards = (() => {
         return new Promise((res, rej) => { const u = URL.createObjectURL(blob), im = new Image(); im.onload = () => { res(im); URL.revokeObjectURL(u); }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error('decode')); }; im.src = u; });
     }
     const toBlob = (c, type, q) => new Promise(res => c.toBlob(res, type, q));
-    // الصورة بتتصغّر لـ ٢٥٦٠ بكسل (كافي لأي شاشة) قبل ما تنحفظ، ومعها صورة مصغّرة للشريط
+    // الصورة بتتصغّر لـ 2560 بكسل (كافي لأي شاشة) قبل ما تنحفظ، ومعها صورة مصغّرة للشريط
     async function importFile(file) {
         const src = await decode(file), k = Math.min(1, 2560 / Math.max(src.width, src.height)), c = document.createElement('canvas');
         c.width = Math.max(1, Math.round(src.width * k)); c.height = Math.max(1, Math.round(src.height * k));
@@ -120,7 +120,7 @@ const Cards = (() => {
             if ($('card-maker').hidden) await open(null, rec.id); else await selectPhoto(rec.id);
         } catch (err) { Toast.show('ما قدرنا نفتح هالصورة، جرّب وحدة تانية'); }
     }
-    // ق٣: سحب الصورة بإصبع، وتكبير بإصبعين أو بعجلة الفأرة
+    // ق3: سحب الصورة بإصبع، وتكبير بإصبعين أو بعجلة الفأرة
     function bindPhotoGestures() {
         const cv = $('cm-canvas'), pts = new Map(); let startD = 1, startZ = 1, raf = 0;
         const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -148,7 +148,7 @@ const Cards = (() => {
         cv.addEventListener('wheel', e => { if (!photo) return; e.preventDefault(); photo.zoom = clamp(photo.zoom * (e.deltaY < 0 ? 1.07 : 1 / 1.07), 1, 4); repaint(); }, { passive: false });
     }
 
-    // ---------- شاشة الصنع (ص١) ----------
+    // ---------- شاشة الصنع (ص1) ----------
     function paintPreview() {
         const stage = $('cm-stage'), cv = $('cm-canvas'), s = spec();
         const maxW = Math.max(120, stage.clientWidth - 32), maxH = Math.max(160, stage.clientHeight - 16);
@@ -157,7 +157,7 @@ const Cards = (() => {
         lastGeom = render(cv, Math.round(cw * dpr), Math.round(ch * dpr), s.kind, false);
         cv.setAttribute('aria-label', `معاينة البطاقة: ${photo ? 'صورتك' : `${CardArt.STYLES[style].name}، ${mode === 'dark' ? 'داكنة' : 'فاتحة'}`}${item && !bare ? '' : '، بلا كتابة'}`);
     }
-    // الشريط: «+ أضف خلفية»، وبعدها صورك (ح١)، وبعدها الخلفيات المرسومة
+    // الشريط: «+ أضف خلفية»، وبعدها صورك (ح1)، وبعدها الخلفيات المرسومة
     // الصور المرسومة المصغّرة بتنرسم من جديد بس لما يتغيّر الفاتح والداكن
     function paintThumbs() {
         const box = $('cm-thumbs');
@@ -267,7 +267,7 @@ const Cards = (() => {
         Toast.show(spec().kind === 'desktop' ? 'انحفظت ✓ افتحها وكبس يمين ← «تعيين كخلفية»' : 'انحفظت ✓ من الصور: مشاركة ← «استخدام كخلفية»');
     }
 
-    // ---------- صفحة «صنع بطاقة» (ق١) ----------
+    // ---------- صفحة «صنع بطاقة» (ق1) ----------
     let rows = [];
     async function ayahText(s, a, page) {
         if (!page) return '';
@@ -305,7 +305,7 @@ const Cards = (() => {
             paintList(rows.length < marks.length ? 'في آيات ما قدرنا نجيب نصها هلّق، بتبين لما يكون في نت.' : '');
             return;
         }
-        // ورد اليوم: آيات صفحات ورد اليوم (أول ٦ صفحات)
+        // ورد اليوم: آيات صفحات ورد اليوم (أول 6 صفحات)
         let snap = null;
         try { snap = Wird.snapshot(); } catch (e) {}
         if (!snap || !snap.from) { paintList('<div class="cd-empty"><p>لسا ما في ورد. جهّز خطة الورد من صفحة القرآن.</p></div>'); return; }
@@ -318,7 +318,7 @@ const Cards = (() => {
                 if (tab !== my) return;
                 ayahs.forEach(x => rows.push({ kind: 'ayah', text: QuranData.verseText(x), ref: ayahRefText(x.surah.number, x.numberInSurah), label: `${surahName(x.surah.number)} ${ar(x.numberInSurah)}، صفحة ${ar(p)}` }));
             }
-            paintList(pages.length < (snap.to - snap.from + 1) ? 'هي آيات أول ٦ صفحات من ورد اليوم.' : '');
+            paintList(pages.length < (snap.to - snap.from + 1) ? 'هي آيات أول 6 صفحات من ورد اليوم.' : '');
         } catch (e) {
             if (tab !== my) return;
             paintList(rows.length ? 'ما قدرنا نجيب باقي الصفحات، تأكد من النت.' : '<div class="cd-empty"><p>ما قدرنا نجيب آيات ورد اليوم. تأكد من النت.</p></div>');

@@ -1,9 +1,9 @@
 /* =====================================================================
- * مُذكّر — screen.js  (الإصدار ١٦، معرض ٩: س١ س٢ س٣)
+ * مُذكّر — screen.js  (الإصدار 16، معرض 9: س1 س2 س3)
  * «شاشة مُذكّر»: شاشة كاملة بتنحط على الطاولة أو التلفزيون، متل أدوات الجوال:
  *   الساعة، والتاريخ الميلادي والهجري، وورد اليوم وتقدّمه، وذكر الوقت (الصباح أو المساء)، وآية أو حديث اليوم.
  *   ثلاث أنماط، وكل جهاز إله نمطه تلقائيًا (وبيقدر يغيّره):
- *     س٢ «بطاقات متل الأدوات» للجوال والتابلت · س١ «لوحة التلفزيون» للتلفزيون · س٣ «هادئة لليل» للابتوب
+ *     س2 «بطاقات متل الأدوات» للجوال والتابلت · س1 «لوحة التلفزيون» للتلفزيون · س3 «هادئة لليل» للابتوب
  *   الشاشة ما بتطفي (KeepAwake)، والأدوات (إغلاق والنمط) بتطلع بضغطة. الخروج: × أو Esc أو زر الرجوع.
  *   بالنمطين الغامقين الكلام بيتزحزح بكسلات قليلة كل دقيقة حتى ما يعلّم عالشاشة (OLED والتلفزيون).
  * الفتح: زر الرئيسية، الإعدادات، ‎?open=screen‎ (اختصار الأيقونة)، والمساعد.
@@ -14,7 +14,7 @@
 const MdkScreen = (() => {
     const $ = id => document.getElementById(id);
     const KEY = 'mudhakkir-screen';
-    const AR = n => Number(n).toLocaleString('ar-EG');
+    const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
     const root = $('mdk-screen'), body = $('scr-body');
@@ -34,19 +34,19 @@ const MdkScreen = (() => {
 
     // ---------- المحتوى ----------
     function clockParts(d = new Date()) {
-        const parts = new Intl.DateTimeFormat('ar-EG', { hour: 'numeric', minute: '2-digit' }).formatToParts(d);
+        const parts = new Intl.DateTimeFormat('ar-EG-u-nu-latn', { hour: 'numeric', minute: '2-digit' }).formatToParts(d);
         const time = parts.filter(p => p.type !== 'dayPeriod').map(p => p.value).join('').trim();
         const period = (parts.find(p => p.type === 'dayPeriod') || {}).value || '';
         return { time, period };
     }
-    const greg = () => new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+    const greg = () => new Date().toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' });
     const hijri = () => { try { return (typeof Hijri !== 'undefined' && Hijri.today()?.text) || ''; } catch (e) { return ''; } };
     // الصباح من الفجر للعصر تقريبًا، والمساء بعده
     const isMorning = () => { const h = new Date().getHours(); return h >= 3 && h < 15; };
     // المحتوى (الأذكار القصيرة، آيات وأحاديث اليوم) من assets/data/widget-content.json:
     // نفس الملف يلي بتقرا منه الأدوات برّا التطبيق (worker.js ← /widget)، فالشاشة والأدوات بيعرضوا نفس الشي.
     // محفوظ بالـ Service Worker، فبيشتغل بلا نت. وإذا ما وصل لسبب ما منعرض المحتوى الاحتياطي.
-    const FALLBACK = { ayat: [['أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', 'الرعد ٢٨']], hadith: [['أَحَبُّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ', 'متفق عليه']], morning: [], evening: [] };
+    const FALLBACK = { ayat: [['أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', 'الرعد 28']], hadith: [['أَحَبُّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ', 'متفق عليه']], morning: [], evening: [] };
     let content = null;
     function loadContent() {
         if (content) return Promise.resolve(content);
@@ -81,7 +81,7 @@ const MdkScreen = (() => {
             return { pct, range, title: w.rangeTitle || '', streak: w.streak || 0, done: !!w.done || pct >= 100, complete: !!w.complete };
         } catch (e) { return { pct: 0, range: '', title: '', streak: 0, done: false, complete: false }; }
     }
-    // ملاحظة: ما منحط «·» جنب الأرقام العربية لأنها بتبيّن متل الصفر (٣· بتنقرا ٣٠)، منستعمل الفاصلة
+    // ملاحظة: ما منحط «·» جنب الأرقام العربية لأنها بتبيّن متل الصفر (3· بتنقرا 30)، منستعمل الفاصلة
     const wirdLine = w => (w.complete ? 'الختمة كاملة، تقبّل الله' : w.done ? 'ورد اليوم تمّ، تقبّل الله' : `ورد اليوم ${AR(w.pct)}٪${w.range ? '، ' + w.range : ''}`);
     const streakText = n => (n > 0 ? `سلسلة ${AR(n)} ${n === 1 ? 'يوم' : n === 2 ? 'يومين' : n <= 10 ? 'أيام' : 'يوم'}` : 'ابدأ سلسلتك اليوم');
 
@@ -112,7 +112,7 @@ const MdkScreen = (() => {
                 <article class="scr-card c-daily">${dailyHtml(d)}</article>
                 <article class="scr-card c-dhikr">${dhikrHtml(k)}</article>`;
         } else {
-            // س٣ هادئة: الساعة كبيرة، وتحتها سطر واحد بيتبدّل بهدوء (الورد، الذكر، آية أو حديث اليوم)
+            // س3 هادئة: الساعة كبيرة، وتحتها سطر واحد بيتبدّل بهدوء (الورد، الذكر، آية أو حديث اليوم)
             const lines = [wirdLine(w), k.text, `${d.text} (${d.src})`];
             body.innerHTML = `${clockHtml()}${dateHtml()}<p class="s3-line">${esc(lines[0])}</p>`;
             let i = 0;

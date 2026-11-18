@@ -37,6 +37,14 @@ const Install = (() => {
         desktop: [`اضغط أيقونة التثبيت ${k(ICON.install)} في آخر شريط العنوان`, `أو من القائمة ${k(ICON.dots)} اختر <b>«تثبيت مُذكّر»</b>`, 'اضغط <b>«تثبيت»</b> ويفتح كتطبيق مستقل'],
         inapp: ['اضغط <b>«تثبيت التطبيق»</b> لنسخ الرابط', `افتحه في <b>${isIOS ? 'Safari' : 'Chrome'}</b>`, 'واضغط «تثبيت التطبيق» هناك']
     };
+    // الإصدار 29: الخطوات بالإنجليزي (فيها أيقونات وخط عريض، فما بتنفع ترجمة القطع لحالها)
+    if (typeof I18n !== 'undefined' && I18n.isEn) Object.assign(STEPS, {
+        android: [`Tap the menu ${k(ICON.dots)} at the top of Chrome`, 'Choose <b>“Install app”</b> or “Add to Home screen”', 'Tap <b>“Install”</b> and it appears with your apps'],
+        samsung: [`Tap the menu ${k(ICON.lines)} at the bottom`, 'Choose <b>“Add page to”</b>', 'Then <b>“Home screen”</b>'],
+        ios: ['Open the site in <b>Safari</b>', `Tap the share button ${k(ICON.share)}`, 'Choose <b>“Add to Home Screen”</b>, then “Add”'],
+        desktop: [`Click the install icon ${k(ICON.install)} at the end of the address bar`, `Or from the menu ${k(ICON.dots)} choose <b>“Install Mudhakkir”</b>`, 'Click <b>“Install”</b> and it opens as its own app'],
+        inapp: ['Tap <b>“Install app”</b> to copy the link', `Open it in <b>${isIOS ? 'Safari' : 'Chrome'}</b>`, 'And tap “Install app” there']
+    });
     const platform = () => inApp ? 'inapp' : isIOS ? 'ios' : isSamsung ? 'samsung' : isAndroid ? 'android' : 'desktop';
 
     // حالة «مثبّت مسبقًا لكن لا أجده» (مشكلة شائعة بعد حذف الأيقونة فقط)
@@ -84,7 +92,7 @@ const Install = (() => {
 
     async function onInstall(e) {
         const btn = e.currentTarget;
-        // ١) التثبيت المباشر بضغطة
+        // 1) التثبيت المباشر بضغطة
         if (deferred) {
             const prompt = deferred; deferred = null;
             prompt.prompt();
@@ -95,16 +103,16 @@ const Install = (() => {
             render();
             return;
         }
-        // ٢) داخل واتساب/إنستغرام: ننسخ الرابط ليُفتح في المتصفح
+        // 2) داخل واتساب/إنستغرام: ننسخ الرابط ليُفتح في المتصفح
         if (inApp) {
             try { await navigator.clipboard.writeText(SITE_URL); Toast.show(`تم نسخ الرابط، افتحه في ${isIOS ? 'Safari' : 'Chrome'} ثم اضغط «تثبيت التطبيق»`); }
             catch (err) { Toast.show(`افتح الرابط في ${isIOS ? 'Safari' : 'Chrome'}: ${SITE_URL}`); }
             highlight(btn);
             return;
         }
-        // ٣) آيفون: النظام لا يسمح بالتثبيت من زر، نوضح الخطوات
+        // 3) آيفون: النظام لا يسمح بالتثبيت من زر، نوضح الخطوات
         if (isIOS) { Toast.show('على الآيفون والآيباد: اتبع الخطوات الظاهرة تحت الزر ↓'); highlight(btn); return; }
-        // ٤) أندرويد/كمبيوتر دون تثبيت مباشر: هل هو مثبّت أصلًا؟
+        // 4) أندرويد/كمبيوتر دون تثبيت مباشر: هل هو مثبّت أصلًا؟
         installedHere = await checkInstalledHere();
         render();
         if (installedHere) { Toast.show('مُذكّر مثبّت مسبقًا على هذا الجهاز، التفاصيل تحت ↓'); highlight(btn); return; }

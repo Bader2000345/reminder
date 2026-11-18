@@ -45,10 +45,10 @@ function themeIsDark() {
 }
 function themeStatusText() {
     if (themeMode !== 'sun') return 'اختر المظهر المناسب لك';
-    if (!sunCoords) return 'حسب الوقت: داكن من ٦ مساءً حتى ٦ صباحًا (لم يُحدَّد موقعك)';
+    if (!sunCoords) return 'حسب الوقت: داكن من 6 مساءً حتى 6 صباحًا (لم يُحدَّد موقعك)';
     const s = sunTimes(new Date(), sunCoords.lat, sunCoords.lon);
     if (s.polar) return 'حسب موقعك';
-    const t = d => d.toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' });
+    const t = d => d.toLocaleTimeString('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' });
     return `حسب موقعك: فاتح من الشروق ${t(s.rise)} حتى الغروب ${t(s.set)}`;
 }
 function applyTheme(origin) {
@@ -56,7 +56,7 @@ function applyTheme(origin) {
     try { localStorage.setItem(THEME_DARK_KEY, dark ? '1' : '0'); } catch (e) {}
     document.querySelectorAll('[data-theme-opt]').forEach(b => b.classList.toggle('active', b.dataset.themeOpt === themeMode));
     const status = document.getElementById('theme-status'); if (status) status.textContent = themeStatusText();
-    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = dark ? '#08110e' : '#0b4234';
+    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = dark ? '#161915' : '#F1F0EA';
     if (dark === document.body.classList.contains('dark-mode')) return;
     const html = document.documentElement;
     // أثناء التبديل ما في ولا انتقال لون (theme-fade بـ 14-performance.css): الألوان الجديدة بتطلع دفعة وحدة
@@ -64,7 +64,7 @@ function applyTheme(origin) {
     let cleared = false;
     const done = () => { if (cleared) return; cleared = true; requestAnimationFrame(() => html.classList.remove('theme-fade')); };
     setTimeout(done, 500); // أمان: لو المتصفح تخطّى الحركة أو علّقت، الانتقالات بترجع
-    // الإصدار ١٥: تلاشٍ سريع ٢٠٠ms (بدل الدائرة)، الشكل الجديد بيظهر فوق القديم
+    // الإصدار 15: تلاشٍ سريع 200ms (بدل الدائرة)، الشكل الجديد بيظهر فوق القديم
     if (origin && document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches && !document.hidden) {
         const vt = document.startViewTransition(flip);
         // إن تخطّى المتصفح الحركة (تبويب مخفي مثلًا) يبقى التبديل نفسه مطبّقًا
@@ -80,7 +80,7 @@ function setThemeMode(mode, origin) {
             sunCoords = { lat: +p.coords.latitude.toFixed(2), lon: +p.coords.longitude.toFixed(2) };
             try { localStorage.setItem(SUN_KEY, JSON.stringify(sunCoords)); } catch (e) {}
             applyTheme(origin);
-        }, () => Toast.show('تعذّر تحديد موقعك، سنعتمد على الوقت (٦ص – ٦م)'), { maximumAge: 864e5, timeout: 15000 });
+        }, () => Toast.show('تعذّر تحديد موقعك، سنعتمد على الوقت (6ص – 6م)'), { maximumAge: 864e5, timeout: 15000 });
     }
 }
 document.querySelectorAll('[data-theme-opt]').forEach(b => b.addEventListener('click', e => setThemeMode(b.dataset.themeOpt, { x: e.clientX, y: e.clientY })));

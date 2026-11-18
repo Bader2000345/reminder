@@ -17,12 +17,12 @@ const Assistant = (() => {
     const DATA_CACHE = 'mudhakkir-data';
     const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-    const ar = n => Number(n).toLocaleString('ar-EG');
+    const ar = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const today = () => new Date().toISOString().slice(0, 10);
     const isMobile = () => matchMedia('(max-width:700px)').matches;
     const pick = list => list[Math.floor(Math.random() * list.length)];
     const nameOf = () => (typeof UserName !== 'undefined' ? UserName.get() : '');
-    const timeOf = t => new Date(t || Date.now()).toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' });
+    const timeOf = t => new Date(t || Date.now()).toLocaleTimeString('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' });
     // نص «التفكير» الذي قد يرسله بعض النماذج قبل الرد
     const stripThink = t => String(t || '').replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/<think>[\s\S]*$/i, '').replace(/^\s+/, '');
 
@@ -35,7 +35,7 @@ const Assistant = (() => {
             const d = JSON.parse(localStorage.getItem(KEY));
             if (d && Array.isArray(d.msgs)) {
                 msgs = d.msgs.filter(m => m && m.text);
-                // الإصدار ٦ غيّر ترتيب أذكار الصلاة: بطاقات المحادثات القديمة قد تشير لذكر آخر
+                // الإصدار 6 غيّر ترتيب أذكار الصلاة: بطاقات المحادثات القديمة قد تشير لذكر آخر
                 if ((d.v || 1) < 2) msgs.forEach(m => { m.text = m.text.replace(/\[\[post_prayer:\d+\]\]/g, ''); });
             }
         } catch (e) {}
@@ -71,7 +71,7 @@ const Assistant = (() => {
             friday: safe(() => FridayReminder.isOn()), version: safe(() => APP_BUILD),
             update: !!($('update-banner') && !$('update-banner').hidden),
             time: `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`,
-            day: now.toLocaleDateString('ar', { weekday: 'long' }),
+            day: now.toLocaleDateString('ar-u-nu-latn', { weekday: 'long' }),
             daytime: document.documentElement.dataset.daytime,
             page: (document.querySelector('.page-view.active-page')?.id || '').replace('page-', ''),
             wird: w ? { khatma: Math.round(w.khatmaPct) || 0, today: Math.round(w.todayPct) || 0, streak: Math.round(w.streak) || 0 } : undefined
@@ -87,7 +87,7 @@ const Assistant = (() => {
         general: () => { navigateTo('my-adhkar'); later(() => $('general-reminder-card')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300); },
         reminder: () => { navigateTo('my-adhkar'); later(() => Reminders.openForm()); },
         templates: () => { navigateTo('my-adhkar'); later(() => $('rem-templates')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 350); },
-        month: () => { navigateTo('home'); later(() => WeekLog.openMonth(), 350); },
+        month: () => { navigateTo('quran'); later(() => WeekLog.openMonth(), 350); }, // الإصدار 28: صارت تحت «ختمتك» بصفحة القرآن
         kahf: () => FridayReminder.openKahf(),
         wird: () => navigateTo('quran', 'wird'),
         reader: () => { navigateTo('quran'); Reader.enter(); },
@@ -159,7 +159,7 @@ const Assistant = (() => {
         if (it.hadith) {
             // الدليل مطوي افتراضيًا حتى تبقى المحادثة خفيفة
             const q = el('blockquote', 'ask-card-hadith', it.hadith); q.hidden = true;
-            if (it.source) q.append(el('cite', '', it.source.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d])));
+            if (it.source) q.append(el('cite', '', it.source));
             const t = btn('الدليل ▾', () => { q.hidden = !q.hidden; t.textContent = q.hidden ? 'الدليل ▾' : 'إخفاء الدليل ▴'; t.setAttribute('aria-expanded', String(!q.hidden)); }, 'is-proof');
             t.setAttribute('aria-expanded', 'false');
             c.append(q);

@@ -7,10 +7,43 @@
 // 2. عارض الأذكار: صفحة لكل ذكر مع الدليل، عدّاد، وتقليب ثلاثي الأبعاد
 const AdhkarViewer = (() => {
     const $ = id => document.getElementById(id);
-    const ar = n => Number(n).toLocaleString('ar-EG');
+    const ar = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     const CORNER = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M2 38V14C2 7 7 2 14 2h24" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 38V18c0-6 4-10 10-10h20" fill="none" stroke="currentColor" stroke-width=".8"/><circle cx="14" cy="14" r="2.6" fill="currentColor"/></svg>';
-    let group = null, items = [], idx = 0, counts = [], busy = false, swiped = false;
+    let group = null, groupKey = '', items = [], idx = 0, counts = [], busy = false, swiped = false;
+    // الإصدار 28: «كمّل من وين وقفت» (الورشة). منحفظ آخر قسم ووين وصلت فيه، ومنمسحو لما يخلص القسم
+    const RESUME_KEY = 'mudhakkir-adhkar-resume';
+    const RESUME_MAX = 18 * 3600e3; // بعد 18 ساعة بيصير قسم جديد، ما في داعي نذكّر بالقديم
+    const readResume = () => {
+        try {
+            const r = JSON.parse(localStorage.getItem(RESUME_KEY) || 'null');
+            if (!r || typeof ADHKAR_DATABASE === 'undefined' || !ADHKAR_DATABASE[r.key] || Date.now() - r.at > RESUME_MAX) return null;
+            if (!Array.isArray(r.counts) || r.counts.length !== ADHKAR_DATABASE[r.key].items.length) return null;
+            return r;
+        } catch (e) { return null; }
+    };
+    function saveResume() {
+        if (!group || !groupKey) return;
+        const started = idx > 0 || counts.some(c => c > 0);
+        const finished = items.every((_, i) => isDone(i));
+        try {
+            if (!started || finished) localStorage.removeItem(RESUME_KEY);
+            else localStorage.setItem(RESUME_KEY, JSON.stringify({ key: groupKey, idx, counts, at: Date.now() }));
+        } catch (e) {}
+        paintResume();
+    }
+    // بطاقة «كمّل من وين وقفت» بصفحة الأذكار
+    function paintResume() {
+        const box = $('adhkar-resume'); if (!box) return;
+        const r = readResume();
+        box.hidden = !r;
+        if (!r) return;
+        const data = ADHKAR_DATABASE[r.key], list = data.items;
+        const done = list.reduce((s, it, i) => s + ((totalOf(it) === 0 || r.counts[i] >= totalOf(it)) ? 1 : 0), 0);
+        $('adhkar-resume-title').textContent = data.title;
+        $('adhkar-resume-sub').textContent = `وصلت ${ar(r.idx + 1)} من ${ar(list.length)}`;
+        $('adhkar-resume-bar').style.width = Math.round(done / list.length * 100) + '%';
+    }
 
     const timesLabel = n => n === 1 ? '' : n === 2 ? 'مرّتان' : n <= 10 ? `${ar(n)} مرات` : `${ar(n)} مرة`;
     const totalOf = it => it.list ? 0 : it.seq ? it.seq.reduce((s, x) => s + x.count, 0) : (it.count || 1);
@@ -58,7 +91,7 @@ const AdhkarViewer = (() => {
         }
         if (foot.length) {
             const ol = el('ol', 'dk-foot');
-            foot.forEach((f, k) => { const li = el('li'); li.append(el('b', '', `(${ar(k + 1)}) `), document.createTextNode(f.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]))); ol.append(li); });
+            foot.forEach((f, k) => { const li = el('li'); li.append(el('b', '', `(${ar(k + 1)}) `), document.createTextNode(f)); ol.append(li); });
             inner.append(ol);
         }
         page.append(inner);
@@ -129,25 +162,29 @@ const AdhkarViewer = (() => {
             .catch(() => {}).then(() => { try { a.finish(); } catch (e) {} });
     }
 
+    // الإصدار 28 «رزمة بطاقات» (الورشة): البطاقة يلي خلصت بتطوي لفوق، والجاية بتطلع من ورا.
+    // والرجوع لورا بيعمل العكس. (قبل كانت صفحة كتاب بتنقلب)
     async function show(next, dir = 0) {
         if (busy || next < 0 || next >= items.length) return;
         const book = $('dk-book');
         const old = book.firstElementChild;
         busy = true;
-        // الصفحة التالية تُقلب من اليسار (اتجاه الكتاب العربي)
-        const origin = dir > 0 ? 'left center' : 'right center';
         if (old && dir) {
-            old.style.transformOrigin = origin;
-            await play(old, [{ transform: 'perspective(1600px) rotateY(0)', opacity: 1 }, { transform: `perspective(1600px) rotateY(${dir > 0 ? 75 : -75}deg)`, opacity: 0 }], 260, 'cubic-bezier(.4,0,.8,.4)');
+            await play(old, dir > 0
+                ? [{ transform: 'none', opacity: 1 }, { transform: 'translateY(-26px) scale(.97)', opacity: 0 }]
+                : [{ transform: 'none', opacity: 1 }, { transform: 'translateY(18px) scale(.94)', opacity: 0 }], 200, 'cubic-bezier(.7,0,.84,0)');
         }
         idx = next;
         const page = buildPage(idx);
-        page.style.transformOrigin = origin;
         book.replaceChildren(page);
         fit(page);
         $('dk-stage').scrollTop = 0;
         paintChrome(); paintCounter();
-        if (dir) play(page, [{ transform: `perspective(1600px) rotateY(${dir > 0 ? -75 : 75}deg)`, opacity: 0 }, { transform: 'perspective(1600px) rotateY(0)', opacity: 1 }], 380, 'cubic-bezier(.2,.7,.2,1)');
+        book.classList.toggle('is-last', idx === items.length - 1);
+        if (dir) play(page, dir > 0
+            ? [{ transform: 'translateY(16px) scale(.95)', opacity: .5 }, { transform: 'none', opacity: 1 }]
+            : [{ transform: 'translateY(-22px) scale(.97)', opacity: 0 }, { transform: 'none', opacity: 1 }], 300, 'cubic-bezier(.16,1,.3,1)');
+        if (dir) saveResume();
         busy = false;
     }
 
@@ -160,7 +197,7 @@ const AdhkarViewer = (() => {
         try { if (navigator.vibrate) navigator.vibrate(counts[idx] >= total ? [20, 40, 30] : 12); } catch (e) {}
         const btn = $('dk-counter');
         btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
-        paintCounter(); paintChrome();
+        paintCounter(); paintChrome(); saveResume();
         if (counts[idx] >= total) {
             $('dk-book').firstElementChild?.classList.add('is-done');
             if (idx < items.length - 1) setTimeout(() => show(idx + 1, 1), 520);
@@ -170,14 +207,17 @@ const AdhkarViewer = (() => {
 
     // يُفتح بملء الشاشة (دون شريط التنقل) ويُغلق بزر «الأقسام» أو زر الرجوع في الجوال
     // start: رقم الذكر الذي يُفتح عليه (من المساعد مثلًا)
-    function open(key, start = 0) {
+    // restore: عدّات محفوظة («كمّل من وين وقفت»)
+    function open(key, start = 0, restore = null) {
         const data = ADHKAR_DATABASE[key]; if (!data) return;
-        group = data; items = data.items; counts = items.map(() => 0); idx = 0;
+        group = data; groupKey = key; items = data.items; idx = 0;
+        counts = Array.isArray(restore) && restore.length === items.length ? restore.map(n => Math.max(0, n | 0)) : items.map(() => 0);
         const root = $('adhkar-detail');
         $('adhkar-detail-title').textContent = data.title;
         root.dataset.group = key.startsWith('sit-') ? 'situations' : key; // جوّ خاص لكل قسم (10-atmosphere.css)
         root.hidden = false;
-        Immersive.enter(root, { onClose: close });
+        // الإصدار 28: الأدوات (الرجوع والعدد) ضلّت ظاهرة، لأنو الكبسة عالبطاقة صارت تعدّ
+        Immersive.enter(root, { onClose: close, hideAfter: 0 });
         $('dk-book').replaceChildren();
         show(Math.min(Math.max(0, start | 0), items.length - 1));
         $('dk-counter').focus({ preventScroll: true });
@@ -258,9 +298,16 @@ const AdhkarViewer = (() => {
             card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSituations(); } });
         });
         $('adhkar-back').addEventListener('click', () => close());
-        Immersive.bindTap($('adhkar-detail'), $('dk-stage'), () => swiped);
+        // الإصدار 28: كبسة عالبطاقة = عدّة (متل زر العدّاد)، والسحب للتنقّل
+        $('dk-stage').addEventListener('click', ev => {
+            if (swiped || ev.target.closest('button, a, input, select, textarea, label, summary, details')) return;
+            if (ev.target.closest('.dk-page')) tap();
+        });
         addEventListener('resize', () => { const p = $('dk-book').firstElementChild; if (p && !$('adhkar-detail').hidden) fit(p); });
-        $('dk-hint').textContent = matchMedia('(hover: hover)').matches ? 'اضغط العدّاد للتسبيح · الأسهم ← → للتنقّل · Esc للعودة' : 'اضغط على الصفحة لإظهار زر العودة · اسحب للتنقّل';
+        $('dk-hint').textContent = matchMedia('(hover: hover)').matches ? 'اكبس عالبطاقة أو العدّاد لتعدّ · الأسهم ← → للتنقّل · Esc للعودة' : 'اكبس عالبطاقة لتعدّ · اسحب للتنقّل';
+        // «كمّل من وين وقفت»
+        $('adhkar-resume')?.addEventListener('click', () => { const r = readResume(); if (r) open(r.key, r.idx, r.counts); });
+        paintResume();
         $('dk-prev').addEventListener('click', () => show(idx - 1, -1));
         $('dk-next').addEventListener('click', () => show(idx + 1, 1));
         $('dk-counter').addEventListener('click', tap);

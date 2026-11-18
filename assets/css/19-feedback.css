@@ -1,7 +1,7 @@
 /* =====================================================================
- * مُذكّر — 19-feedback.css  (الإصدار ٢٠، معرض ٩)
- * «ملاحظات وشكاوي» (ل١)، صندوق الرسائل على جهاز المطوّر (ص١)، بطاقات الرئيسية: «وصلك رد» (ر٢) والإعلان (ع١)،
- * صفحة القفل (ق٢) وصفحة المطوّرين (ط٣). كل الألوان من متغيرات التطبيق، فالفاتح والداكن وألوان الوقت بيمشوا لحالهم.
+ * مُذكّر — 19-feedback.css  (الإصدار 20، معرض 9)
+ * «ملاحظات وشكاوي» (ل1)، صندوق الرسائل على جهاز المطوّر (ص1)، بطاقات الرئيسية: «وصلك رد» (ر2) والإعلان (ع1)،
+ * صفحة القفل (ق2) وصفحة المطوّرين (ط3). كل الألوان من متغيرات التطبيق، فالفاتح والداكن وألوان الوقت بيمشوا لحالهم.
  * ===================================================================== */
 :root { --fb-complaint:#a3592e; --fb-idea:#7f5f22; --fb-bug:#b23f33; --fb-thanks:#0f5c48; --fb-field:color-mix(in srgb, var(--cream) 55%, var(--paper)); }
 body.dark-mode { --fb-complaint:#e0a37a; --fb-idea:#e0c27a; --fb-bug:#ef8d80; --fb-thanks:#6fd0ad; --fb-field:var(--surface-2); }
@@ -65,7 +65,7 @@ body.dark-mode .fb-back { color:var(--olive-dark); }
 .fb-pill { flex:none; padding:2px 10px; border-radius:8px; background:var(--gold-light); color:var(--gold-ink); font:600 12px var(--font-main); }
 .fb-pill[hidden] { display:none; }
 
-/* ---------- ر٢ «وصلك رد» + ع١ الإعلان (أول الرئيسية) ---------- */
+/* ---------- ر2 «وصلك رد» + ع1 الإعلان (أول الرئيسية) ---------- */
 .home-notes { display:flex; flex-direction:column; gap:10px; margin:0 0 16px; }
 .hn-card { position:relative; display:flex; border:1px solid color-mix(in srgb, var(--gold) 55%, transparent); border-radius:18px; background:var(--gold-light); color:var(--ink);
   box-shadow:var(--shadow); animation:hn-in var(--m-300, 300ms) var(--ease-out, ease-out) both; }
@@ -110,7 +110,7 @@ body.dark-mode .fb-back { color:var(--olive-dark); }
 .hn-inbox .hn-ic { color:var(--olive); }
 body.dark-mode .hn-inbox .hn-ic { color:var(--olive-dark); }
 
-/* ---------- ص١ صندوق الرسائل ---------- */
+/* ---------- ص1 صندوق الرسائل ---------- */
 .dv-badge { align-self:center; padding:3px 12px; border-radius:9px; background:var(--gold-light); color:var(--gold-ink); font:600 12.5px var(--font-main); }
 .dv-badge.is-ok { background:color-mix(in srgb, var(--fb-thanks) 13%, transparent); color:var(--fb-thanks); }
 .ib-filters { margin-top:2px; }
@@ -134,7 +134,7 @@ body.dark-mode .ib-dot { background:var(--olive-dark); }
 .ib-reply[hidden] { display:none; }
 .ib-actions, .dv-actions { display:flex; flex-wrap:wrap; gap:8px; }
 
-/* ---------- ق٢ صفحة القفل ---------- */
+/* ---------- ق2 صفحة القفل ---------- */
 .dv-lock { align-items:center; text-align:center; padding:28px 0 8px; }
 .dv-lock[hidden], .dv-main[hidden], .fb-user[hidden], .fb-inbox[hidden] { display:none; }
 .dv-lock-ic { width:64px; height:64px; display:grid; place-items:center; border-radius:20px; background:var(--gold-light); color:var(--gold-ink); }
@@ -149,7 +149,7 @@ body.dark-mode .ib-dot { background:var(--olive-dark); }
 .dv-eye[aria-pressed="true"] { color:var(--olive); }
 .dv-lock-form .primary-button { min-height:46px; }
 
-/* ---------- ط٣ صفحة المطوّرين ---------- */
+/* ---------- ط3 صفحة المطوّرين ---------- */
 .dv-main .page-header { margin-bottom:6px !important; }
 .dv-rows { display:flex; flex-direction:column; background:var(--paper); border:1px solid var(--card-line); border-radius:18px; overflow:hidden; box-shadow:var(--shadow); }
 .dv-row { display:flex; align-items:center; gap:12px; width:100%; min-height:64px; padding:12px 14px; border:0; border-bottom:1px solid var(--row-line, var(--line)); background:none; color:var(--ink); font:inherit; text-align:right; }
@@ -176,7 +176,10 @@ button.dv-row:hover { background:color-mix(in srgb, var(--ink) 3%, transparent);
 .dv-tile small { font-size:12.5px; color:var(--muted); }
 .dv-tz h2 { margin:0 0 4px; font:700 15px var(--font-main); color:var(--title-ink); }
 .dv-tz h2 small { font-weight:400; font-size:12px; color:var(--muted); }
-.dv-bar { display:grid; grid-template-columns:minmax(64px, 30%) 1fr 34px; gap:8px; align-items:center; font-size:13px; }
+.dv-bar { display:grid; grid-template-columns:minmax(0, 46%) minmax(0, 1fr); gap:10px; align-items:center; font-size:13px; padding:4px 0; }
+.dv-bar-t { display:flex; flex-direction:column; min-width:0; line-height:1.35; }
+.dv-bar-t b { font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dv-bar-t small { color:var(--muted); font-size:12px; }
 .dv-trk { height:8px; border-radius:4px; background:var(--surface-2); overflow:hidden; }
 .dv-trk i { display:block; height:100%; border-radius:4px; background:var(--olive); }
 body.dark-mode .dv-trk i { background:var(--olive-dark); }

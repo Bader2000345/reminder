@@ -1,24 +1,24 @@
 /* =====================================================================
- * مُذكّر — extras.js  (الإصدار ١٤)
- *   Hijri      إ٤ التاريخ الهجري جنب التاريخ بالرئيسية (تقويم أم القرى من المتصفح نفسه، بلا نت)،
+ * مُذكّر — extras.js  (الإصدار 14)
+ *   Hijri      إ4 التاريخ الهجري جنب التاريخ بالرئيسية (تقويم أم القرى من المتصفح نفسه، بلا نت)،
  *              مع تصحيح يوم ± من الإعدادات، وبطاقة للأيام المميزة (البيض، عاشوراء، عرفة، العشر، العيدين…)
- *   WeekLog    إ٨ تقويم آخر ٧ أيام بالرئيسية: الورد، الأذكار، التسبيح (نقاط هادية)،
- *              و«إحصائيات الشهر» (الإصدار ١٥): آخر ٣٠ يوم كشبكة + أطول سلسلة، و«أتممت» من الإشعار (sw.js) *   Backup     إ٦ حفظ نسخة من كل بيانات مُذكّر بملف، واسترجاعها بأي جهاز
- *   Shortcuts  إ٧ اختصارات أيقونة التطبيق (manifest.json): ?open=tasbih-mode | morning | evening | screen (والورد بـ wird-intro.js)
+ *   WeekLog    إ8 تقويم آخر 7 أيام بالرئيسية: الورد، الأذكار، التسبيح (نقاط هادية)،
+ *              و«إحصائيات الشهر» (الإصدار 15): آخر 30 يوم كشبكة + أطول سلسلة، و«أتممت» من الإشعار (sw.js) *   Backup     إ6 حفظ نسخة من كل بيانات مُذكّر بملف، واسترجاعها بأي جهاز
+ *   Shortcuts  إ7 اختصارات أيقونة التطبيق (manifest.json): ?open=tasbih-mode | morning | evening | screen (والورد بـ wird-intro.js)
  * يُحمَّل بعد home.js و tasbih.js و adhkar-viewer.js وقبل main.js. التشغيل من main.js: Extras.init().
  * ===================================================================== */
 
 const Hijri = (() => {
     const $ = id => document.getElementById(id);
     const ADJ_KEY = 'mudhakkir-hijri-adjust';
-    const AR = n => Number(n).toLocaleString('ar-EG');
+    const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     let adj = 0;
     try { adj = Math.max(-2, Math.min(2, Number(localStorage.getItem(ADJ_KEY)) || 0)); } catch (e) {}
     // أم القرى إن دعمها المتصفح، وإلا الهجري العام
     const fmt = (() => {
         for (const cal of ['islamic-umalqura', 'islamic']) {
             try {
-                const f = new Intl.DateTimeFormat('ar-SA-u-ca-' + cal + '-nu-arab', { day: 'numeric', month: 'long', year: 'numeric' });
+                const f = new Intl.DateTimeFormat('ar-SA-u-ca-' + cal + '-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' });
                 const n = new Intl.DateTimeFormat('en-u-ca-' + cal + '-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric' });
                 if (f.resolvedOptions().calendar.startsWith('islamic')) return { f, n };
             } catch (e) {}
@@ -46,11 +46,11 @@ const Hijri = (() => {
         if (m === 12 && d === 10) return ['عيد الأضحى المبارك', 'تقبّل الله منا ومنكم. لا يُصام يوم العيد.'];
         if (m === 12 && d >= 11 && d <= 13) return ['أيام التشريق', 'أيام أكل وشرب وذكر لله، لا يُصام فيها. أكثر من التكبير.'];
         if (m === 12 && d <= 8) return ['العشر الأوائل من ذي الحجة', 'أفضل أيام الدنيا؛ أكثر فيها من التكبير والتهليل والتحميد والعمل الصالح.'];
-        if (d >= 13 && d <= 15) return [`من الأيام البيض · ${AR(d)} ${monthName(h)}`, 'يُستحب صيام الأيام البيض: ١٣ و١٤ و١٥ من كل شهر هجري.'];
-        if (d === 12) return ['غدًا تبدأ الأيام البيض', 'يُستحب صيام ١٣ و١٤ و١٥ من الشهر الهجري، فانوِ من الليلة إن استطعت.'];
+        if (d >= 13 && d <= 15) return [`من الأيام البيض · ${AR(d)} ${monthName(h)}`, 'يُستحب صيام الأيام البيض: 13 و14 و15 من كل شهر هجري.'];
+        if (d === 12) return ['غدًا تبدأ الأيام البيض', 'يُستحب صيام 13 و14 و15 من الشهر الهجري، فانوِ من الليلة إن استطعت.'];
         return null;
     }
-    const monthName = h => (h.text.match(/^[٠-٩]+\s+(.+?)\s+[٠-٩]+/) || [])[1] || '';
+    const monthName = h => (h.text.match(/^[0-9]+\s+(.+?)\s+[0-9]+/) || [])[1] || '';
     function paint() {
         const h = today();
         const line = $('home-hijri');
@@ -90,13 +90,13 @@ const WeekLog = (() => {
         const log = read();
         if (log[k] && log[k][kind]) return;
         log[k] = { ...(log[k] || {}), [kind]: 1 };
-        // نحتفظ بآخر ٦٠ يوم بس (بتكفي لإحصائيات الشهر)
+        // نحتفظ بآخر 60 يوم بس (بتكفي لإحصائيات الشهر)
         const keys = Object.keys(log).sort();
         keys.slice(0, Math.max(0, keys.length - 60)).forEach(x => delete log[x]);
         try { localStorage.setItem(KEY, JSON.stringify(log)); } catch (e) {}
         render();
     }
-    // إ٢: «أتممت» من إشعار التذكير (sw.js بيسجّلها والتطبيق مسكّر)
+    // إ2: «أتممت» من إشعار التذكير (sw.js بيسجّلها والتطبيق مسكّر)
     async function mergePending() {
         if (typeof NotifyStore === 'undefined') return;
         const list = await NotifyStore.get('weeklog-pending', []);
@@ -119,7 +119,7 @@ const WeekLog = (() => {
         }
         box.innerHTML = cols.join('');
     }
-    // ---------- إ٨ إحصائيات الشهر (الإصدار ١٥): آخر ٣٠ يوم كشبكة، وعدد أيام كل عبادة، وأطول سلسلة ----------
+    // ---------- إ8 إحصائيات الشهر (الإصدار 15): آخر 30 يوم كشبكة، وعدد أيام كل عبادة، وأطول سلسلة ----------
     function monthView() {
         const log = read(), now = new Date(), days = [];
         for (let i = 29; i >= 0; i--) { const d = new Date(now); d.setDate(now.getDate() - i); days.push({ d, e: log[keyOf(d)] || {} }); }
@@ -127,19 +127,19 @@ const WeekLog = (() => {
         const any = e => e.w || e.r || e.a || e.t;
         let best = 0, run = 0; days.forEach(x => { run = any(x.e) ? run + 1 : 0; best = Math.max(best, run); });
         let cur = 0; for (let i = days.length - 1; i >= 0 && any(days[i].e); i--) cur++;
-        const AR = n => Number(n).toLocaleString('ar-EG');
+        const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
         const stat = (n, label, cls) => `<div class="ms-stat ${cls}"><b>${AR(n)}</b><small>${label}</small></div>`;
         const box = document.createElement('div');
         box.className = 'month-stats';
         // أول خانة بالشبكة على يوم أسبوعها (السبت أول الأسبوع)
         const lead = (days[0].d.getDay() + 1) % 7;
         box.innerHTML = `
-            <p class="ms-lead">آخر ٣٠ يوم، من ${days[0].d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' })} لليوم</p>
+            <p class="ms-lead">آخر 30 يوم، من ${days[0].d.toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'long' })} لليوم</p>
             <div class="ms-stats">${stat(count(e => e.w), 'يوم أتممت الورد', 'w')}${stat(count(e => e.w || e.r), 'يوم قرأت', 'r')}${stat(count(e => e.a), 'يوم أذكار', 'a')}${stat(count(e => e.t), 'يوم تسبيح', 't')}</div>
-            <div class="ms-grid" role="img" aria-label="${AR(count(any))} يوم فيه عبادة من آخر ٣٠ يوم">
+            <div class="ms-grid" role="img" aria-label="${AR(count(any))} يوم فيه عبادة من آخر 30 يوم">
                 ${['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'].map(d => `<span class="ms-h">${d}</span>`).join('')}
                 ${'<i class="ms-pad"></i>'.repeat(lead)}
-                ${days.map(({ d, e }) => { const n = (e.w || e.r ? 1 : 0) + (e.a ? 1 : 0) + (e.t ? 1 : 0); return `<i class="ms-d l${n}${keyOf(d) === keyOf(now) ? ' is-today' : ''}" title="${d.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' })}"><em>${AR(d.getDate())}</em></i>`; }).join('')}
+                ${days.map(({ d, e }) => { const n = (e.w || e.r ? 1 : 0) + (e.a ? 1 : 0) + (e.t ? 1 : 0); return `<i class="ms-d l${n}${keyOf(d) === keyOf(now) ? ' is-today' : ''}" title="${d.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' })}"><em>${AR(d.getDate())}</em></i>`; }).join('')}
             </div>
             <p class="ms-legend" aria-hidden="true"><i class="ms-d l0"></i>ولا شي <i class="ms-d l1"></i>عبادة <i class="ms-d l2"></i>عبادتين <i class="ms-d l3"></i>الثلاثة</p>
             <div class="ms-streak"><span>السلسلة الحالية <b>${AR(cur)}</b> يوم</span><span>أطول سلسلة <b>${AR(best)}</b> يوم</span></div>`;
@@ -190,7 +190,7 @@ const Backup = (() => {
         if (!json || json.app !== 'mudhakkir' || !json.data || typeof json.data !== 'object') { Toast.show('هذا الملف ليس نسخة احتياطية من مُذكّر'); return; }
         const entries = Object.entries(json.data).filter(([k, v]) => k.startsWith('mudhakkir-') && !SKIP.test(k) && typeof v === 'string');
         if (!entries.length) { Toast.show('النسخة فارغة'); return; }
-        const when = json.date ? new Date(json.date).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+        const when = json.date ? new Date(json.date).toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
         if (!confirm(`استرجاع النسخة${when ? ' المحفوظة في ' + when : ''}؟\nستحلّ محلّ بياناتك الحالية على هذا الجهاز (الورد، التذكيرات، العلامات، الإعدادات).`)) return;
         try {
             keys().forEach(k => localStorage.removeItem(k));

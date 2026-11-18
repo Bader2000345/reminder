@@ -1,5 +1,5 @@
 /* =====================================================================
- * مُذكّر — cardart.js  (الإصدار ٢٤، معرض ١١: كل خلفية بنسختين داكنة وفاتحة + ١٠ خلفيات جديدة بلا مساجد)
+ * مُذكّر — cardart.js  (الإصدار 24، معرض 11: كل خلفية بنسختين داكنة وفاتحة + 10 خلفيات جديدة بلا مساجد)
  * محرّك «صنع بطاقة»: خلفيات مرسومة بالكود (بلا صور ولا نت) + كتابة الذكر أو الآية بمكان مريح حسب الجهاز.
  *   CardArt.draw(ctx, w, h, style, seed, mode, opts) ← mode: 'dark' | 'light'، opts.mosque === false بيشيل المسجد
  *   CardArt.text(ctx, w, h, item, opts)               ← بيكتب { text, ref, kind:'ayah'|'dhikr' } بالمنطقة الآمنة لـ opts.kind
@@ -237,7 +237,7 @@ const CardArt = (() => {
   }
 
   // ---------- الخلفيات ----------
-  // خ١–خ٩: المعرض ١٠ بنسخة داكنة وفاتحة. ج١–ج١٠: جديدة بلا مساجد.
+  // خ1–خ9: المعرض 10 بنسخة داكنة وفاتحة. ج1–ج10: جديدة بلا مساجد.
   const STYLES = {
     forest: { name: 'غابة الضباب', zone: 'upper', def: 'dark', modes: {
       dark: { ink: '#f6f2e6', accent: '#dcc993', scrim: '#0d2220', sky: [[0, '#173230'], [.42, '#3d6660'], [.6, '#9fbcb1'], [.66, '#c9d8cd'], [1, '#c9d8cd']], orb: '#f7f1df', orbGlow: '#fff8e6', orbA: .35, layers: ['#86a69d', '#5f8279', '#3e5f57', '#24413b'], mist: '#d9e4dc', mistA: .38, lake: ['#1d3a35', '#0b1d1a'], shimmer: '#e8f0ea', fg: '#0a1a17', vig: .35 },
@@ -372,7 +372,7 @@ const CardArt = (() => {
         grain(ctx, w, h, .06); vignette(ctx, w, h, P.vig);
       } },
 
-    // ===== ج١–ج١٠: خلفيات جديدة بأنماط تانية، بلا مساجد =====
+    // ===== ج1–ج10: خلفيات جديدة بأنماط تانية، بلا مساجد =====
     paper: { name: 'ورق مقصوص', zone: 'upper', def: 'light', modes: {
       light: { light: true, ink: '#5a2c1c', accent: '#b8694a', scrim: '#fdf3ea', bg: [[0, '#fdf1e4'], [1, '#f8dfc9']], orb: '#f0a07a', orbGlow: '#ffd2b8', star: null, layers: ['#f4cdae', '#efb995', '#e5a07c', '#d78866', '#c3704f', '#a85a3d'], top: ['#fae6d3', '#f6d7bd'], shadow: 'rgba(120,58,28,.28)' },
       dark: { ink: '#f6efdd', accent: '#e2c98f', scrim: '#0e2533', bg: [[0, '#0d2433'], [1, '#163a4d']], orb: '#f3e6c4', orbGlow: '#f3e6c4', star: '#f3e6c4', layers: ['#1f4d60', '#1a4355', '#163a4a', '#12313f', '#0e2833', '#0a1f28'], top: ['#123142', '#0f2a39'], shadow: 'rgba(0,0,0,.5)' } },
@@ -574,11 +574,11 @@ const CardArt = (() => {
     ctx.beginPath(); ctx.moveTo(cx - half, dy); ctx.lineTo(cx - 9 * u, dy); ctx.moveTo(cx + 9 * u, dy); ctx.lineTo(cx + half, dy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx, dy - 5 * u); ctx.lineTo(cx + 5 * u, dy); ctx.lineTo(cx, dy + 5 * u); ctx.lineTo(cx - 5 * u, dy); ctx.closePath(); ctx.fill();
     for (const d of [-1, 1]) { ctx.beginPath(); ctx.arc(cx + d * (half + 4 * u), dy, 1.6 * u, 0, TAU); ctx.fill(); }
-    if (item.ref) { ctx.font = `500 ${refSize}px "Readex Pro", sans-serif`; ctx.fillText(item.ref.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]), cx, dy + refSize * 2); }
+    if (item.ref) { ctx.font = `500 ${refSize}px "Readex Pro", sans-serif`; ctx.fillText(item.ref, cx, dy + refSize * 2); }
     if (o.sign) { ctx.globalAlpha = .75; ctx.font = `600 ${13 * u}px "Readex Pro", sans-serif`; ctx.fillStyle = st.light ? '#4b4038' : '#f3ecdc'; ctx.fillText('مُذكّر', w / 2, h - (o.kind === 'story' ? h * .1 : h * .035)); }
     ctx.restore();
   }
-  // ---------- صورة المستخدم («أضف خلفية»، الإصدار ٢٤، معرض ١٢: ق٣ ك١) ----------
+  // ---------- صورة المستخدم («أضف خلفية»، الإصدار 24، معرض 12: ق3 ك1) ----------
   // v: { fit: 'cover'|'contain', zoom ≥ 1, ox, oy بين -1 و 1 = إزاحة نسبية من الوسط } حتى تطلع نفسها بالمعاينة وبالحفظ
   function photoGeom(img, w, h, v) {
     const base = v.fit === 'contain' ? Math.min(w / img.width, h / img.height) : Math.max(w / img.width, h / img.height);

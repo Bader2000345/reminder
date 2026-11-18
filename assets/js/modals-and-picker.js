@@ -22,7 +22,7 @@ const Picker = (() => {
     const body = pop.querySelector('.picker-body');
     const WEEK = [6, 0, 1, 2, 3, 4, 5];
     const WEEK_SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
-    const ar = n => Number(n).toLocaleString('ar-EG');
+    const ar = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const pad = n => String(n).padStart(2, '0');
     const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     const parseKey = k => { const [y, m, d] = String(k).split('-').map(Number); return y ? new Date(y, m - 1, d) : null; };
@@ -37,10 +37,10 @@ const Picker = (() => {
         if (inp.type === 'time') {
             if (!/^\d\d:\d\d$/.test(v)) return 'اختر الوقت';
             const [h, m] = v.split(':').map(Number);
-            return new Date(2000, 0, 1, h, m).toLocaleTimeString('ar', { hour: 'numeric', minute: '2-digit' });
+            return new Date(2000, 0, 1, h, m).toLocaleTimeString('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' });
         }
         const d = parseKey(v);
-        return d ? d.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : 'اختر التاريخ';
+        return d ? d.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : 'اختر التاريخ';
     }
     function sync(inp) { const p = inp && inp._picker; if (p) { p.value.textContent = label(inp); p.btn.classList.toggle('is-empty', !inp.value); } }
     function setValue(inp, v, fire = true) {
@@ -75,18 +75,18 @@ const Picker = (() => {
         const first = new Date(view.getFullYear(), view.getMonth(), 1);
         const days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
         const lead = WEEK.indexOf(first.getDay());
-        const title = first.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
+        const title = first.toLocaleDateString('ar-EG-u-nu-latn', { month: 'long', year: 'numeric' });
         let cells = WEEK.map(d => `<span class="pk-wd">${WEEK_SHORT[d]}</span>`).join('');
         for (let i = 0; i < lead; i++) cells += '<span class="pk-empty"></span>';
         for (let d = 1; d <= days; d++) {
             const date = new Date(view.getFullYear(), view.getMonth(), d), k = keyOf(date);
             const cls = ['pk-day', k === today ? 'is-today' : '', sel && k === keyOf(sel) ? 'is-selected' : '', [5, 6].includes(date.getDay()) ? 'is-weekend' : ''].join(' ');
-            cells += `<button type="button" class="${cls}" data-key="${k}" ${inRange(date) ? '' : 'disabled'} aria-label="${date.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' })}">${ar(d)}</button>`;
+            cells += `<button type="button" class="${cls}" data-key="${k}" ${inRange(date) ? '' : 'disabled'} aria-label="${date.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' })}">${ar(d)}</button>`;
         }
         body.innerHTML = `
             <div class="pk-head">
                 <button type="button" class="pk-nav" data-step="-1" aria-label="الشهر السابق">›</button>
-                <div class="pk-title"><strong>${title}</strong><span class="pk-dot"></span><small>${sel ? sel.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric' }) : 'اختر يومًا'}</small></div>
+                <div class="pk-title"><strong>${title}</strong><span class="pk-dot"></span><small>${sel ? sel.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric' }) : 'اختر يومًا'}</small></div>
                 <button type="button" class="pk-nav" data-step="1" aria-label="الشهر التالي">‹</button>
             </div>
             <div class="pk-grid ${dir > 0 ? 'slide-next' : dir < 0 ? 'slide-prev' : ''}">${cells}</div>

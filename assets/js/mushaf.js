@@ -172,7 +172,10 @@ const Mushaf = (() => {
         const b = el('div', 'qp-surah');
         b.setAttribute('role', 'heading'); b.setAttribute('aria-level', '2');
         b.setAttribute('aria-label', 'سورة ' + surahName(s));
-        const name = el('span', 'qp-surah-name', 'surah' + String(s).padStart(3, '0'));
+        // الإصدار ٢٧: خط أسماء السور فيه شكلين منفصلين: «surah» = كلمة «سورة» و«018» = «الكهف».
+        // لو انكتبوا سوا «surah018» بيطلعوا بترتيب الإنجليزي (الكهف سورة)، فكل واحد بعلبة والعلب من اليمين لليسار
+        const name = el('span', 'qp-surah-name');
+        name.append(el('span', '', 'surah'), el('span', '', String(s).padStart(3, '0')));
         name.setAttribute('aria-hidden', 'true');
         name.dataset.fallback = 'سورة ' + surahName(s);
         b.append(name);

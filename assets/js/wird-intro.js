@@ -1,7 +1,7 @@
 /* =====================================================================
- * مُذكّر — wird-intro.js  (الإصدار ١٤)
- * أسئلة خطة الورد: أول ما يفوت المستخدم على «الورد اليومي» بتطلعله ٤ أسئلة قصيرة، وبعدين ملخّص خطته:
- *   ١) كم ختمة ناوي؟   ٢) بكم يوم الختمة؟ (منها «تحزيب الصحابة»)   ٣) من وين يبلّش؟   ٤) إيمتى نذكّره؟
+ * مُذكّر — wird-intro.js  (الإصدار 14)
+ * أسئلة خطة الورد: أول ما يفوت المستخدم على «الورد اليومي» بتطلعله 4 أسئلة قصيرة، وبعدين ملخّص خطته:
+ *   1) كم ختمة ناوي؟   2) بكم يوم الختمة؟ (منها «تحزيب الصحابة»)   3) من وين يبلّش؟   4) إيمتى نذكّره؟
  * - ما بتغيّر «تعديل الورد»: هي بس طريقة لطيفة لأول مرة (وفيك تعيدها من نافذة التعديل).
  * - «لاحقًا» بتسكّرها لهالجلسة، وبترجع المرة الجاية لحد ما يكمّلها.
  * - العنوان بيظهر كلمة كلمة (FX.textIn) والخيارات بتنزل وحدة ورا التانية.
@@ -23,7 +23,7 @@ const WirdReminder = (() => {
         if (typeof syncNotifications === 'function') syncNotifications();
         paintRow();
     }
-    // م٣ (الإصدار ١٥): سطر «تذكير الورد» بصفحة أذكاري (وقت + مفتاح)
+    // م3 (الإصدار 15): سطر «تذكير الورد» بصفحة أذكاري (وقت + مفتاح)
     function paintRow() {
         const time = document.getElementById('wird-rem-time'), sw = document.getElementById('wird-rem-switch'), st = document.getElementById('wird-rem-status');
         if (!time || !sw) return;
@@ -56,7 +56,7 @@ const WirdIntro = (() => {
     const $ = id => document.getElementById(id);
     const DONE_KEY = 'mudhakkir-wird-intro', LATER_KEY = 'mdk-wird-intro-later';
     const TOTAL = 604, MIN_PER_PAGE = 1.5;
-    const AR = n => Number(n).toLocaleString('ar-EG');
+    const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     const sv = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
     const ICON = {
@@ -84,7 +84,7 @@ const WirdIntro = (() => {
         return h === 1 ? 'ساعة تقريبًا' : h === 2 ? 'ساعتين تقريبًا' : `${AR(h)} ساعات تقريبًا`;
     };
     const pagesFor = days => Math.ceil(TOTAL / days);
-    // صفحة وحدة · صفحتين · ٣–١٠ صفحات · ١١ صفحة فما فوق
+    // صفحة وحدة · صفحتين · 3–10 صفحات · 11 صفحة فما فوق
     const pagesLabel = n => (n === 1 ? 'صفحة وحدة' : n === 2 ? 'صفحتين' : n <= 10 ? `${AR(n)} صفحات` : `${AR(n)} صفحة`);
 
     let A = {}, step = 0, isOpen = false, lastFocus = null;
@@ -99,7 +99,7 @@ const WirdIntro = (() => {
             options: [
                 { v: 1, icon: 'book', label: 'ختمة وحدة', sub: 'بداية مباركة' },
                 { v: 2, icon: 'books', label: 'ختمتين', sub: 'نيّة طيبة وهمّة عالية' },
-                { v: 3, icon: 'books', label: '٣ ختمات', sub: 'الله يبارك بوقتك' },
+                { v: 3, icon: 'books', label: '3 ختمات', sub: 'الله يبارك بوقتك' },
                 { v: 'more', icon: 'plus', label: 'أكتر', sub: 'حدّد العدد بنفسك' }
             ]
         };
@@ -108,7 +108,7 @@ const WirdIntro = (() => {
             hint: 'اختار يلي بتقدر تداوم عليه، فالقليل الدايم أحسن من الكتير المنقطع.',
             options: [
                 { v: 'sahaba', icon: 'star', label: 'أسبوع · تحزيب الصحابة', sub: `كل يوم حزب بحدود السور، ${minutes(86)}`, badge: 'سنّة الصحابة' },
-                { v: 15, icon: 'cal', label: '١٥ يوم', sub: `${pagesLabel(pagesFor(15))} باليوم · ${minutes(pagesFor(15))}` },
+                { v: 15, icon: 'cal', label: '15 يوم', sub: `${pagesLabel(pagesFor(15))} باليوم · ${minutes(pagesFor(15))}` },
                 { v: 30, icon: 'cal', label: 'شهر', sub: `جزء كل يوم (${pagesLabel(pagesFor(30))}) · ${minutes(pagesFor(30))}` },
                 { v: 60, icon: 'leaf', label: 'شهرين', sub: `${pagesLabel(pagesFor(60))} باليوم · ${minutes(pagesFor(60))}` },
                 { v: 'daily', icon: 'list', label: 'على قدّي', sub: 'بحدّد كم صفحة باليوم' }
@@ -125,11 +125,11 @@ const WirdIntro = (() => {
             key: 'time', title: 'إيمتى بتحب نذكّرك بوردك؟',
             hint: 'بيوصلك إشعار لطيف كل يوم، حتى والتطبيق مسكّر.',
             options: [
-                { v: '06:00', icon: 'sunrise', label: 'الصبح بكّير', sub: '٦:٠٠ صباحًا' },
-                { v: '09:00', icon: 'sun', label: 'الضحى', sub: '٩:٠٠ صباحًا' },
-                { v: '14:00', icon: 'sun', label: 'بعد الظهر', sub: '٢:٠٠ ظهرًا' },
-                { v: '19:00', icon: 'sunset', label: 'بعد المغرب', sub: '٧:٠٠ مساءً' },
-                { v: '22:00', icon: 'moon', label: 'قبل النوم', sub: '١٠:٠٠ مساءً' },
+                { v: '06:00', icon: 'sunrise', label: 'الصبح بكّير', sub: '6:00 صباحًا' },
+                { v: '09:00', icon: 'sun', label: 'الضحى', sub: '9:00 صباحًا' },
+                { v: '14:00', icon: 'sun', label: 'بعد الظهر', sub: '2:00 ظهرًا' },
+                { v: '19:00', icon: 'sunset', label: 'بعد المغرب', sub: '7:00 مساءً' },
+                { v: '22:00', icon: 'moon', label: 'قبل النوم', sub: '10:00 مساءً' },
                 { v: 'custom', icon: 'clock', label: 'وقت تاني', sub: 'بختار الساعة بنفسي' },
                 { v: 'none', icon: 'off', label: 'بلا تذكير', sub: 'بفتح الورد لحالي' }
             ]
@@ -249,7 +249,7 @@ const WirdIntro = (() => {
     function summary() {
         const f = plan(), goal = f.goal, days = f.mode === 'sahaba' ? 7 : f.days;
         const time = A.time === 'custom' ? A.customTime : A.time;
-        const timeLabel = !time || time === 'none' ? 'بلا تذكير' : (() => { const [h, m] = time.split(':').map(Number); const pm = h >= 12; const hh = h % 12 || 12; return `كل يوم ${AR(hh)}:${AR(m).padStart(2, '٠')} ${pm ? 'مساءً' : 'صباحًا'}`; })();
+        const timeLabel = !time || time === 'none' ? 'بلا تذكير' : (() => { const [h, m] = time.split(':').map(Number); const pm = h >= 12; const hh = h % 12 || 12; return `كل يوم ${AR(hh)}:${AR(m).padStart(2, '0')} ${pm ? 'مساءً' : 'صباحًا'}`; })();
         const startLabel = f.start === 'continue' ? 'من مكانك الحالي' : f.start === 'surah' ? `من سورة ${SURAH_NAMES[f.surah - 1]}` : 'من سورة الفاتحة';
         const paceLabel = f.mode === 'sahaba' ? 'تحزيب الصحابة: كل يوم حزب' : `${pagesLabel(f.pagesPerDay)} باليوم`;
         const each = f.mode === 'sahaba' ? minutes(86) : minutes(f.pagesPerDay);

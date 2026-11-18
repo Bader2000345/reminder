@@ -261,7 +261,8 @@ const Reader = (() => {
     // التالي/السابق: صفحة، أو صفحتين بالمصحف المفتوح
     const nextPage = () => { const n = shownSpread[shownSpread.length - 1] + 1; if (n <= TOTAL) goTo(n, true); };
     const prevPage = () => { const n = shownSpread[0] - 1; if (n >= 1) goTo(n); };
-    function updateResume() { const r = $('reader-resume'); if (r) r.textContent = 'متابعة من صفحة ' + st.page.toLocaleString('ar-EG'); }
+    // الإصدار 28: هالسطر برّا المصحف (بصفحة القرآن)، فرقمو بالإنجليزي متل باقي التطبيق
+    function updateResume() { const r = $('reader-resume'); if (r) r.textContent = 'من صفحة ' + st.page.toLocaleString('ar-EG-u-nu-latn'); }
 
     // ---------- ش٢: «شريط الصفحات» تحت بعرض الشاشة ----------
     // الصفحات: كل صفحات المصحف شرائح صغيرة، بتسحبها وبتوقف عالصفحة يلي بالنص · شريط التمرير · الفواصل: آياتك المعلَّمة

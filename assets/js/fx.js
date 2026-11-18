@@ -1,9 +1,9 @@
 /* =====================================================================
  * مُذكّر — fx.js
- * المؤثرات (الإصدار ١٥: السلاسة أولًا):
- *   - الخلفية ج٥: مشربية زمرّدية بالزاوية وضو ذهبي بيتنفّس (بتنرسم مرة وحدة، بلا تغيّر وقت التمرير)
+ * المؤثرات (الإصدار 15: السلاسة أولًا):
+ *   - الخلفية ج5: مشربية زمرّدية بالزاوية وضو ذهبي بيتنفّس (بتنرسم مرة وحدة، بلا تغيّر وقت التمرير)
  *   - إطار نور يسري على بطاقة الذكر والمتابعة والختمة والاقتراح — بالمؤثرات الكاملة بس
- *   - البطاقات بتظهر كاملة (تلاشٍ وطلعة ٨px، ٢٠٠ms) لما تبيّن، والذكر الجديد بتلاشٍ، والعدّاد يتدحرج
+ *   - البطاقات بتظهر كاملة (تلاشٍ وطلعة 8px، 200ms) لما تبيّن، والذكر الجديد بتلاشٍ، والعدّاد يتدحرج
  * - «تقليل الحركة» يوقف كل شيء. «خفيفة» (html.fx-lite من الإعدادات ← المؤثرات، والتلقائي على الجوال)
  *   بتشيل كل حركة دائمة والزجاج المغبّش (14-performance.css).
  * يُحمَّل قبل home.js (يستعمل FX.textIn و FX.ticker عند التشغيل)، و FX.init() من main.js.
@@ -17,8 +17,8 @@ const FX = (() => {
     const born = performance.now();
     const SPLASH_MS = 500; // مدة شاشة البداية (04 + 14 css)
 
-    // ---------- الخلفية ج٥ «مشربية وضو» (الإصدار ١٥) ----------
-    // شبكة مشربية زمرّدية بزاوية الشاشة بتتلاشى، و٣ خيوط ضو ذهبي نازلة منها بتتنفّس ببطء (opacity بس).
+    // ---------- الخلفية ج5 «مشربية وضو» (الإصدار 15) ----------
+    // شبكة مشربية زمرّدية بزاوية الشاشة بتتلاشى، و3 خيوط ضو ذهبي نازلة منها بتتنفّس ببطء (opacity بس).
     // الرسم كله CSS (16-layout.css)، والطبقة بتنبنى مرة وحدة وما بتتغيّر وقت التمرير.
     function pattern() {
         const amb = document.querySelector('.ambient');
@@ -31,7 +31,7 @@ const FX = (() => {
         document.addEventListener('visibilitychange', () => box.classList.toggle('is-paused', document.hidden));
     }
 
-    // ---------- ب٢ إطار نور يسري (بالمؤثرات الكاملة بس؛ بالخفيفة مخفي من 14-performance.css) ----------
+    // ---------- ب2 إطار نور يسري (بالمؤثرات الكاملة بس؛ بالخفيفة مخفي من 14-performance.css) ----------
     const BEAM_HOSTS = '.dhikr-card, .progress-card, .khatma-card, .smart-card';
     function beams() {
         const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('is-paused', !e.isIntersecting))) : null;
@@ -45,7 +45,7 @@ const FX = (() => {
         });
     }
 
-    // ---------- الذكر الجديد بيظهر كله بتلاشٍ ٢٠٠ms (الإصدار ١٥: بلا كلمة كلمة) ----------
+    // ---------- الذكر الجديد بيظهر كله بتلاشٍ 200ms (الإصدار 15: بلا كلمة كلمة) ----------
     function textIn(el, text) {
         if (!el) return;
         el.classList.remove('fx-words', 'fx-fade');
@@ -57,8 +57,8 @@ const FX = (() => {
         el.classList.add('fx-fade');
     }
 
-    // ---------- ظهور البطاقات (الإصدار ١٥): كل بطاقة بتظهر كاملة ----------
-    // تلاشٍ مع طلعة ٨px خلال ٢٠٠ms (14-performance.css)، ورا بعض بفرق ٤٠ms، أول ما تبيّن على الشاشة.
+    // ---------- ظهور البطاقات (الإصدار 15): كل بطاقة بتظهر كاملة ----------
+    // تلاشٍ مع طلعة 8px خلال 200ms (14-performance.css)، ورا بعض بفرق 40ms، أول ما تبيّن على الشاشة.
     // بلا تقسيم الكلام لكلمات ولا تمويه: عنصر واحد بيتحرك بالـ transform و opacity بس.
     const HEAD = ':scope > :is(.home-intro, .page-header)';
     const CARD = '.home-card:not(.dhikr-card), .smart-section, .category-card:not(.glist-row), .setting-card, .khatma-top, .quran-tiles, .glist, .shelf, .sit-chips, .tb-wrap, .wird-streak-bar, .install-card, .friday-card, .hijri-card, .section-title, .section-heading, .adhkar-detail-intro';
@@ -103,18 +103,18 @@ const FX = (() => {
         pageIn(document.querySelector('.page-view.active-page'), splashLeft());
     }
 
-    // ---------- ح١ العدّاد يتدحرج ----------
-    const DIGITS = '٠١٢٣٤٥٦٧٨٩';
+    // ---------- ح1 العدّاد يتدحرج ----------
+    const DIGITS = '0123456789';
     const column = () => `<span class="tk-col">${[...DIGITS].map(d => `<i>${d}</i>`).join('')}</span>`;
     function ticker(el, n) {
         if (!el) return;
         const s = String(Math.max(0, Math.floor(n)));
-        el.setAttribute('aria-label', Number(s).toLocaleString('ar-EG'));
-        if (reduce.matches) { el.textContent = Number(s).toLocaleString('ar-EG'); return; }
+        el.setAttribute('aria-label', Number(s).toLocaleString('ar-EG-u-nu-latn'));
+        if (reduce.matches) { el.textContent = Number(s).toLocaleString('ar-EG-u-nu-latn'); return; }
         if (!el.classList.contains('fx-ticker') || el.children.length !== s.length) {
             el.classList.add('fx-ticker');
             el.innerHTML = [...s].map(() => `<span class="tk" aria-hidden="true">${column()}</span>`).join('');
-            // الخانات الجديدة تبدأ من ٠ ثم تتدحرج للقيمة
+            // الخانات الجديدة تبدأ من 0 ثم تتدحرج للقيمة
             void el.offsetWidth;
         }
         [...el.children].forEach((tk, i) => tk.firstElementChild.style.setProperty('--d', s[i]));

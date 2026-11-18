@@ -5,18 +5,18 @@
  * ===================================================================== */
 
 // ===== حركات الظهور والتموّج =====
-// (الإصدار ١٥: انشال عمق الخلفية مع المؤشر والتمرير والإمالة، ونقاط النور: الخلفية صارت مشربية ثابتة
-//  بضو بيتنفّس (ج٥ بـ fx.js)، فما في داعي نحدّث متغيرات الخلفية مع كل تمرير — أخف بكتير عالجوال)
+// (الإصدار 15: انشال عمق الخلفية مع المؤشر والتمرير والإمالة، ونقاط النور: الخلفية صارت مشربية ثابتة
+//  بضو بيتنفّس (ج5 بـ fx.js)، فما في داعي نحدّث متغيرات الخلفية مع كل تمرير — أخف بكتير عالجوال)
 const Motion = (() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-    // البطاقات الرئيسية بيحرّكها fx.js (ب٢: البطاقة بتطلع وكلماتها بعدها)؛ هون بس العناصر يلي ما بيلمسها
+    // البطاقات الرئيسية بيحرّكها fx.js (ب2: البطاقة بتطلع وكلماتها بعدها)؛ هون بس العناصر يلي ما بيلمسها
     const REVEAL = '.adhkar-list article, .smart-card';
     let io = null;
     function observe(root = document) {
         if (!io) return;
         root.querySelectorAll(REVEAL).forEach(n => { if (!n.dataset.revealed) { n.classList.add('reveal'); io.observe(n); } });
     }
-    // (التموّج عند الضغط انشال بالإصدار ١٤: الضغط صار توهّج ذهبي بالـ CSS — ز٣)
+    // (التموّج عند الضغط انشال بالإصدار 14: الضغط صار توهّج ذهبي بالـ CSS — ز3)
     function init() {
         if (reduce.matches || !('IntersectionObserver' in window)) return;
         io = new IntersectionObserver(entries => entries.forEach(en => {

@@ -88,12 +88,12 @@ const Atmosphere = (() => {
     }
 
     // الأرقام تعدّ صعودًا (نسبة الورد وإحصائية اليوم)
-    const toNum = s => Number(String(s).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^\d.]/g, ''));
+    const toNum = s => Number(String(s).replace(/[0-9]/g, d => '0123456789'.indexOf(d)).replace(/[^\d.]/g, ''));
     function countUp(el) {
         if (!el || reduce.matches || el.dataset.counting) return;
         const final = el.textContent, target = toNum(final);
         if (!target || target > 100000) return;
-        const tpl = final.replace(/[٠-٩\d][٠-٩\d.,٬]*/, '{n}');
+        const tpl = final.replace(/[0-9\d][0-9\d.,٬]*/, '{n}');
         if (!tpl.includes('{n}')) return;
         const t0 = performance.now(), dur = 900;
         let written = null;
@@ -102,7 +102,7 @@ const Atmosphere = (() => {
             // تغيّر الرقم من مكان آخر أثناء العدّ: نتوقف ونترك القيمة الجديدة
             if (written !== null && el.textContent !== written) { delete el.dataset.counting; return; }
             const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
-            if (k < 1) { written = tpl.replace('{n}', Math.round(target * e).toLocaleString('ar-EG')); el.textContent = written; requestAnimationFrame(step); }
+            if (k < 1) { written = tpl.replace('{n}', Math.round(target * e).toLocaleString('ar-EG-u-nu-latn')); el.textContent = written; requestAnimationFrame(step); }
             else { el.textContent = final; delete el.dataset.counting; }
         };
         requestAnimationFrame(step);

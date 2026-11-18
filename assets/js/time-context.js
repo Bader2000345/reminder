@@ -20,7 +20,7 @@ const TimeContext = (() => {
         const now = new Date(); slot = slotFor(now.getHours());
         const s = SLOTS[slot];
         setText('greeting-word', greetingFor(now.getHours()));
-        setText('home-date-label', now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }));
+        setText('home-date-label', now.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', day: 'numeric', month: 'long' }));
         setText('smart-title', s.title);
         setText('smart-description', s.desc);
         setText('smart-time-context', s.ctx);
@@ -29,7 +29,7 @@ const TimeContext = (() => {
         if (action) action.innerHTML = `فتح ${s.title} <span>←</span>`;
         orderShelf(now.getHours());
     }
-    // ذ٣ (الإصدار ١٥): رفّ «حسب وقتك» بالأذكار: يلي وقتها هلّق أول وحدة وعليها «الآن»، والباقي بترتيب اليوم
+    // ذ3 (الإصدار 15): رفّ «حسب وقتك» بالأذكار: يلي وقتها هلّق أول وحدة وعليها «الآن»، والباقي بترتيب اليوم
     const DAY_ORDER = ['wake', 'morning', 'evening', 'sleep'];
     let shelfFor = '';
     function orderShelf(h) {
@@ -90,7 +90,7 @@ const UserName = (() => {
 })();
 
 // ===== تذكير الجمعة: سورة الكهف والصلاة على النبي ﷺ =====
-// يُرسل للسيرفر كتذكير عادي (الجمعة ٩:٠٠ بتوقيت الجهاز) فيصل حتى والتطبيق مغلق
+// يُرسل للسيرفر كتذكير عادي (الجمعة 9:00 بتوقيت الجهاز) فيصل حتى والتطبيق مغلق
 const FridayReminder = (() => {
     const KEY = 'mudhakkir-friday', SINCE = 'mudhakkir-friday-since';
     const KAHF_PAGE = 293;

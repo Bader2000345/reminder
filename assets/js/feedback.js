@@ -1,9 +1,9 @@
 /* =====================================================================
- * مُذكّر — feedback.js  (الإصدار ٢٠، معرض ٩)
- * «ملاحظات وشكاوي» (ل١): نوع الرسالة والنجوم والكتابة، ومعها نسخة التطبيق ونوع الجهاز بس (بلا اسم ولا رقم).
+ * مُذكّر — feedback.js  (الإصدار 20، معرض 9)
+ * «ملاحظات وشكاوي» (ل1): نوع الرسالة والنجوم والكتابة، ومعها نسخة التطبيق ونوع الجهاز بس (بلا اسم ولا رقم).
  *   رسائلك والردود تحت النموذج. الجهاز بيتعرّف برمز عشوائي (mudhakkir-fb-id) بيتولد أول ما تبعت.
- * ر٢ «وصلك رد»: بطاقة بأول الرئيسية + نقطة على «الإعدادات» بالشريط + «جديد» جنب «ملاحظات وشكاوي».
- * ع١ إعلان من المطوّر: بطاقة بأول الرئيسية بتضل لحد ما تسكّرها أو تخلص مدتها.
+ * ر2 «وصلك رد»: بطاقة بأول الرئيسية + نقطة على «الإعدادات» بالشريط + «جديد» جنب «ملاحظات وشكاوي».
+ * ع1 إعلان من المطوّر: بطاقة بأول الرئيسية بتضل لحد ما تسكّرها أو تخلص مدتها.
  * على جهاز المطوّر نفس الصفحة بتصير صندوق الرسائل (dev.js).
  * يعتمد على PUSH_SERVER (notifications.js) و APP_BUILD (updates.js) و Install و Toast و navigateTo.
  * ===================================================================== */
@@ -14,7 +14,7 @@ const Feedback = (() => {
     const TYPES = { complaint: 'شكوى', idea: 'اقتراح', bug: 'خطأ بالتطبيق', thanks: 'شكر' };
     const ICON_FB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10.5H10l-5 4v-4H4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/></svg>';
     const ICON_GO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6l-6 6 6 6"/></svg>';
-    const ar = n => Number(n).toLocaleString('ar-EG', { maximumFractionDigits: 1 });
+    const ar = n => Number(n).toLocaleString('ar-EG-u-nu-latn', { maximumFractionDigits: 1 });
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const read = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } };
     const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
@@ -22,7 +22,7 @@ const Feedback = (() => {
     const isDev = () => typeof Dev !== 'undefined' && Dev.isDevice();
     let type = '', stars = 0, sending = false, wasOpen = false;
 
-    // «قبل ٥ دقايق»، «أمس»… (بالعامية متل باقي التطبيق)
+    // «قبل 5 دقايق»، «أمس»… (بالعامية متل باقي التطبيق)
     function when(at) {
         const s = Math.max(0, (Date.now() - at) / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
         const plural = (n, one, two, few, many) => (n === 1 ? one : n === 2 ? two : `${ar(n)} ${n <= 10 ? few : many}`);
@@ -31,9 +31,9 @@ const Feedback = (() => {
         if (d < 1) return 'قبل ' + plural(h, 'ساعة', 'ساعتين', 'ساعات', 'ساعة');
         if (d === 1) return 'أمس';
         if (d < 7) return 'قبل ' + plural(d, 'يوم', 'يومين', 'أيام', 'يوم');
-        return new Date(at).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
+        return new Date(at).toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'long' });
     }
-    const starsHTML = n => (n ? `<span class="fb-st" aria-label="${ar(n)} من ٥">${'★'.repeat(n)}<span aria-hidden="true">${'★'.repeat(5 - n)}</span></span>` : '');
+    const starsHTML = n => (n ? `<span class="fb-st" aria-label="${ar(n)} من 5">${'★'.repeat(n)}<span aria-hidden="true">${'★'.repeat(5 - n)}</span></span>` : '');
     const tagHTML = t => `<span class="fb-tag" data-t="${esc(t)}">${TYPES[t] || ''}</span>`;
 
     // رمز الجهاز: عشوائي، بلا أي معلومة عنك
@@ -152,7 +152,7 @@ const Feedback = (() => {
         paintNotice();
     }
 
-    // ---------- ر٢ «وصلك رد» + ع١ الإعلان ----------
+    // ---------- ر2 «وصلك رد» + ع1 الإعلان ----------
     function liveAnnouncement() {
         const a = (read(KEY_ANN, null) || {}).a;
         if (!a || !a.id || (a.until && a.until < Date.now())) return null;
@@ -174,7 +174,7 @@ const Feedback = (() => {
         const box = $('home-notes');
         if (!box) return;
         const cards = [];
-        const inbox = isDev() ? Dev.homeCard() : ''; // جهاز المطوّر: «صندوق الرسائل: ٣ رسائل جديدة»
+        const inbox = isDev() ? Dev.homeCard() : ''; // جهاز المطوّر: «صندوق الرسائل: 3 رسائل جديدة»
         if (inbox) cards.push(inbox);
         if (hasNew()) {
             const m = read(KEY_MINE, []).filter(x => x.replyAt).sort((a, b) => b.replyAt - a.replyAt)[0];
@@ -214,11 +214,18 @@ const Feedback = (() => {
         }, 350);
     }
 
-    // ---------- عدد المستخدمين (الإصدار ٢٢) ----------
-    // رمز عشوائي (مو نفس رمز الرسائل، فما بينربطوا ببعض) بينبعت مرة بالأسبوع، حتى يعرف المطوّر كم واحد عم يستعمل مُذكّر
+    // ---------- عدد المستخدمين (الإصدار 22، والإصدار 27: مثبّت أو من الموقع، ونوع الجهاز، والمنطقة) ----------
+    // رمز عشوائي (مو نفس رمز الرسائل، فما بينربطوا ببعض) بينبعت مرة بالأسبوع، أو أول ما يتغيّر شي (متلًا ثبّت التطبيق)،
+    // حتى يعرف المطوّر كم واحد عم يستعمل مُذكّر. بلا اسم ولا إيميل ولا موقع دقيق: المنطقة الزمنية بس (متل «دمشق»)
+    const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const osOf = () => { const ua = navigator.userAgent; return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'ios' : /Android/.test(ua) ? 'android' : /Windows|Macintosh|Linux|CrOS/.test(ua) ? 'desktop' : 'other'; };
     async function hello() {
         if (!server() || !navigator.onLine) return;
-        if (Date.now() - read('mudhakkir-uid-at', 0) < 7 * 864e5) return;
+        let tz = 'UTC';
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (e) {}
+        const info = { mode: installed() ? 'app' : 'web', os: osOf(), tz };
+        const sig = info.mode + '|' + info.os + '|' + info.tz;
+        if (Date.now() - read('mudhakkir-uid-at', 0) < 7 * 864e5 && read('mudhakkir-uid-sig', '') === sig) return;
         let id = '';
         try { id = localStorage.getItem('mudhakkir-uid') || ''; } catch (e) {}
         if (!/^[a-z0-9]{20,40}$/.test(id)) {
@@ -226,8 +233,8 @@ const Feedback = (() => {
             try { localStorage.setItem('mudhakkir-uid', id); } catch (e) {}
         }
         try {
-            const res = await fetch(server() + '/hello', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-            if (res.ok) write('mudhakkir-uid-at', Date.now());
+            const res = await fetch(server() + '/hello', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...info }) });
+            if (res.ok) { write('mudhakkir-uid-at', Date.now()); write('mudhakkir-uid-sig', sig); }
         } catch (e) {}
     }
 
