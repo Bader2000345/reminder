@@ -63,6 +63,9 @@ const Install = (() => {
         const later = Number(localStorage.getItem(LATER_KEY) || 0) > Date.now();
         // بطاقة الرئيسية: تختفي داخل التطبيق المثبّت، أو بعد التثبيت، أو «لاحقًا»
         $$('[data-install-card]').forEach(card => { card.hidden = standalone || justInstalled || installedHere || later; });
+        // الإصدار 30 (معرض الرئيسية): بالمتصفح الرئيسية بتصير صفحة التثبيت بس، و«لاحقًا» بترجّع «يومك»
+        document.getElementById('page-home')?.classList.toggle('is-install', !(standalone || justInstalled || installedHere || later));
+        document.documentElement.classList.remove('web-guess');
         $$('[data-install-steps]').forEach(ol => {
             ol.innerHTML = STEPS[p].map((s, i) => `<li style="--i:${i}"><span>${s}</span></li>`).join('');
             ol.closest('[data-install-how]').hidden = standalone || justInstalled;

@@ -9,4 +9,6 @@ try { var __x = localStorage.getItem('mudhakkir-effects'), __c = navigator.conne
 // الإصدار 29: اللغة (i18n.js بيترجم). هون بس الاتجاه، حتى ما ترقص الصفحة لما تكون إنجليزي
 // (لهلّق تجريبي: الإنجليزي بس إذا اختارو المستخدم. نفس AUTO بـ i18n.js)
 try { var __l = localStorage.getItem('mudhakkir-lang'); if (__l === 'en') { document.documentElement.lang = 'en'; document.documentElement.dir = 'ltr'; } } catch (e) {}
+// الإصدار 30: بالمتصفح الرئيسية صفحة تثبيت (install.js بيأكّد وبيشيل web-guess). هون تخمين أول حتى ما تبين «يومك» لحظة
+try { if (!(matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) && !(Number(localStorage.getItem('mudhakkir-install-later') || 0) > Date.now())) document.documentElement.classList.add('web-guess'); } catch (e) {}
 try { var __m = localStorage.getItem('mudhakkir-theme') || 'light'; if (__m === 'dark' || (__m === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches) || (__m === 'sun' && localStorage.getItem('mudhakkir-theme-dark') === '1')) document.body.classList.add('dark-mode'); } catch (e) {}

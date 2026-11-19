@@ -340,7 +340,17 @@ const I18n = (() => {
         ['الإنجليزي صار أكمل', 'English is more complete'], ['صورة المشاركة ونصّها صاروا بالإنجليزي إذا اخترت English', 'The share image and its text are now in English when you choose English'],
         ['نوافذ «متأكد؟» وأرباع الحزب وألوان الوقت صاروا مترجمين', '“Are you sure?” dialogs, hizb quarters and time-of-day colours are now translated'],
         ['بالإنجليزي زر الإغلاق ✕ والمفاتيح صاروا بمكانهن الصح', 'In English, the ✕ close button and the switches now sit on the right side'],
-        ['الردود على ملاحظاتك والإعلانات صارت باسم «فريق مُذكّر»', 'Replies to your feedback and announcements now come from “the Mudhakkir team”']
+        ['الردود على ملاحظاتك والإعلانات صارت باسم «فريق مُذكّر»', 'Replies to your feedback and announcements now come from “the Mudhakkir team”'],
+        ['إحساس تطبيق أكتر', 'Feels more like an app'], ['«يومك» بالرئيسية', '“Your day” on the home page'],
+        ['الرئيسية صارت «يومك»: أذكار الصباح، وورد القرآن، وأذكار المساء والنوم، وكل ما تخلّص شي بيتعلّم', 'The home page is now “Your day”: morning adhkar, Quran wird, evening and sleep adhkar, each ticked off when you finish'],
+        ['بالمتصفح، أول صفحة صارت صفحة التثبيت', 'In the browser, the first page is now the install page'], ['الضغط المطوّل (متل التفسير بالمصحف) ما عاد بيحدّد النص ولا بينسخو', 'A long press (like tafsir in the mushaf) no longer selects or copies the text'],
+        ['الصفحة بتوقف عند آخر المحتوى، بلا فراغ زيادة تحت', 'Pages now stop at the end of the content, with no extra space below'],
+        // الإصدار 30: «يومك» وصفحة التثبيت بالمتصفح
+        ['يومك', 'Your day'], ['محطات يومك', 'Your day’s steps'], ['يومك لسا ببدايتو', 'Your day is just starting'], ['بداية حلوة، كمّل', 'Nice start, keep going'],
+        ['خلّصت نص يومك، كمّل 🤍', 'Half your day is done, keep going 🤍'], ['باقي خطوة وحدة', 'One step left'], ['تمّ يومك، تقبّل الله منك 🤍', 'Your day is complete, may Allah accept it 🤍'],
+        ['ورد القرآن', 'Quran wird'], ['خلّصت وردك اليوم 🤍', 'Today’s wird is done 🤍'], ['فاتت؟ لسا فيك تقراها', 'Missed it? You can still read it'],
+        ['بعد الفجر', 'After Fajr'], ['بعد العصر', 'After Asr'], ['قبل النوم', 'Before sleep'], ['ابدأ', 'Start'], ['كمّل', 'Continue'], ['اقرأ', 'Read'],
+        ['القرآن والأذكار والتذكير، بمكان واحد. مجاني، بلا إعلانات، بلا حساب.', 'Quran, adhkar and reminders in one place. Free, no ads, no account.']
     ].forEach(([a, b]) => EN.set(a, b));
 
     // أسماء السور بالإنجليزي، بنفس ترتيب SURAH_NAMES (wird.js)
@@ -364,6 +374,10 @@ const I18n = (() => {
     const PATTERNS = [
         [/^(\d+) من (\d+)$/, (m, a, b) => `${a} of ${b}`],
         // الدفعة التانية
+        [/^(\d+)[٪%] من ورد اليوم$/, (m, a) => `${a}% of today’s wird`],
+        [/^خلصت (\d.+)$/, (m, a) => `Done at ${a}`],
+        [/^وقفت عند (\d+) من (\d+)$/, (m, a, b) => `Stopped at ${a} of ${b}`],
+        [/^(\d+) ذكر$/, (m, a) => `${a} adhkar`],
         [/^الآن (الفجر|النهار|العصر|المغرب|الليل)$/, (m, a) => `now ${PHASE[a]}`],
         [/^ثابتة على ألوان (الفجر|النهار|العصر|المغرب|الليل) طول اليوم$/, (m, a) => `Fixed on ${PHASE[a]} colours all day`],
         [/^إحصائية اليوم: (.+)$/, (m, a) => `Today: ${tr(a) || a}`],

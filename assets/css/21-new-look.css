@@ -584,3 +584,59 @@ html[dir="ltr"] .hn-x { left:auto; right:6px; }
 html[dir="ltr"] .switch span:before { right:auto; left:3px; }
 html[dir="ltr"] .switch input:checked + span:before { transform:translateX(20px); }
 html[lang="en"] #page-adhkar .shelf-card.is-now::after { content:"Now"; }
+
+/* ===== الإصدار 29: إحساس تطبيق ===== */
+/* 1) الضغط المطوّل (متل التفسير بالمصحف) ما بيحدّد ولا بينسخ نص الصفحة. خانات الكتابة بتضل متل ما هي،
+      وصورة المشاركة بتنحفظ بالضغط المطوّل عالآيفون */
+html { -webkit-tap-highlight-color:transparent; }
+body { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+input, textarea, select, [contenteditable="true"], [contenteditable=""] { -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; }
+#share-preview-img { -webkit-touch-callout:default; }
+/* 2) آخر الصفحة: بتوقف عند آخر المحتوى بلا مطّ ولا رجّة (كان في 150px فاضيين، و300 بصفحتين) */
+/* على html بس! body عندو overflow-y:auto (من ملف قديم) فبيصير «حاوية تمرير» ما بتتمرر، ولو حطيناها عليه
+   بيمنع التمرير يوصل للصفحة وما بتنزل أبدًا (صارت بأول نسخة من 30، وانمسكت بتجربة عجلة الماوس الحقيقية) */
+html { overscroll-behavior-y:none; }
+@media (max-width:700px) {
+  .main-content { padding-bottom:calc(96px + env(safe-area-inset-bottom, 0px)) !important; }
+  #page-feedback, #page-cards { padding-bottom:0 !important; }
+}
+
+/* ===== الإصدار 30: ر2 «يومك» بالرئيسية (معرض الرئيسية) ===== */
+#page-home .hw-card[hidden] { display:none !important; }
+#page-home .day-path { background:var(--nl-card); color:var(--nl-ink); box-shadow:var(--frame-ring); border-radius:22px; padding:18px 18px 10px; display:grid; gap:8px; }
+.dp-head { display:flex; align-items:center; gap:14px; }
+.dp-ring { --p:0; width:74px; height:74px; border-radius:50%; flex:none; display:grid; place-items:center;
+  background:conic-gradient(var(--nl-ac) calc(var(--p) * 1%), color-mix(in srgb, var(--nl-ink) 10%, transparent) 0); transition:background .4s ease-out; }
+.dp-ring span { width:60px; height:60px; border-radius:50%; background:var(--nl-card); display:grid; place-items:center; font:700 17px/1 var(--title-font); color:var(--nl-ink); font-variant-numeric:tabular-nums; }
+.dp-head h2 { margin:0; font:700 23px/1.3 var(--title-font); color:var(--nl-ink); }
+.dp-head p { margin:2px 0 0; color:var(--nl-mut); font-size:14px; }
+.dp-steps { list-style:none; margin:0; padding:0; display:grid; }
+.dp-step button { position:relative; width:100%; min-height:58px; display:grid; grid-template-columns:32px minmax(0, 1fr) auto; gap:12px; align-items:center;
+  padding:8px 2px; border:0; background:none; color:var(--nl-ink); font:inherit; text-align:start; cursor:pointer; border-radius:14px; }
+.dp-step button:hover { background:color-mix(in srgb, var(--nl-ink) 4%, transparent); }
+.dp-step button:active { transform:translateY(1px); }
+/* خط بين النقاط */
+.dp-step + .dp-step button::before { content:""; position:absolute; inset-inline-start:17px; top:-14px; height:24px; width:2px; border-radius:2px; background:color-mix(in srgb, var(--nl-ink) 12%, transparent); }
+.dp-step.is-ok + .dp-step button::before { background:var(--nl-ac); }
+.dp-dot { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:14px; font-weight:700; line-height:1;
+  border:2px solid color-mix(in srgb, var(--nl-ink) 16%, transparent); background:var(--nl-bg); color:var(--nl-mut); }
+.is-ok .dp-dot { background:var(--nl-ac); border-color:var(--nl-ac); color:var(--nl-aci); }
+.is-now .dp-dot { background:var(--nl-ac2); border-color:var(--nl-ac2); color:var(--nl-bg); font-size:10px; box-shadow:0 0 0 5px color-mix(in srgb, var(--nl-ac2) 24%, transparent); }
+.dp-txt { min-width:0; }
+.dp-txt b { display:block; font-weight:600; font-size:15.5px; line-height:1.4; }
+.dp-txt small { display:block; color:var(--nl-mut); font-size:13px; line-height:1.5; }
+.is-ok .dp-txt b, .is-later .dp-txt b { color:var(--nl-mut); font-weight:500; }
+.dp-go { font-style:normal; font-weight:700; font-size:13px; padding:7px 14px; border-radius:12px; background:var(--nl-ac); color:var(--nl-aci); white-space:nowrap; }
+:is(.is-missed, .is-open) .dp-go { background:color-mix(in srgb, var(--nl-ink) 8%, transparent); color:var(--nl-ink); }
+@media (prefers-reduced-motion: reduce) { .dp-ring { transition:none; } }
+
+/* ===== الإصدار 30: بالمتصفح الرئيسية = صفحة التثبيت (install.js ← #page-home.is-install، و html.web-guess أول لحظة) ===== */
+.web-hero { display:none; }
+:is(#page-home.is-install, html.web-guess #page-home) .web-hero { display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; padding:8px 0 18px; }
+.web-logo { width:min(150px, 38vw); height:auto; }
+.web-logo-dark { display:none; }
+body.dark-mode .web-logo-light { display:none; }
+body.dark-mode .web-logo-dark { display:block; }
+.web-hero p { margin:0; max-width:34ch; color:var(--nl-mut); font-size:15px; line-height:1.8; text-wrap:balance; }
+:is(#page-home.is-install, html.web-guess #page-home) :is(.home-notes, .home-intro, .home-dashboard, .hijri-card, .friday-card, .home-footer-note) { display:none !important; }
+#page-home.is-install .install-card { max-width:560px; margin-inline:auto; }

@@ -75,6 +75,13 @@
         <!-- 1. الصفحة الرئيسية -->
         <section id="page-home" class="page-view active-page">
             <div class="brand-logo home-logo" role="img" aria-label="شعار مُذكّر"></div>
+            <!-- الإصدار 30 (معرض الرئيسية): بالمتصفح الرئيسية بتصير صفحة التثبيت بس (install.js بيحط #page-home.is-install).
+                 «لاحقًا» بترجّع «يومك»، وبالتطبيق المثبّت ما بتبين أبدًا -->
+            <div class="web-hero">
+                <img class="web-logo web-logo-light" src="assets/img/logo-light.webp" alt="مُذكّر" width="380" height="591" decoding="async">
+                <img class="web-logo web-logo-dark" src="assets/img/logo-dark.webp" alt="مُذكّر" width="380" height="591" decoding="async">
+                <p>القرآن والأذكار والتذكير، بمكان واحد. مجاني، بلا إعلانات، بلا حساب.</p>
+            </div>
             <!-- الإصدار 28 (من «ورشة مُذكّر»): رسالة إلك ← التحية ← زر التسبيح ← سطر الورد ← يوم مميز ← ثبّت التطبيق -->
             <!-- ر2 «وصلك رد على ملاحظتك» وع1 إعلان من فريق مُذكّر (feedback.js) -->
             <div class="home-notes" id="home-notes" hidden></div>
@@ -91,6 +98,14 @@
             </header>
 
             <section class="home-dashboard" aria-label="لوحة التحكم اليومية">
+                <!-- ر2 «يومك» (الإصدار 30): أربع محطات باليوم، بيكتبها home.js ← DayPath -->
+                <section class="day-path" id="day-path" aria-labelledby="dp-title">
+                    <div class="dp-head">
+                        <div class="dp-ring" id="dp-ring" aria-hidden="true"><span id="dp-count">0/4</span></div>
+                        <div><h2 id="dp-title">يومك</h2><p id="dp-line">يومك لسا ببدايتو</p></div>
+                    </div>
+                    <ol class="dp-steps" id="dp-steps" aria-label="محطات يومك"></ol>
+                </section>
                 <article class="home-card dhikr-card">
                     <span class="card-kicker">الذِكر التفاعلي التالي</span>
                     <h2 id="dhikr-card-title">خذ لحظة للذكر</h2>
@@ -100,7 +115,8 @@
                     <span class="tasbih-float" id="tasbih-float">+1</span>
                 </article>
                 <!-- ورد اليوم «سطر» (الورشة): كبسة بتفتح صفحة القرآن. الأرقام بيكتبها wird.js -->
-                <article class="home-card progress-card hw-card">
+                <!-- الإصدار 30: الورد صار محطة بـ «يومك»، فهالسطر مخفي (wird.js لسا بيكتب بعناصرو) -->
+                <article class="home-card progress-card hw-card" hidden>
                     <button class="hw-row nav-btn" data-target="quran" data-tab="wird-now" type="button">
                         <span class="hw-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.5-5-2-8-1.5V19c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V4.5C17 4 14 4.5 12 6z"/><path d="M12 6v14.5"/></svg></span>
                         <span class="hw-txt"><b>ورد اليوم</b><small><span id="dashboard-resume-surah">—</span> · <span id="dashboard-resume-meta"></span></small></span>

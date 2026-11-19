@@ -198,6 +198,8 @@ const AdhkarViewer = (() => {
         const btn = $('dk-counter');
         btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
         paintCounter(); paintChrome(); saveResume();
+        // الإصدار 30: خلص القسم كلو ← بيتعلّم بـ «يومك» بالرئيسية (الصباح والمسا والنوم بس)
+        if (typeof DayPath !== 'undefined' && items.every((_, i) => isDone(i))) DayPath.mark(groupKey);
         if (counts[idx] >= total) {
             $('dk-book').firstElementChild?.classList.add('is-done');
             if (idx < items.length - 1) setTimeout(() => show(idx + 1, 1), 520);

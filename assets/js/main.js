@@ -37,6 +37,7 @@ Motion.init();
 UpdateNotice.init();
 Install.init();
 Wird.init();
+DayPath.init();
 WirdIntro.init();
 WirdReminder.initRow();
 QuranOffline.init();
