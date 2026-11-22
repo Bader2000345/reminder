@@ -15,7 +15,7 @@ const ADHKAR = (typeof GENERAL_ADHKAR_LIST !== 'undefined' && GENERAL_ADHKAR_LIS
     'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ'
 ];
 // ← عند كل تحديث: زد هذا الرقم (مع APP_BUILD في assets/js/updates.js و build في version.json)
-const CACHE = 'mudhakkir-v43';
+const CACHE = 'mudhakkir-v44';
 const DATA = 'mudhakkir-data'; // إعدادات التذكير والنسخة المعتمدة (لا تُحذف عند التحديث)
 // ملفات التطبيق التي تُخزَّن (أضف أي ملف جديد هنا)
 const CSS_FILES = ['01-base', '02-reader-and-palette', '03-home-and-wird', '04-brand-and-effects', '05-viewer-reminders-picker', '06-immersive-and-mobile', '07-design', '08-quran-tools', '09-assistant', '10-atmosphere', '11-refresh', '12-pages', '13-mushaf-and-motion', '14-performance', '15-look', '16-layout', '17-mushaf', '18-screen', '19-feedback', '20-cards', '21-new-look'].map(n => `./assets/css/${n}.css`);
@@ -23,8 +23,10 @@ const JS_FILES = ['preload-theme', 'splash', 'i18n', 'knowledge', 'core', 'adhka
 // محتوى «شاشة مُذكّر» (نفس محتوى الأدوات برّا التطبيق): بيتخزّن متل ملفات التطبيق حتى تشتغل الشاشة بلا نت
 const DATA_FILES = ['./assets/data/widget-content.json'];
 const CORE = ['./', './index.html', './general-adhkar.js', './adhkar-data.js', './situations-adhkar.js', './manifest.json', ...CSS_FILES, ...JS_FILES, ...DATA_FILES,
-    './assets/img/logo-light.webp', './assets/img/logo-dark.webp', './assets/img/icon-192.webp', './assets/img/icon-192.png', './assets/img/favicon-64.png'];
-const ICON = './assets/img/icon-192.png', BADGE = './assets/img/favicon-64.png';
+    './assets/img/logo-light.webp', './assets/img/logo-dark.webp', './assets/img/icon-192.webp', './assets/img/icon-192.png', './assets/img/favicon-64.png', './assets/img/badge-96.png'];
+// BADGE (الإصدار 31): أيقونة شريط الحالة بأندرويد لازم تكون بيضا على شفاف، لأنو أندرويد بيرسمها بلون واحد من الشفافية بس.
+// قبل كانت favicon-64.png الملوّنة، فكانت تطلع مربّع (شكوى من أندرويد 10).
+const ICON = './assets/img/icon-192.png', BADGE = './assets/img/badge-96.png';
 // يُعرض التذكير إن تأخر وصول الإشعار حتى ساعة: السيرفر بيلقط المتأخر لحد 30 دقيقة (جدول كل نص ساعة)،
 // وفوقها تأخير خدمة الإشعارات نفسها (TTL نص ساعة). و«shown» بيمنع التكرار.
 const DUE_WINDOW = 60 * 60 * 1000;

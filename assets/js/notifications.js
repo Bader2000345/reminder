@@ -80,7 +80,7 @@ const Notifier = (() => {
     // extra: أزرار الإشعار وبياناته (تعمل فقط عبر الـ Service Worker)
     async function system(title, body, tag, extra = null) {
         if (permission() !== 'granted') return false;
-        const options = { body, tag, renotify: true, lang: 'ar', dir: 'rtl', icon: 'assets/img/icon-192.png', badge: 'assets/img/favicon-64.png' };
+        const options = { body, tag, renotify: true, lang: 'ar', dir: 'rtl', icon: 'assets/img/icon-192.png', badge: 'assets/img/badge-96.png' };
         try {
             if (SW_OK) {
                 const reg = await navigator.serviceWorker.getRegistration();

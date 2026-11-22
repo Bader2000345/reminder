@@ -640,3 +640,19 @@ body.dark-mode .web-logo-dark { display:block; }
 .web-hero p { margin:0; max-width:34ch; color:var(--nl-mut); font-size:15px; line-height:1.8; text-wrap:balance; }
 :is(#page-home.is-install, html.web-guess #page-home) :is(.home-notes, .home-intro, .home-dashboard, .hijri-card, .friday-card, .home-footer-note) { display:none !important; }
 #page-home.is-install .install-card { max-width:560px; margin-inline:auto; }
+
+/* ===== الإصدار 31: «لم تظهر الأيقونة؟» تحت طريقة التثبيت (أندرويد بـ Chrome، install.js) ===== */
+.ic-help { position:relative; margin-top:12px; border-radius:16px; background:var(--nl-card-2); color:var(--nl-ink); font-size:13px; line-height:1.85; }
+.ic-help[hidden] { display:none; }
+:is(.ic-help, .ic-brand) > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px; min-height:44px; font-weight:600; -webkit-user-select:none; user-select:none; }
+:is(.ic-help, .ic-brand) > summary::-webkit-details-marker { display:none; }
+.ic-help > summary { padding:10px 14px; }
+:is(.ic-help, .ic-brand) > summary::after { content:""; margin-inline-start:auto; flex:none; width:7px; height:7px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:translateY(-2px) rotate(45deg); opacity:.55; transition:transform .2s ease-out; }
+:is(.ic-help, .ic-brand)[open] > summary::after { transform:translateY(2px) rotate(-135deg); }
+.ic-help-list { display:grid; gap:6px; padding:0 8px 8px; }
+.ic-brand { border-radius:12px; background:var(--nl-bg); }
+.ic-brand > summary { padding:8px 12px; }
+.ic-brand > summary i { font-style:normal; font-size:11.5px; font-weight:700; line-height:1.6; padding:1px 9px; border-radius:999px; background:var(--nl-ac); color:var(--nl-aci); }
+.ic-brand p { margin:0; padding:0 12px 12px; color:var(--nl-mut) !important; }
+.ic-brand b { color:var(--nl-ink) !important; font-weight:600; }
+#page-settings .ic-help { flex:1 1 100%; }

@@ -179,6 +179,10 @@ const I18n = (() => {
         ['مثبّت ✓ أنت تستخدم تطبيق مُذكّر الآن', 'Installed ✓ You’re using the Mudhakkir app'], ['تم التثبيت ✓ ستجده بين تطبيقاتك', 'Installed ✓ You’ll find it among your apps'], ['مثبّت على هذا الجهاز ✓ (التفاصيل تحت)', 'Installed on this device ✓ (details below)'],
         ['جارٍ التثبيت… سيظهر مُذكّر بين تطبيقاتك', 'Installing… Mudhakkir will appear among your apps'], ['على الآيفون والآيباد: اتبع الخطوات الظاهرة تحت الزر ↓', 'On iPhone and iPad: follow the steps below the button ↓'],
         ['مُذكّر مثبّت مسبقًا على هذا الجهاز، التفاصيل تحت ↓', 'Mudhakkir is already installed on this device, details below ↓'], ['اتبع الخطوات الظاهرة تحت الزر ↓', 'Follow the steps below the button ↓'],
+        ['افتحه في Chrome لتثبيته، فهذا المتصفح لا يثبّت التطبيقات', 'Open it in Chrome to install it, this browser can’t install apps'],
+        ['جارٍ فتح Chrome… وإن لم يُفتح، فالرابط منسوخ: الصقه في Chrome', 'Opening Chrome… If it doesn’t open, the link is copied: paste it in Chrome'],
+        ['جارٍ التثبيت… وإن لم تظهر الأيقونة خلال دقيقة، افتح «لم تظهر الأيقونة؟»', 'Installing… If the icon doesn’t appear within a minute, open “Installed, but no icon?”'],
+        ['تم التثبيت ✓ وإن لم تظهر الأيقونة، افتح «لم تظهر الأيقونة؟»', 'Installed ✓ If the icon doesn’t appear, open “Installed, but no icon?”'],
         ['أنت فاتح مُذكّر كتطبيق مثبّت ✓', 'You opened Mudhakkir as an installed app ✓'], ['تم تثبيت مُذكّر ✓ ستجده بين تطبيقاتك', 'Mudhakkir installed ✓ You’ll find it among your apps'],
         // النسخ الاحتياطي
         ['تم تجهيز النسخة الاحتياطية ✓', 'Backup ready ✓'], ['تم حفظ النسخة الاحتياطية ✓', 'Backup saved ✓'], ['هذا الملف ليس نسخة احتياطية من مُذكّر', 'This file is not a Mudhakkir backup'], ['النسخة فارغة', 'The backup is empty'],
