@@ -583,9 +583,11 @@ const Assistant = (() => {
         // رابط مباشر: ?ask=1&q=...
         const params = new URLSearchParams(location.search);
         if (params.get('ask') === '1') {
-            const q = params.get('q') || '';
+            const q = (params.get('q') || '').slice(0, 300);
             history.replaceState(history.state, '', location.pathname);
-            setTimeout(() => open({ question: q }), 400);
+            // الإصدار 32 (الأمان): السؤال من الرابط بينكتب بالخانة بس، والمستخدم بيبعتو بإيدو.
+            // قبل كان ينبعت لحالو، فأي حدا بيقدر يعمل رابط بيبعت كلام باسم المستخدم ويصرف من حدّو اليومي.
+            setTimeout(() => open({ question: q, send: false }), 400);
         }
     }
     return { init, open, close, send };

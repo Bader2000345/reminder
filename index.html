@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- الإصدار 32 (الأمان): المتصفح ما بيشغّل غير سكربتات التطبيق نفسه، وما بيتصل إلا بالسيرفر ومصادر القرآن والتفسير والخطوط.
+         فحتى لو انحشر كود بنص ما، ما بيشتغل ولا بيقدر يبعت بيانات لبرّا. أي مصدر جديد (API، خط، صور) لازم ينضاف هون. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://mudhakkir-push.bader-bm-2000.workers.dev https://api.alquran.cloud https://api.quran.com https://quranenc.com https://cdn.jsdelivr.net https://static.qurancdn.com https://verses.quran.foundation; worker-src 'self'; manifest-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="theme-color" content="#F4F3EE">
     <title>مُذكّر | التطبيق الشامل للقرآن الكريم والأذكار</title>
     <meta name="description" content="مُذكّر: وردك اليومي من القرآن الكريم، والمصحف بالتجويد والتفسير، وأذكار الصباح والمساء بأدلّتها، ومسبحة، وتذكيرات تصلك حتى والتطبيق مغلق. مجاني وبلا إعلانات.">
