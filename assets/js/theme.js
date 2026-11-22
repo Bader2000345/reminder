@@ -56,7 +56,7 @@ function applyTheme(origin) {
     try { localStorage.setItem(THEME_DARK_KEY, dark ? '1' : '0'); } catch (e) {}
     document.querySelectorAll('[data-theme-opt]').forEach(b => b.classList.toggle('active', b.dataset.themeOpt === themeMode));
     const status = document.getElementById('theme-status'); if (status) status.textContent = themeStatusText();
-    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = dark ? '#161915' : '#F1F0EA';
+    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = dark ? '#121A17' : '#F4F3EE';
     if (dark === document.body.classList.contains('dark-mode')) return;
     const html = document.documentElement;
     // أثناء التبديل ما في ولا انتقال لون (theme-fade بـ 14-performance.css): الألوان الجديدة بتطلع دفعة وحدة

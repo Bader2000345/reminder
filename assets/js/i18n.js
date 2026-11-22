@@ -61,7 +61,7 @@ const I18n = (() => {
         ['كمّل من وين وقفت', 'Continue where you stopped'], ['كمّل', 'Continue'], ['حسب وقتك', 'For your time'], ['هلّق', 'Now'],
         ['بعد الفجر', 'After Fajr'], ['بعد العصر', 'After Asr'], ['قبل النوم', 'Before sleep'], ['عند الاستيقاظ', 'On waking'],
         ['أذكار الصباح', 'Morning adhkar'], ['أذكار المساء', 'Evening adhkar'], ['أذكار النوم', 'Sleep adhkar'], ['أذكار الاستيقاظ', 'Waking adhkar'],
-        ['بعد العبادات', 'After worship'], ['أذكار بعد الصلاة', 'After-prayer adhkar'], ['أذكار ودعاء بعد كل صلاة', 'Adhkar and du‘a after every prayer'], ['تسبيح واستغفار', 'Tasbih & istighfar'], ['فضل الذكر العظيم', 'The great virtue of dhikr'],
+        ['بعد العبادات', 'After worship'], ['الصلاة والذكر', 'Prayer & dhikr'], ['أدعية الاستفتاح', 'Opening supplications'], ['أول الصلاة بعد تكبيرة الإحرام', 'Start of prayer, after the opening takbir'],['أذكار بعد الصلاة', 'After-prayer adhkar'], ['أذكار ودعاء بعد كل صلاة', 'Adhkar and du‘a after every prayer'], ['تسبيح واستغفار', 'Tasbih & istighfar'], ['فضل الذكر العظيم', 'The great virtue of dhikr'],
         ['المناسبات', 'Situations'], ['عند الغضب', 'When angry'], ['الهمّ والحزن', 'Worry & sadness'], ['السفر', 'Travel'], ['المطر', 'Rain'], ['المرض', 'Illness'], ['الطعام', 'Food'], ['الخروج من المنزل', 'Leaving home'],
         ['كل المناسبات ←', 'All situations →'], ['أذكار المناسبات', 'Adhkar for situations'], ['ابحث عن موقف… (غضب، سفر، مطر)', 'Search a situation… (anger, travel, rain)'], ['البحث في أذكار المناسبات', 'Search situations'],
         ['لا يوجد موقف بهذا الاسم. جرّب «اسأل مُذكّر».', 'No situation by that name. Try “Ask Mudhakkir”.'],

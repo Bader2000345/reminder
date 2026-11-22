@@ -11,7 +11,7 @@
 
 const Assistant = (() => {
     const $ = id => document.getElementById(id);
-    const KEY = 'mudhakkir-chat', DAY_KEY = 'mudhakkir-chat-day', VERSION = 2;
+    const KEY = 'mudhakkir-chat', DAY_KEY = 'mudhakkir-chat-day', VERSION = 3;
     const MAX_SAVED = 40, SEND_LAST = 12, DAILY = 20;
     const ID_RE = /\[\[((?:[\w-]+:\d+)|(?:help:[a-z-]+))\]\]/g, HAS_ID = /\[\[(?:[\w-]+:\d+|help:[a-z-]+)\]\]/;
     const DATA_CACHE = 'mudhakkir-data';
@@ -36,7 +36,9 @@ const Assistant = (() => {
             if (d && Array.isArray(d.msgs)) {
                 msgs = d.msgs.filter(m => m && m.text);
                 // الإصدار 6 غيّر ترتيب أذكار الصلاة: بطاقات المحادثات القديمة قد تشير لذكر آخر
+                // والإصدار 32 زاد دعاء رابع بأذكار الصلاة، فالأرقام من 3 وطالع انزاحت
                 if ((d.v || 1) < 2) msgs.forEach(m => { m.text = m.text.replace(/\[\[post_prayer:\d+\]\]/g, ''); });
+                else if (d.v < 3) msgs.forEach(m => { m.text = m.text.replace(/\[\[post_prayer:(\d+)\]\]/g, (s, n) => Number(n) >= 3 ? `[[post_prayer:${Number(n) + 1}]]` : s); });
             }
         } catch (e) {}
     }

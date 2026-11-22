@@ -12,16 +12,22 @@
 
 /* ===================== الألوان ===================== */
 /* --nl-* هنن الألوان الجديدة، وتحت منربط عليهن أسماء الألوان القديمة يلي مستعملة بكل الملفات */
+/* الإصدار 32 (معرض الألوان: ل2 «زمرّد وعاج» ق1 «هادي»، وأهدى من المعرض بطلب صاحب التطبيق):
+ *   60٪ أساسي --nl-bg: عاجي (بالليل حبر زمرّدي)
+ *   30٪ داعم  --nl-card/--nl-card-2: زمرّدي فاتح للبطاقات والشريط تحت
+ *   10٪ ملفت  --nl-fill (+ --nl-fill-ink للكتابة فوقه): ذهبي للأزرار والعدّاد والتقدّم والنقطة
+ *   --nl-ac: الزمرّدي الغامق للكتابة والأيقونات بس (الذهبي ما بيبين ككتابة عالعاجي). بالليل ذهبي.
+ * التخفيف: الكتابة مو أسود تام (#1F2D27)، والليل مو أسود فاحم (#121A17)، والذهبي أقل برتقاني. */
 body:not(.dark-mode) {
-  /* بعد التجربة (18 تشرين التاني): الكريمي كان قوي عالعين، فصار ورق أهدى وأقل صفار، والبطاقة أوضح عن الخلفية، والذهبي أهدى */
-  --nl-bg:#F1F0EA; --nl-card:#E7E5DC; --nl-card-2:#DCDAD0; --nl-ink:#1C241F; --nl-mut:#575C53;
-  --nl-ac:#2D4739; --nl-aci:#F3F2EC; --nl-ac2:#A98A3E; --nl-ac2-ink:#6E5716; --nl-line:rgba(28,36,31,.12);
-  --nl-float:0 10px 26px -14px rgba(31,42,34,.35);
+  --nl-bg:#F4F3EE; --nl-card:#DBE6E0; --nl-card-2:#CDDBD3; --nl-ink:#1F2D27; --nl-mut:#58685F;
+  --nl-ac:#215A48; --nl-aci:#F4F3EE; --nl-fill:#C9A04A; --nl-fill-ink:#231B0B;
+  --nl-ac2:#C49B45; --nl-ac2-ink:#7A5B1E; --nl-line:rgba(31,45,39,.12);
+  --nl-float:0 10px 26px -14px rgba(28,52,43,.32);
 }
 body.dark-mode {
-  --nl-bg:#161915; --nl-card:#21251F; --nl-card-2:#2A2F27; --nl-ink:#EDEDE4; --nl-mut:#A3A797;
-  /* الزعفراني كان فاقع بالليل، صار أهدى (أقل تشبّع) */
-  --nl-ac:#CDA75F; --nl-aci:#1A1408; --nl-ac2:#9DB592; --nl-ac2-ink:#9DB592; --nl-line:rgba(237,237,228,.11);
+  --nl-bg:#121A17; --nl-card:#1B2B25; --nl-card-2:#23362E; --nl-ink:#DDE6E1; --nl-mut:#9BADA4;
+  --nl-ac:#D2B062; --nl-aci:#1A1409; --nl-fill:#D2B062; --nl-fill-ink:#1A1409;
+  --nl-ac2:#C9A85E; --nl-ac2-ink:#D2B062; --nl-line:rgba(221,230,225,.11);
   --nl-float:0 12px 28px -12px rgba(0,0,0,.7);
 }
 /* لازم ينكتبوا عالـ body بالوضعين، لأنو المتغيّر يلي بيعتمد على متغيّر تاني بينحسب مكان ما انكتب */
@@ -78,7 +84,7 @@ footer, .home-footer-note { display:none !important; }
 
 /* ===================== الأزرار ===================== */
 .primary-button, .ic-btn, #nc-run {
-  background:var(--nl-ac) !important; color:var(--nl-aci) !important; border:0 !important; box-shadow:none !important;
+  background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; border:0 !important; box-shadow:none !important;
   border-radius:16px !important; font-weight:600 !important; background-image:none !important;
 }
 .primary-button:hover { filter:brightness(1.06); }
@@ -92,7 +98,7 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline:2px so
 
 /* المفاتيح (تشغيل/إيقاف) */
 .switch span { background:color-mix(in srgb, var(--nl-ink) 18%, transparent) !important; box-shadow:none !important; }
-.switch input:checked + span { background:var(--nl-ac) !important; }
+.switch input:checked + span { background:var(--nl-fill) !important; }
 .switch span::before { background:var(--nl-bg) !important; box-shadow:none !important; }
 
 /* حقول الكتابة */
@@ -105,7 +111,7 @@ input[type="text"], input[type="search"], input[type="time"], input[type="number
 
 /* التبويبات والاختيارات المقطّعة */
 .segmented { background:var(--nl-card) !important; border:0 !important; box-shadow:none !important; }
-.segmented button.active, .segmented button[aria-pressed="true"] { background:var(--nl-ac) !important; color:var(--nl-aci) !important; box-shadow:none !important; }
+.segmented button.active, .segmented button[aria-pressed="true"] { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; box-shadow:none !important; }
 
 /* ===================== شريط التنقّل ش3: أيقونات ونقطة ===================== */
 .sidebar, body:not(.dark-mode) .sidebar, body.dark-mode .sidebar,
@@ -116,7 +122,7 @@ html.fx-lite .sidebar, html.fx-lite body:not(.dark-mode) .sidebar, html.fx-lite 
 .nav-pill { display:none !important; }
 .side-link, .side-link:hover { color:var(--nl-mut) !important; background:transparent !important; box-shadow:none !important; }
 .side-link.active, .side-link.active:hover { color:var(--nl-ac) !important; background:transparent !important; }
-.side-link::after { content:""; position:absolute; left:50%; bottom:8px; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:var(--nl-ac); opacity:0; transform:scale(.4); transition:opacity var(--m-150, .15s) ease-out, transform var(--m-150, .15s) ease-out; }
+.side-link::after { content:""; position:absolute; left:50%; bottom:8px; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:var(--nl-fill); opacity:0; transform:scale(.4); transition:opacity var(--m-150, .15s) ease-out, transform var(--m-150, .15s) ease-out; }
 .side-link.active::after { opacity:1; transform:none; }
 .side-link.active svg { animation:none !important; }
 /* الكلمات تحت الأيقونات مخفية بالعين، بس قارئ الشاشة بيقراها */
@@ -151,7 +157,7 @@ body:is(.dark-mode, :not(.dark-mode)) { --frame-ring:inset 0 0 0 6px var(--nl-ca
 
 /* ===================== أزرار عائمة (التسبيح السريع والمساعد) ===================== */
 .tasbih-fab { background:var(--nl-card) !important; color:var(--nl-ac) !important; border:0 !important; box-shadow:var(--nl-float) !important; }
-.ask-fab { background:var(--nl-ac) !important; color:var(--nl-aci) !important; border:0 !important; box-shadow:var(--nl-float) !important; }
+.ask-fab { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; border:0 !important; box-shadow:var(--nl-float) !important; }
 .ask-fab::before, .ask-fab::after, .tasbih-fab::before, .tasbih-fab::after { display:none !important; }
 
 /* ===================== الرئيسية (الورشة: «حاشية»، والتقدّم «خط») ===================== */
@@ -191,10 +197,10 @@ body:is(.dark-mode, :not(.dark-mode)) { --frame-ring:inset 0 0 0 6px var(--nl-ca
 #page-home .dhikr-card::before, #page-home .dhikr-card::after { display:none !important; }
 #page-home .dhikr-card :is(.card-kicker, h2) { display:none !important; }
 #page-home .dhikr-card .dhikr-copy { grid-area:copy; margin:0 !important; padding:0 !important; max-width:none !important; font-size:22px !important; line-height:1.9 !important; color:var(--nl-ink) !important; text-shadow:none !important; }
-#page-home .tasbih-orb { grid-area:orb; position:relative !important; inset:auto !important; left:auto !important; top:auto !important; margin:8px; width:96px !important; height:96px !important; border-radius:50% !important; background:var(--nl-ac) !important; color:var(--nl-aci) !important; border:0 !important; box-shadow:none !important; animation:none !important; display:grid !important; place-items:center; align-content:center; gap:2px; }
+#page-home .tasbih-orb { grid-area:orb; position:relative !important; inset:auto !important; left:auto !important; top:auto !important; margin:8px; width:96px !important; height:96px !important; border-radius:50% !important; background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; border:0 !important; box-shadow:none !important; animation:none !important; display:grid !important; place-items:center; align-content:center; gap:2px; }
 #page-home .tasbih-orb::before { display:none !important; }
 #page-home .tasbih-orb::after { inset:-8px !important; background:conic-gradient(var(--nl-ac2) calc(var(--p) * 360deg), color-mix(in srgb, var(--nl-ac2) 22%, transparent) 0) !important; }
-#page-home #tasbih-count { font:600 30px/1 var(--font-main) !important; color:var(--nl-aci) !important; text-shadow:none !important; }
+#page-home #tasbih-count { font:600 30px/1 var(--font-main) !important; color:var(--nl-fill-ink) !important; text-shadow:none !important; }
 #page-home .tasbih-orb small { display:none !important; } /* الرقم لحالو كافي، والدائرة نفسها هي الزر */
 #page-home .tasbih-float { left:58px !important; top:2px !important; right:auto !important; color:var(--nl-ac) !important; }
 #page-home .dhikr-meta { grid-area:meta; display:flex !important; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin:0 !important; padding-top:10px; border-top:1px solid var(--nl-line); }
@@ -225,7 +231,7 @@ body:is(.dark-mode, :not(.dark-mode)) { --frame-ring:inset 0 0 0 6px var(--nl-ca
 .adhkar-resume .ar-txt { grid-area:txt; display:grid; gap:1px; min-width:0; }
 .adhkar-resume .ar-txt small { color:var(--nl-mut); font-size:12.5px; }
 .adhkar-resume .ar-txt b { font:600 17px/1.5 var(--title-font); }
-.adhkar-resume .ar-go { grid-area:go; background:var(--nl-ac); color:var(--nl-aci); border-radius:14px; padding:9px 18px; font-weight:600; }
+.adhkar-resume .ar-go { grid-area:go; background:var(--nl-fill); color:var(--nl-fill-ink); border-radius:14px; padding:9px 18px; font-weight:600; }
 .adhkar-resume .ar-track { grid-area:bar; height:4px; border-radius:4px; background:color-mix(in srgb, var(--nl-ac2) 22%, transparent); overflow:hidden; }
 .adhkar-resume .ar-track i { display:block; height:100%; width:0; background:var(--nl-ac2); border-radius:inherit; }
 .adhkar-resume:hover { background:color-mix(in srgb, var(--nl-ink) 4%, var(--nl-card)); }
@@ -244,7 +250,7 @@ body:is(.dark-mode, :not(.dark-mode)) { --frame-ring:inset 0 0 0 6px var(--nl-ca
 #page-adhkar .shelf-card strong { color:var(--nl-ink) !important; font:600 15.5px/1.45 var(--title-font) !important; }
 #page-adhkar .shelf-card .cat-count { color:var(--nl-mut) !important; font-size:12px !important; font-style:normal; opacity:1 !important; background:none !important; padding:0 !important; position:static !important; }
 #page-adhkar .shelf-card.is-now { box-shadow:inset 0 0 0 1.5px var(--nl-ac2) !important; }
-#page-adhkar .shelf-card.is-now::after { content:"هلّق"; position:absolute; top:12px; left:12px; display:block !important; font-size:11px; font-weight:600; line-height:1; padding:5px 9px; border-radius:999px; background:var(--nl-ac2); color:var(--nl-aci); }
+#page-adhkar .shelf-card.is-now::after { content:"هلّق"; position:absolute; top:12px; left:12px; display:block !important; font-size:11px; font-weight:600; line-height:1; padding:5px 9px; border-radius:999px; background:var(--nl-ac2); color:var(--nl-fill-ink); }
 body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 
 /* بعد العبادات: سطور */
@@ -306,7 +312,7 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 .adhkar-detail .dk-counter { background:var(--nl-card) !important; color:var(--nl-ink) !important; border:0 !important; box-shadow:none !important; }
 .adhkar-detail .dk-counter .dk-ring-bg { stroke:color-mix(in srgb, var(--nl-ac2) 22%, transparent) !important; }
 .adhkar-detail .dk-counter .dk-ring { stroke:var(--nl-ac2) !important; }
-.adhkar-detail .dk-counter.done { background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
+.adhkar-detail .dk-counter.done { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
 .adhkar-detail #dk-count { color:inherit !important; }
 .adhkar-detail .dk-hint { color:var(--nl-mut) !important; opacity:1 !important; }
 
@@ -317,8 +323,8 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 #page-quran .q-tile svg { width:30px !important; height:30px !important; color:var(--nl-ac) !important; margin:0 0 4px !important; }
 #page-quran .q-tile b { font:600 15px/1.4 var(--title-font) !important; color:inherit !important; }
 #page-quran .q-tile small { font-size:12px !important; color:var(--nl-mut) !important; line-height:1.4; }
-#page-quran .q-tile.is-primary { background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
-#page-quran .q-tile.is-primary :is(svg, small) { color:color-mix(in srgb, var(--nl-aci) 85%, transparent) !important; }
+#page-quran .q-tile.is-primary { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
+#page-quran .q-tile.is-primary :is(svg, small) { color:color-mix(in srgb, var(--nl-fill-ink) 85%, transparent) !important; }
 #page-quran .q-tile.q-streak svg { color:var(--nl-ac2) !important; }
 #page-quran .q-tile::before, #page-quran .q-tile::after { display:none !important; }
 #page-quran .wird-streak-bar { display:none !important; } /* صارت مربع «السلسلة» فوق */
@@ -339,7 +345,7 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 /* الآية: ورقة المصحف بنفس ألوان التطبيق */
 #page-quran .single-verse-display { --paper-q:var(--nl-bg); --ink-q:var(--nl-ink); --frame:color-mix(in srgb, var(--nl-ac2) 70%, transparent); box-shadow:none !important; }
 #page-quran .single-verse-nav { gap:8px !important; }
-#page-quran .single-verse-nav .hero-solid { background:var(--nl-ac) !important; color:var(--nl-aci) !important; border:0 !important; box-shadow:none !important; }
+#page-quran .single-verse-nav .hero-solid { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; border:0 !important; box-shadow:none !important; }
 #page-quran .single-verse-nav .hero-ghost { background:transparent !important; color:var(--nl-ac) !important; border:0 !important; box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--nl-ac) 40%, transparent) !important; }
 #page-quran .wird-action-row { gap:6px !important; }
 #page-quran .wird-action-row .focus-button { background:var(--nl-card-2) !important; box-shadow:none !important; color:var(--nl-ink) !important; font-size:13px !important; border-radius:12px !important; min-height:40px; }
@@ -374,7 +380,7 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 #page-settings .setting-icon svg { width:21px; height:21px; }
 #page-settings .setting-card .segmented { flex:1 1 100%; display:flex !important; flex-wrap:wrap; gap:4px; padding:4px !important; border-radius:14px !important; background:var(--nl-card-2) !important; }
 #page-settings .setting-card .segmented button { flex:1 1 auto; border-radius:11px !important; min-height:38px; font-size:13px !important; color:var(--nl-ink) !important; background:transparent !important; }
-#page-settings .setting-card .segmented button:is(.active, [aria-pressed="true"], [aria-checked="true"]) { background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
+#page-settings .setting-card .segmented button:is(.active, [aria-pressed="true"], [aria-checked="true"]) { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
 #page-settings .setting-card > .ghost-button, #page-settings .setting-card > .primary-button { min-height:40px; padding:8px 16px !important; font-size:13.5px !important; }
 /* اسمك: سطر عادي أول شي */
 #page-settings .name-setting .name-form { flex:1 1 100%; display:flex !important; gap:8px; margin:0 !important; }
@@ -388,12 +394,12 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 #page-settings .backup-actions { flex:1 1 100%; display:flex !important; gap:8px; }
 #page-settings .backup-actions > * { flex:1; min-height:40px; }
 #page-settings .install-how, #page-settings .ic-note { flex:1 1 100%; color:var(--nl-mut) !important; }
-#page-settings .fb-pill { background:var(--nl-ac2) !important; color:var(--nl-aci) !important; }
+#page-settings .fb-pill { background:var(--nl-ac2) !important; color:var(--nl-fill-ink) !important; }
 #page-settings .ver-chip { background:transparent !important; color:var(--nl-mut) !important; border:0 !important; box-shadow:none !important; justify-self:center; }
 #page-settings .setting-card[hidden] { display:none !important; }
 [data-install]::before, [data-install]::after { display:none !important; }
 /* الأرقام بالإنجليزي متل باقي التطبيق (الإصدار 27)، حتى بعدّادات القوائم */
-.ic-steps li::before { content:counter(icstep) !important; background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
+.ic-steps li::before { content:counter(icstep) !important; background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
 .dk-list li::before { content:counter(sunna) !important; background:var(--nl-card-2) !important; color:var(--nl-ac2-ink) !important; }
 .ic-steps li { background:var(--nl-card-2) !important; color:var(--nl-ink) !important; }
 .ic-steps .k { background:var(--nl-bg) !important; color:var(--nl-ac) !important; box-shadow:none !important; }
@@ -427,7 +433,7 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 @keyframes nlCycle { 30% { color:var(--nl-ac2); } }
 #page-tasbih .tb-chips { display:flex !important; flex-wrap:wrap; justify-content:center; gap:8px !important; }
 #page-tasbih .tb-chips button { border-radius:999px !important; padding:8px 16px !important; min-height:40px; background:var(--nl-card) !important; color:var(--nl-ink) !important; font-size:14px !important; }
-#page-tasbih .tb-chips button[aria-checked="true"] { background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
+#page-tasbih .tb-chips button[aria-checked="true"] { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
 #page-tasbih .tb-tools { display:flex !important; flex-wrap:wrap; justify-content:center; gap:8px !important; }
 #page-tasbih .tb-tools .segmented { border-radius:14px !important; padding:4px !important; }
 #page-tasbih .tb-tools .segmented button { border-radius:11px !important; min-height:36px; }
@@ -444,7 +450,7 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 .rem-today .rt-line li::before { content:""; position:absolute; right:-26px; top:7px; width:10px; height:10px; border-radius:50%; background:var(--nl-card); box-shadow:0 0 0 2px color-mix(in srgb, var(--nl-ink) 28%, transparent); }
 .rem-today .rt-line li b { font-weight:600; font-size:15px; color:var(--nl-ink); }
 .rem-today .rt-line li small { color:var(--nl-mut); font-size:12.5px; }
-.rem-today .rt-line li.is-done::before { background:var(--nl-ac); box-shadow:none; }
+.rem-today .rt-line li.is-done::before { background:var(--nl-fill); box-shadow:none; }
 .rem-today .rt-line li.is-done b { color:var(--nl-mut); font-weight:500; }
 .rem-today .rt-line li.rt-now { margin:-4px 0; }
 .rem-today .rt-line li.rt-now::before { right:-30px; top:50%; width:18px; height:18px; margin-top:-9px; background:var(--nl-ac2); box-shadow:0 0 0 5px color-mix(in srgb, var(--nl-ac2) 25%, transparent), 0 0 18px var(--nl-ac2); }
@@ -481,17 +487,17 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 .tb-ring-fg, .tm-ring-fg, .tm-hold circle { stroke:var(--nl-ac2) !important; }
 .tm-exit:focus-visible { outline-color:var(--nl-ac2) !important; }
 /* تذكير جوّا التطبيق */
-.inapp-reminder, body.dark-mode .inapp-reminder { background:var(--nl-ac) !important; background-image:none !important; color:var(--nl-aci) !important; box-shadow:var(--nl-float) !important; border:0 !important; }
+.inapp-reminder, body.dark-mode .inapp-reminder { background:var(--nl-fill) !important; background-image:none !important; color:var(--nl-fill-ink) !important; box-shadow:var(--nl-float) !important; border:0 !important; }
 /* صنع بطاقة: زر المشاركة */
-.cm-share { background:var(--nl-ac) !important; background-image:none !important; color:var(--nl-aci) !important; box-shadow:none !important; }
+.cm-share { background:var(--nl-fill) !important; background-image:none !important; color:var(--nl-fill-ink) !important; box-shadow:none !important; }
 /* شاشة مُذكّر: مربع الساعة */
-.c-clock { background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
+.c-clock { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
 /* النوافذ والأوراق المنبثقة */
 .modal-card, .qsheet, .q-sheet, .ask-panel { background:var(--nl-bg) !important; color:var(--nl-ink) !important; border:0 !important; }
 .modal-card h2, .qsheet h2, .q-sheet h2 { font-family:var(--title-font) !important; color:var(--nl-ink) !important; }
 .wn-badge { background:color-mix(in srgb, var(--nl-ac) 12%, transparent) !important; color:var(--nl-ac) !important; border:0 !important; }
 .update-banner { background:var(--nl-card) !important; color:var(--nl-ink) !important; border:0 !important; box-shadow:var(--nl-float) !important; }
-.update-banner .ub-icon, .update-banner [class*="icon"] { background:var(--nl-ac) !important; color:var(--nl-aci) !important; background-image:none !important; }
+.update-banner .ub-icon, .update-banner [class*="icon"] { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; background-image:none !important; }
 .toast { box-shadow:var(--nl-float) !important; }
 /* شاشة البداية */
 .splash, body.dark-mode .splash { background:var(--nl-bg) !important; }
@@ -508,7 +514,7 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 .tasbih-mode .tm-ring-bg { stroke:color-mix(in srgb, var(--nl-ac2) 24%, transparent) !important; }
 .tasbih-mode .tm-chip { background:var(--nl-card) !important; color:var(--nl-ink) !important; }
 .tasbih-mode :is(.tm-sub, .tm-hint) { color:var(--nl-mut) !important; opacity:1 !important; }
-.tasbih-mode .tm-toast { background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
+.tasbih-mode .tm-toast { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
 .tasbih-mode .tm-ripple { background:color-mix(in srgb, var(--nl-ac2) 30%, transparent) !important; }
 .tasbih-mode .tb-wave, .tb-orb .tb-wave { border-color:color-mix(in srgb, var(--nl-ac2) 45%, transparent) !important; background:transparent !important; }
 
@@ -550,7 +556,7 @@ body.dark-mode #page-adhkar .shelf-card.is-now::after { color:#161915; }
 .wird-focus .wf-tools { max-width:720px; width:100%; margin:0 auto; }
 .wird-focus .focus-tools { display:flex !important; flex-wrap:wrap; justify-content:center; gap:6px !important; margin:0 !important; opacity:1 !important; }
 .wird-focus .focus-tool { background:var(--nl-card) !important; color:var(--nl-ink) !important; border:0 !important; box-shadow:none !important; border-radius:12px !important; min-height:38px; font-size:12.5px !important; }
-.wird-focus .focus-tool[aria-pressed="true"] { background:var(--nl-ac) !important; color:var(--nl-aci) !important; }
+.wird-focus .focus-tool[aria-pressed="true"] { background:var(--nl-fill) !important; color:var(--nl-fill-ink) !important; }
 .wird-float-plus { color:var(--nl-ac2-ink) !important; }
 .wird-focus .wird-focus-card, #page-quran .single-verse-display { outline:0 !important; outline-offset:0 !important; }
 
@@ -606,7 +612,7 @@ html { overscroll-behavior-y:none; }
 #page-home .day-path { background:var(--nl-card); color:var(--nl-ink); box-shadow:var(--frame-ring); border-radius:22px; padding:18px 18px 10px; display:grid; gap:8px; }
 .dp-head { display:flex; align-items:center; gap:14px; }
 .dp-ring { --p:0; width:74px; height:74px; border-radius:50%; flex:none; display:grid; place-items:center;
-  background:conic-gradient(var(--nl-ac) calc(var(--p) * 1%), color-mix(in srgb, var(--nl-ink) 10%, transparent) 0); transition:background .4s ease-out; }
+  background:conic-gradient(var(--nl-fill) calc(var(--p) * 1%), color-mix(in srgb, var(--nl-ink) 10%, transparent) 0); transition:background .4s ease-out; }
 .dp-ring span { width:60px; height:60px; border-radius:50%; background:var(--nl-card); display:grid; place-items:center; font:700 17px/1 var(--title-font); color:var(--nl-ink); font-variant-numeric:tabular-nums; }
 .dp-head h2 { margin:0; font:700 23px/1.3 var(--title-font); color:var(--nl-ink); }
 .dp-head p { margin:2px 0 0; color:var(--nl-mut); font-size:14px; }
@@ -617,16 +623,16 @@ html { overscroll-behavior-y:none; }
 .dp-step button:active { transform:translateY(1px); }
 /* خط بين النقاط */
 .dp-step + .dp-step button::before { content:""; position:absolute; inset-inline-start:17px; top:-14px; height:24px; width:2px; border-radius:2px; background:color-mix(in srgb, var(--nl-ink) 12%, transparent); }
-.dp-step.is-ok + .dp-step button::before { background:var(--nl-ac); }
+.dp-step.is-ok + .dp-step button::before { background:var(--nl-fill); }
 .dp-dot { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:14px; font-weight:700; line-height:1;
   border:2px solid color-mix(in srgb, var(--nl-ink) 16%, transparent); background:var(--nl-bg); color:var(--nl-mut); }
-.is-ok .dp-dot { background:var(--nl-ac); border-color:var(--nl-ac); color:var(--nl-aci); }
-.is-now .dp-dot { background:var(--nl-ac2); border-color:var(--nl-ac2); color:var(--nl-bg); font-size:10px; box-shadow:0 0 0 5px color-mix(in srgb, var(--nl-ac2) 24%, transparent); }
+.is-ok .dp-dot { background:var(--nl-fill); border-color:var(--nl-fill); color:var(--nl-fill-ink); }
+.is-now .dp-dot { background:var(--nl-ac2); border-color:var(--nl-ac2); color:var(--nl-fill-ink); font-size:10px; box-shadow:0 0 0 5px color-mix(in srgb, var(--nl-ac2) 24%, transparent); }
 .dp-txt { min-width:0; }
 .dp-txt b { display:block; font-weight:600; font-size:15.5px; line-height:1.4; }
 .dp-txt small { display:block; color:var(--nl-mut); font-size:13px; line-height:1.5; }
 .is-ok .dp-txt b, .is-later .dp-txt b { color:var(--nl-mut); font-weight:500; }
-.dp-go { font-style:normal; font-weight:700; font-size:13px; padding:7px 14px; border-radius:12px; background:var(--nl-ac); color:var(--nl-aci); white-space:nowrap; }
+.dp-go { font-style:normal; font-weight:700; font-size:13px; padding:7px 14px; border-radius:12px; background:var(--nl-fill); color:var(--nl-fill-ink); white-space:nowrap; }
 :is(.is-missed, .is-open) .dp-go { background:color-mix(in srgb, var(--nl-ink) 8%, transparent); color:var(--nl-ink); }
 @media (prefers-reduced-motion: reduce) { .dp-ring { transition:none; } }
 
@@ -652,7 +658,7 @@ body.dark-mode .web-logo-dark { display:block; }
 .ic-help-list { display:grid; gap:6px; padding:0 8px 8px; }
 .ic-brand { border-radius:12px; background:var(--nl-bg); }
 .ic-brand > summary { padding:8px 12px; }
-.ic-brand > summary i { font-style:normal; font-size:11.5px; font-weight:700; line-height:1.6; padding:1px 9px; border-radius:999px; background:var(--nl-ac); color:var(--nl-aci); }
+.ic-brand > summary i { font-style:normal; font-size:11.5px; font-weight:700; line-height:1.6; padding:1px 9px; border-radius:999px; background:var(--nl-fill); color:var(--nl-fill-ink); }
 .ic-brand p { margin:0; padding:0 12px 12px; color:var(--nl-mut) !important; }
 .ic-brand b { color:var(--nl-ink) !important; font-weight:600; }
 #page-settings .ic-help { flex:1 1 100%; }
