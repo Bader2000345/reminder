@@ -155,11 +155,11 @@ const QuranTabs = (() => {
 })();
 
 // 1. Navigation SPA
-const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'settings', 'cards', 'feedback'];
+const PAGE_ORDER = ['home', 'adhkar', 'quran', 'tasbih', 'my-adhkar', 'make', 'cards', 'video', 'feedback', 'settings'];
 // صفحات قديمة صارت جزء من صفحة القرآن: «القراءة الحرة» = زر «افتح المصحف» (روابط المساعد وإشعار الكهف القديمة تبقى شغّالة)
 const PAGE_ALIAS = { 'free-reading': ['quran', 'mushaf'], wird: ['quran', 'wird'] };
-// صفحات بتنفتح من الإعدادات (الإصدار 20): زر «الإعدادات» بالشريط بيضل مفعّل عليها
-const NAV_PARENT = { feedback: 'settings', dev: 'settings', cards: 'settings' };
+// صفحات جوّا قسم: الرابط تبع القسم بالقائمة بيضل مفعّل عليها (الإصدار 35: «صنع بطاقة» جوّا «اصنع»، والملاحظات إلها رابط لحالها)
+const NAV_PARENT = { dev: 'settings', cards: 'make', video: 'make' };
 function navigateTo(pageId, tab) {
     if (PAGE_ALIAS[pageId]) [pageId, tab] = PAGE_ALIAS[pageId];
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -177,6 +177,9 @@ function navigateTo(pageId, tab) {
         });
         updateNavPill();
         syncWirdAwake();
+        if (pageId === 'make' && typeof MakePage !== 'undefined') setTimeout(MakePage.paint, 60);
+        // الإصدار 36: صنع الفيديو بيتجهّز أول ما تنفتح صفحتو، وبيوقف إذا طلعت منها
+        if (typeof VideoMaker !== 'undefined') { if (pageId === 'video') setTimeout(VideoMaker.show, 60); else if (from === 'video') VideoMaker.hide(); }
         window.scrollTo({ top: 0, behavior: 'auto' });
         if (pageId === 'quran' && tab) QuranTabs.show(tab);
     };
@@ -204,6 +207,50 @@ function navigateTo(pageId, tab) {
 document.querySelectorAll('[data-target]').forEach(btn => {
     btn.addEventListener('click', () => navigateTo(btn.getAttribute('data-target'), btn.dataset.tab));
 });
+
+// القائمة (الإصدار 35، معرض القائمة: ق1 درج من الجنب، ز1 الزر فوق أول السطر) بدل الشريط تحت.
+// الدرج هو نفس .sidebar (فروابطو وتفعيلها بـ navigateTo متل ما هي)، والزر ☰ بيفتحو.
+// بيتسكّر بكبسة رابط، أو عالخلفية، أو Esc، أو زر الرجوع بالجوال (منحط خطوة بالتاريخ وقت يفتح).
+const Menu = (() => {
+    const btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim'), panel = document.getElementById('app-menu');
+    if (!btn || !panel) return { open() {}, close() {} };
+    let pushed = false;
+    const isOpen = () => document.body.classList.contains('menu-open');
+    function open() {
+        if (isOpen()) return;
+        document.body.classList.add('menu-open'); btn.setAttribute('aria-expanded', 'true'); scrim.hidden = false;
+        try { history.pushState({ ...(history.state || {}), menu: 1 }, ''); pushed = true; } catch (e) {}
+        setTimeout(() => (panel.querySelector('.side-link.active') || panel.querySelector('.side-link'))?.focus({ preventScroll: true }), 60);
+    }
+    function close(fromPop = false) {
+        if (!isOpen()) return;
+        document.body.classList.remove('menu-open'); btn.setAttribute('aria-expanded', 'false');
+        setTimeout(() => { if (!isOpen()) scrim.hidden = true; }, 250);
+        if (pushed && !fromPop) { pushed = false; try { history.back(); } catch (e) {} }
+        pushed = false;
+    }
+    btn.addEventListener('click', () => (isOpen() ? close() : open()));
+    scrim.addEventListener('click', () => close());
+    panel.addEventListener('click', e => { if (e.target.closest('[data-target]')) close(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen()) { close(); btn.focus(); } });
+    addEventListener('popstate', () => { if (isOpen()) close(true); });
+    return { open, close };
+})();
+
+// «اصنع» (ص1): معاينة البطاقة من رسمات «صنع بطاقة» نفسها، و«فيديو» بيفتح صنع الفيديو (الإصدار 36، video.js)
+const MakePage = (() => {
+    function paint() {
+        const cv = document.getElementById('mk-card-art');
+        if (!cv || typeof CardArt === 'undefined' || cv.dataset.done) return;
+        try {
+            const x = cv.getContext('2d'), dark = document.body.classList.contains('dark-mode');
+            const st = CardArt.draw(x, cv.width, cv.height, dark ? 'stars' : 'emerald', 7, dark ? 'dark' : 'light');
+            CardArt.text(x, cv.width, cv.height, { kind: 'ayah', text: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', ref: 'الرعد 28' }, { kind: 'square', layout: 'center', style: st });
+            cv.dataset.done = '1';
+        } catch (e) {}
+    }
+    return { paint };
+})();
 
 // الوضع الغامر: يخفي شريط التنقل، والضغط على الشاشة يُظهر الأدوات أو يخفيها، وزر الرجوع في الجوال يغلقه
 const Immersive = (() => {

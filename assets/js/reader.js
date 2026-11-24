@@ -196,8 +196,28 @@ const Reader = (() => {
         Mushaf.paintBanners(stage);
         afterRender(pages);
     }
+    // التلاوة (recite.js، الإصدار 36): الآية يلي عم تنقرا بتضوي
+    let playingKey = null;
+    function paintPlaying() {
+        stage.querySelectorAll('.is-playing').forEach(x => x.classList.remove('is-playing'));
+        if (!playingKey) return;
+        const all = stage.querySelectorAll(`.ayah[data-k="${playingKey}"], .qw[data-k="${playingKey}"]`);
+        all.forEach(x => x.classList.add('is-playing'));
+        // بالنصي الصفحة بتنزل لحالها للآية إذا كانت برّا الشاشة
+        if (st.mode === 'text' && all[0]) {
+            const r = all[0].getBoundingClientRect(), sr = stage.getBoundingClientRect();
+            if (r.top < sr.top + 60 || r.bottom > sr.bottom - 160) all[0].scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+        }
+    }
+    function playing(key, page) {
+        playingKey = key;
+        if (root.hidden) return;
+        if (page && !shownSpread.includes(page)) goTo(page, false);
+        else paintPlaying();
+    }
     function afterRender(pages) {
         paintMarks();
+        paintPlaying();
         if (pendingFlash) { const k = pendingFlash; pendingFlash = null; requestAnimationFrame(() => flash(k)); setTimeout(() => flash(k), 120); }
         const next = pages[pages.length - 1] + 1;
         if (next <= TOTAL) {
@@ -513,6 +533,7 @@ const Reader = (() => {
     $('reader-enter')?.addEventListener('click', enter);
     $('reader-close')?.addEventListener('click', () => close());
     $('rd-goto')?.addEventListener('click', openGoto);
+    $('rd-listen-btn')?.addEventListener('click', () => { if (typeof Recite !== 'undefined') Recite.toggle(); });
     $('rd-layout-btn')?.addEventListener('click', () => { applyTheme(); QSheet.open('تنسيق المصحف', $('rd-layout')); });
     $('rd-marks-btn')?.addEventListener('click', () => QSheet.open('العلامات والملاحظات', QuranMarks.view((p, k) => goTo(p, false, k))));
     $('rd-search-btn')?.addEventListener('click', () => QSheet.open('البحث في القرآن', QuranSearch.view((p, k) => goTo(p, false, k))));
@@ -589,5 +610,7 @@ const Reader = (() => {
         pendingFlash = flashKey;
         save(); updateResume(); enter();
     }
-    return { enter, close, openAt, goTo, setAdvanceHook: fn => { advanceHook = fn; } };
+    // firstKey: أول آية بالصفحة المعروضة (زر 🎧 بيبلّش منها)
+    const firstKey = () => (root.hidden ? null : stage.querySelector('.qw[data-k], .ayah[data-k]')?.dataset.k || null);
+    return { enter, close, openAt, goTo, playing, firstKey, isOpen: () => !root.hidden, setAdvanceHook: fn => { advanceHook = fn; } };
 })();

@@ -5,7 +5,7 @@
  *   AyahStore    العلامات المرجعية، التمييز بلون، ملاحظات التدبّر (في الجهاز)
  *   Tajweed      ألوان التجويد (من alquran.cloud — نسخة quran-tajweed)
  *   Tafsir       التفسير: الميسر، المختصر، ابن كثير (عبر سيرفر مُذكّر /tafsir)
- *   AyahSheet    ما يظهر عند الضغط المطوّل على آية (بدون «استمع»)
+ *   AyahSheet    ما يظهر عند الضغط المطوّل على آية (ومن الإصدار 36 فيه «استمع من هون»)
  *   QuranMarks   قائمة العلامات والملاحظات
  *   QuranSearch  البحث في القرآن
  *   FocusTools   زرّا «ألوان التجويد» و«التفسير» في وضع التركيز
@@ -26,7 +26,8 @@ const ICONS = {
     note: '<path d="M5 4h14v12l-4 4H5z"/><path d="M15 20v-4h4M8 9h8M8 13h5"/>',
     ask: '<path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.5l.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8z"/>',
     image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8 8.5"/>',
-    card: '<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/>'
+    card: '<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 16l3.5-3.5 3 3 2-2 3.5 3.5"/><path d="M14.5 6.8a1.6 1.6 0 1 1-1.4 2.4"/>',
+    listen: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3.5" y="13.5" width="4" height="6.5" rx="1.6"/><rect x="16.5" y="13.5" width="4" height="6.5" rx="1.6"/>'
 };
 const svgIcon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 
@@ -314,6 +315,8 @@ const AyahSheet = (() => {
         const actions = qEl('div', 'ay-actions');
         const add = (icon, label, fn, extraCls = '') => { const b = qEl('button', 'ay-action ' + extraCls); b.type = 'button'; b.innerHTML = svgIcon(icon) + `<span>${qEsc(label)}</span>`; b.addEventListener('click', fn); actions.append(b); return b; };
         add('tafsir', 'التفسير', () => QSheet.push('التفسير', Tafsir.view(ayah)), 'is-primary');
+        // الإصدار 36: التلاوة من هالآية (recite.js)
+        if (typeof Recite !== 'undefined') add('listen', 'استمع من هون', () => { QSheet.close(); Recite.start(ayah.s, ayah.a); });
         add('copy', 'نسخ', async () => {
             try { await navigator.clipboard.writeText(`﴿${ayah.text}﴾ [${surahName(ayah.s)}: ${ayah.a}]`); Toast.show('تم نسخ الآية'); } catch (e) {}
         });
@@ -323,8 +326,6 @@ const AyahSheet = (() => {
             try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { return; }
             try { await navigator.clipboard.writeText(text); Toast.show('تم نسخ الآية للمشاركة'); } catch (e) {}
         });
-        // صورة الآية بإطار المصحف للمشاركة (share.js)
-        if (typeof Share !== 'undefined') add('image', 'صورة', () => { QSheet.close(); setTimeout(() => Share.openAyah(ayah), 200); });
         // صنع بطاقة (cards.js): خلفية للجهاز أو بطاقة للمشاركة بالخلفيات المرسومة
         if (typeof Cards !== 'undefined') add('card', 'صنع بطاقة', () => { QSheet.close(); setTimeout(() => Cards.open({ kind: 'ayah', text: ayah.text, ref: `[${surahName(ayah.s)}: ${qAr(ayah.a)}]` }), 200); });
         const bm = add('bookmark', AyahStore.isBookmarked(k) ? 'إزالة العلامة' : 'علامة مرجعية', () => {

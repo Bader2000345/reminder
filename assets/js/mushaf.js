@@ -290,7 +290,17 @@ const Mushaf = (() => {
 
     // تحميل مسبق للصفحة الجاية (بيانات + خط) بهدوء
     const prefetch = n => { if (n >= 1 && n <= 604) Promise.all([pageData(n), pageFont(n)]).catch(() => {}); };
+    // الإصدار 36 «مصحف المدينة بدون نت»: بنحفظ بيانات الصفحة وخطّها بالجهاز بلا ما نحمّل الخط بالصفحة
+    // (604 خط محمّلين سوا بيثقّلوا المتصفح)
+    async function store(n) {
+        await pageData(n);
+        if (await fromCache('qcf-font/' + n)) return true;
+        for (const u of FONT_URLS(n)) {
+            try { const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status); await toCache('qcf-font/' + n, r); return true; } catch (e) {}
+        }
+        throw new Error('font');
+    }
     // هل الصفحة محفوظة بالجهاز؟ (للعمل بلا نت)
     const isStored = async n => !!(await fromCache('qcf/' + n)) && !!(await fromCache('qcf-font/' + n));
-    return { page, fit, prefetch, isStored, pageData, pageTop, pageFoot, surahBanner, paintBanners, tickClocks, quarterLabel, namesFont };
+    return { page, fit, prefetch, store, isStored, pageData, pageTop, pageFoot, surahBanner, paintBanners, tickClocks, quarterLabel, namesFont };
 })();

@@ -215,7 +215,6 @@ const Shortcuts = (() => {
             'tasbih-mode': () => { navigateTo('tasbih'); setTimeout(() => Tasbih.openMode(), 350); },
             morning: () => { navigateTo('adhkar'); setTimeout(() => AdhkarViewer.open('morning'), 300); },
             evening: () => { navigateTo('adhkar'); setTimeout(() => AdhkarViewer.open('evening'), 300); },
-            screen: () => MdkScreen.open(),
             inbox: () => navigateTo('feedback') // إشعار «رسالة جديدة» على جهاز المطوّر
         }[open];
         if (!act) return;

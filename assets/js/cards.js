@@ -13,7 +13,10 @@ const Cards = (() => {
     const ar = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const KEY_STYLE = 'mudhakkir-card-style', KEY_SIZE = 'mudhakkir-card-size', KEY_MODE = 'mudhakkir-card-mode';
-    const SIZES = ['device', 'story', 'square'];
+    // الإصدار 35 (معرض القائمة: ش1): «ريلز» 1080×1920 بمنطقة بعيدة عن أزرار إنستغرام، وتحت الآية شارة مُذكّر (الأيقونة والاسم)
+    const SIZES = ['device', 'story', 'reels', 'square'];
+    const BADGE = new Image(); BADGE.decoding = 'async'; BADGE.src = 'assets/img/icon-192.png';
+    BADGE.onload = () => { const cm = document.getElementById('card-maker'); if (size === 'reels' && cm && !cm.hidden) paintPreview(); };
     // mode: فاتح أو داكن (ل1)، أول مرة حسب مظهر التطبيق وبعدين حسب آخر اختيار
     // photo: صورة المستخدم المختارة { id, img, fit, zoom, ox, oy } أو null للخلفيات المرسومة
     let item = null, style = 'forest', size = 'device', mode = '', bare = false, seed = 1, busy = false, thumbsMode = '', tab = 'mine';
@@ -40,19 +43,21 @@ const Cards = (() => {
         const k = Math.min(1, 4096 / Math.max(W, H));
         return { W: Math.round(W * k), H: Math.round(H * k), kind: w > h ? 'desktop' : 'phone' };
     }
-    const spec = () => (size === 'story' ? { W: 1080, H: 1920, kind: 'story' } : size === 'square' ? { W: 1080, H: 1080, kind: 'square' } : deviceSpec());
+    const spec = () => (size === 'story' ? { W: 1080, H: 1920, kind: 'story' } : size === 'reels' ? { W: 1080, H: 1920, kind: 'reels' } : size === 'square' ? { W: 1080, H: 1080, kind: 'square' } : deviceSpec());
 
     function render(canvas, W, H, kind, sign) {
         canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
+        // الريلز: الشارة دايمًا (بالمعاينة كمان، حتى يشوف كيف رح تطلع)، والخلفية بلا كتابة بلا شارة
+        const badge = kind === 'reels' ? BADGE : null;
         // صورة المستخدم (ك1): التطبيق بيختار مكان الكتابة ولونها حسب الصورة نفسها
         if (photo) {
             const g = CardArt.photo(ctx, W, H, photo.img, photo);
-            if (!bare && item) { const st = CardArt.photoStyle(canvas, kind); CardArt.text(ctx, W, H, item, { kind, layout: st.layout, style: st, sign }); }
+            if (!bare && item) { const st = CardArt.photoStyle(canvas, kind); CardArt.text(ctx, W, H, item, { kind, layout: kind === 'reels' ? 'center' : st.layout, style: st, sign: sign && !badge, badge }); }
             return g;
         }
         const st = CardArt.draw(ctx, W, H, style, seed, mode);
-        if (!bare && item) CardArt.text(ctx, W, H, item, { kind, layout: 'auto', style: st, sign });
+        if (!bare && item) CardArt.text(ctx, W, H, item, { kind, layout: kind === 'reels' ? 'center' : 'auto', style: st, sign: sign && !badge, badge });
         return null;
     }
 

@@ -98,10 +98,11 @@ const Assistant = (() => {
         situations: () => { navigateTo('adhkar'); later(() => AdhkarViewer.openSituations()); },
         tasbih: () => navigateTo('tasbih'),
         'tasbih-mode': () => later(() => Tasbih.openMode(), 350), // بعد ما تتسكّر المحادثة (حتى ما يتداخل زر الرجوع)
-        screen: () => later(() => MdkScreen.open(), 350),
         widgets: () => { navigateTo('settings'); later(() => Widgets.open(), 350); },
         feedback: () => navigateTo('feedback'),
         cards: () => navigateTo('cards'),
+        video: () => navigateTo('video'), // الإصدار 36
+        quran: () => { navigateTo('quran'); Reader.enter(); },
         home: () => navigateTo('home'),
         settings: () => navigateTo('settings'),
         name: () => { navigateTo('settings'); later(() => { $('name-setting')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); $('name-input')?.focus({ preventScroll: true }); }, 350); }

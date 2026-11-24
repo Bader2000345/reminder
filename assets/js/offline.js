@@ -150,6 +150,59 @@ const QuranOffline = (() => {
         const btn = $('q-offline'); if (!btn) return;
         btn.addEventListener('click', start);
         idle();
+        MadinaOffline.init();
+    }
+    return { init, start, isDone };
+})();
+
+// الإصدار 36: «مصحف المدينة بدون نت»: كل صفحة إلها خط (حوالي 80 كيلو) وبيانات صغيرة، فالمجموع حوالي 50 ميغا.
+// نفس مخزن المصحف (mudhakkir-quran-v1، sw.js ما بيمسحو)، والصفحات يلي انفتحت قبل ما بتنزل مرة تانية.
+const MadinaOffline = (() => {
+    const $ = id => document.getElementById(id);
+    const FLAG = 'mudhakkir-madina-offline';
+    const TOTAL = 604, WORKERS = 4;
+    const AR = n => Number(n).toLocaleString('ar-EG-u-nu-latn');
+    let running = false, stopAsked = false;
+    const isDone = () => { try { return localStorage.getItem(FLAG) === String(TOTAL); } catch (e) { return false; } };
+    function paint(text, state = '') {
+        const sub = $('q-madina-sub'), btn = $('q-madina-offline');
+        if (sub) sub.textContent = text;
+        if (btn) { btn.dataset.state = state; btn.setAttribute('aria-busy', String(state === 'busy')); }
+    }
+    const idle = () => paint(isDone() ? 'محفوظ على جهازك ✓ مصحف المدينة بيشتغل بلا نت' : 'نزّل صفحات مصحف المدينة كلها (حوالي 50 ميغا)', isDone() ? 'done' : '');
+    async function start() {
+        if (running) { stopAsked = true; return; }
+        if (isDone()) { Toast.show('مصحف المدينة محفوظ على جهازك ✓'); return; }
+        if (!navigator.onLine) { Toast.show('بدّك نت مرة وحدة لتنزيل مصحف المدينة'); return; }
+        if (typeof Mushaf === 'undefined' || !Mushaf.store) return;
+        running = true; stopAsked = false;
+        paint('جارٍ التجهيز…', 'busy');
+        let next = 1, done = 0, failed = 0;
+        const worker = async () => {
+            while (next <= TOTAL && !stopAsked) {
+                const p = next++;
+                try { await Mushaf.store(p); } catch (e) { failed++; }
+                done++;
+                if (done % 4 === 0 || done === TOTAL) paint(`جارٍ التنزيل… ${AR(done)} من ${AR(TOTAL)} صفحة (اضغط لتوقّف)`, 'busy');
+            }
+        };
+        await Promise.all(Array.from({ length: WORKERS }, worker));
+        running = false;
+        if (stopAsked) { paint(`وقّفنا عند ${AR(done)} من ${AR(TOTAL)}، اضغط لتكمّل`, ''); return; }
+        if (failed) {
+            paint(`انحفظ ${AR(TOTAL - failed)} من ${AR(TOTAL)}، اضغط لتكمّل الباقي`, '');
+            Toast.show('ما كمل التنزيل، تأكد من النت واضغط مرة تانية');
+            return;
+        }
+        try { localStorage.setItem(FLAG, String(TOTAL)); } catch (e) {}
+        try { await navigator.storage?.persist?.(); } catch (e) {}
+        idle();
+        Toast.show('انحفظ مصحف المدينة كامل ✓ بيشتغل بلا نت');
+    }
+    function init() {
+        const btn = $('q-madina-offline'); if (!btn) return;
+        btn.addEventListener('click', start);
+        idle();
     }
     return { init, start, isDone };
 })();

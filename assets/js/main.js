@@ -41,11 +41,12 @@ DayPath.init();
 WirdIntro.init();
 WirdReminder.initRow();
 QuranOffline.init();
+Recite.init();
 Atmosphere.init();
 FX.init();
 Tasbih.init();
 Extras.init();
-MdkScreen.init();
+
 Widgets.init();
 Feedback.init();
 Cards.init();

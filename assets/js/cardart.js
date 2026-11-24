@@ -541,6 +541,8 @@ const CardArt = (() => {
   function zone(kind, w, h) {
     if (kind === 'phone') return { x: w * .1, y: h * .33, w: w * .8, h: h * .45 };
     if (kind === 'story') return { x: w * .1, y: h * .18, w: w * .8, h: h * .6 };
+    // ريلز (الإصدار 35): فوق اسم الحساب، تحت الوصف والصوت، وعاليمين أزرار الإعجاب والتعليق، فالكتابة بالنص بهامش 16٪ من الجهتين
+    if (kind === 'reels') return { x: w * .16, y: h * .17, w: w * .68, h: h * .42 };
     if (kind === 'square') return { x: w * .12, y: h * .14, w: w * .76, h: h * .72 };
     return { x: w * .24, y: h * .2, w: w * .52, h: h * .6 }; // لابتوب
   }
@@ -576,6 +578,19 @@ const CardArt = (() => {
     for (const d of [-1, 1]) { ctx.beginPath(); ctx.arc(cx + d * (half + 4 * u), dy, 1.6 * u, 0, TAU); ctx.fill(); }
     if (item.ref) { ctx.font = `500 ${refSize}px "Readex Pro", sans-serif`; ctx.fillText(item.ref, cx, dy + refSize * 2); }
     if (o.sign) { ctx.globalAlpha = .75; ctx.font = `600 ${13 * u}px "Readex Pro", sans-serif`; ctx.fillStyle = st.light ? '#4b4038' : '#f3ecdc'; ctx.fillText('مُذكّر', w / 2, h - (o.kind === 'story' ? h * .1 : h * .035)); }
+    // شارة مُذكّر (ريلز، ش1): أيقونة التطبيق واسمو بكبسولة تحت الآية، واضحة ومعروفة وبعيدة عن أزرار إنستغرام
+    if (o.badge && o.badge.complete && o.badge.naturalWidth) {
+      const bs = 34 * u, pad = 10 * u, gap = 10 * u;
+      ctx.font = `700 ${17 * u}px "Noto Kufi Arabic", "Readex Pro", sans-serif`;
+      const tw = ctx.measureText('مُذكّر').width, bw = pad + bs + gap + tw + pad * 1.6, bh = bs + pad * 1.2;
+      const by = Math.min(dy + (item.ref ? refSize * 3.4 : refSize * 2), z.y + z.h + 40 * u), bx = cx - bw / 2;
+      ctx.globalAlpha = 1; ctx.fillStyle = st.light ? 'rgba(255,255,255,.78)' : 'rgba(10,20,16,.42)';
+      ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, bh / 2); ctx.fill();
+      const ix = bx + bw - pad - bs, iy = by + (bh - bs) / 2;
+      ctx.save(); ctx.beginPath(); ctx.roundRect(ix, iy, bs, bs, bs * .24); ctx.clip(); ctx.drawImage(o.badge, ix, iy, bs, bs); ctx.restore();
+      ctx.textAlign = 'right'; ctx.direction = 'rtl'; ctx.textBaseline = 'middle'; ctx.fillStyle = st.light ? '#1f2d27' : '#ffffff';
+      ctx.fillText('مُذكّر', ix - gap, by + bh / 2 + 1 * u);
+    }
     ctx.restore();
   }
   // ---------- صورة المستخدم («أضف خلفية»، الإصدار 24، معرض 12: ق3 ك1) ----------

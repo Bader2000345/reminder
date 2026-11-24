@@ -186,13 +186,16 @@ const Feedback = (() => {
         const fresh = hasNew();
         const pill = $('fb-setting-new');
         if (pill) pill.hidden = !fresh;
-        const link = document.querySelector('.side-link[data-target="settings"]');
+        // الإصدار 35: «ملاحظات وشكاوي» إلها رابط بالقائمة، والنقطة كمان على زر القائمة ☰ حتى تنشاف والقائمة مسكّرة
+        const link = document.querySelector('.side-link[data-target="feedback"]');
         if (link) {
             let dot = link.querySelector('.nav-dot');
             if (!dot) { dot = document.createElement('i'); dot.className = 'nav-dot'; dot.setAttribute('aria-hidden', 'true'); link.append(dot); }
             dot.hidden = !fresh;
-            if (fresh) link.setAttribute('aria-label', 'الإعدادات · وصلك رد جديد'); else link.removeAttribute('aria-label');
+            if (fresh) link.setAttribute('aria-label', 'ملاحظات وشكاوي · وصلك رد جديد'); else link.removeAttribute('aria-label');
         }
+        const mb = $('menu-btn');
+        if (mb) { const d = mb.querySelector('.nav-dot'); if (d) d.hidden = !fresh; mb.setAttribute('aria-label', fresh ? 'القائمة · وصلك رد جديد' : 'القائمة'); }
         renderHome();
     }
     function onHomeClick(e) {
